@@ -1,5 +1,7 @@
+import { generateID } from './libs/function.js';
 import { ActivateMessage, InitMessage, InitResponse } from './types/Messages';
 import { Settings } from './types/Settings';
+
 
 // set all the properties of the window object
 // to avoid typescript errors
@@ -21,6 +23,7 @@ declare global {
 		links: any[];
 		box: HTMLElement & { x: number, y: number, x1: number, x2: number, y1: number, y2: number };
 		count_label: HTMLElement;
+		linkclump: HTMLElement;
 		overlay: HTMLElement | null;
 		scroll_bug_ignore: boolean;
 		os: 0 | 1;
@@ -39,6 +42,8 @@ const LEFT_BUTTON = 0;
 const EXCLUDE_LINKS = 0;
 const INCLUDE_LINKS = 1;
 
+const CUSTOM_TAG_LINKCLUMP = "linkclump" + "-" + generateID(8, { number: false, alphabet: { uppercase: false, lowercase: true }, symbol: false });
+
 window.settings = {};
 window.setting = -1;
 window.key_pressed = 0;
@@ -50,6 +55,8 @@ window.mouse_x = -1;
 window.mouse_y = -1;
 window.scroll_id = 0;
 window.links = [];
+// @ts-expect-error -- all will be right at the end of the function
+window.linkclump = undefined;
 // @ts-expect-error -- all will be right at the end of the function
 window.box = undefined;
 // @ts-expect-error -- all will be right at the end of the function
@@ -87,11 +94,13 @@ chrome.runtime.sendMessage(
 
 			if (allowed) {
 				// setting up the box and count label
-				window.box = create_box();
-				document.body.appendChild(window.box);
-
+				window.linkclump   = createCustomElement(CUSTOM_TAG_LINKCLUMP);
+				window.box         = create_box();
 				window.count_label = create_count_label();
-				document.body.appendChild(window.count_label);
+
+				(window.linkclump).appendChild(window.box);
+				(window.linkclump).appendChild(window.count_label);
+				(document.body).appendChild(window.linkclump);
 
 				// add event listeners
 				window.addEventListener("mousedown", mousedown, true);
@@ -117,6 +126,22 @@ chrome.runtime.onMessage.addListener(function (request) {
 		document.body.removeChild(textarea);
 	}
 });
+
+/**
+ * 
+ * @param {string} tagName
+ * @param {ElementCreationOptions} options - { is: "Custom Element Tag Name" }
+ * @returns {HTMLElement}
+ */
+function createCustomElement(tagName: string, options?: ElementCreationOptions) {
+	if (!tagName || typeof tagName !== "string") {
+		throw (`Error, Invalid value passed to createCustomElement(tagName). tagName >> ${tagName}`);
+	}
+
+	const custom = document.createElement(tagName, options);
+
+	return custom;
+}
 
 function create_box() {
 	// @ts-expect-error -- all will be right at the end of the function
@@ -193,7 +218,7 @@ function clean_up() {
 	// remove the link boxes
 	for (var i = 0; i < window.links.length; i++) {
 		if (window.links[i].box !== null) {
-			document.body.removeChild(window.links[i].box);
+			(window.linkclump).removeChild(window.links[i].box);
 			window.links[i].box = null;
 		}
 	}
@@ -563,7 +588,7 @@ function detect(x: number, y: number, open: boolean) {
 				link_box.style.left = window.links[i].x1 + "px";
 				link_box.style.zIndex = (parseFloat(Z_INDEX) - 1).toString();
 
-				document.body.appendChild(link_box);
+				(window.linkclump).appendChild(link_box);
 				window.links[i].box = link_box;
 			} else {
 				window.links[i].box.style.visibility = "visible";
