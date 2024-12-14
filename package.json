@@ -1,16 +1,16 @@
 {
-  "name": "linkclump-ng",
+  "name": "linkclump-plus",
   "description": "Chrome extension",
   "version": "2.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wvanderp/linkclump.git"
+    "url": "git+https://github.com/from-es/linkclump-plus.git"
   },
   "bugs": {
-    "url": "https://github.com/wvanderp/linkclump/issues"
+    "url": "https://github.com/from-es/linkclump-plus/issues"
   },
-  "homepage": "https://github.com/wvanderp/linkclump#readme",
+  "homepage": "https://github.com/from-es/linkclump-plus",
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
