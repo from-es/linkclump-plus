@@ -1,17 +1,40 @@
-# Linkclump-ng
+# Linkclump Plus
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9e38a24d7f524c6ca73c07e8948d58a7)](https://www.codacy.com/manual/benblack86/linkclump?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=benblack86/linkclump&amp;utm_campaign=Badge_Grade)
+## About
 
-After manifest v3, Linkclump is no longer available in the Chrome Web Store. This is a fork of the original Linkclump extension that has been updated to manifest v3.
+The [Linkclump](https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj "https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj") are no longer available when Google Chrome browser support for Manifest v2 ends. This [Linkclump Plus](https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm "https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm") is a fork of [linkclump-ng](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump") with some fixes and additional features.
 
-Thanks to [benblack86](https://github.com/benblack86) for creating and maintaining this amazing extension.
+[linkclump-ng](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump") is a fork of the original [Linkclump](https://github.com/benblack86/linkclump "https://github.com/benblack86/linkclump") extension that has been updated to manifest v3.
+
+Thanks to [benblack86](https://github.com/benblack86 "https://github.com/benblack86") for creating this amazing extension and [wvanderp](https://github.com/wvanderp "https://github.com/wvanderp") for updating it to manifest v3.
+
+## Support
+
+Support is not provided as this is a free extension.
 
 ## Installation
 
-Install it by visiting the [chrome web store](https://chrome.google.com/webstore/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj).
+Install it by visiting the [Linkclump Plus - Chrome Web Store](https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm "Linkclump Plus - Chrome Web Store").
 
 ## Build
 
-run `npm install` to install dependencies.
+Assuming that [Node.js](https://nodejs.org/ "https://nodejs.org/") is installed.
 
-run `npm run build` to build the extension.
+1. clone this repository locally or download the file.
+2. place the file in any local directory.
+3. move it to the directory where ```package.json``` is located.
+3. run ```npm install``` to install dependencies.
+4. build the extension.
+	- ```npm run build:dev``` build the extension in **Development** mode.
+	- ```npm run build:prod``` build the extension in **Production** mode.
+
+## Related Link
+
+- Linkclump
+	- [Linkclump - Chrome Web Store](https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj "https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfef")
+	- [benblack86/linkclump - Github](https://github.com/benblack86/linkclump "https://github.com/benblack86/linkclump")
+- Linkclump-ng
+	- [wvanderp/linkclump - Github](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump")
+- Linkclump Plus
+	- [Linkclump Plus - Chrome Web Store](https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm "Linkclump Plus - Chrome Web Store")
+	- [from-es/linkclump-plus - Github](https://github.com/from-es/linkclump-plus "https://github.com/from-es/linkclump-plus")
