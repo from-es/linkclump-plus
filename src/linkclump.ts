@@ -675,10 +675,16 @@ function allow_selection() {
 				window.box.style.border = "2px dotted " + (setting?.color ?? "red");
 
 				// counter
-				if ((setting?.color && typeof setting.color === "string") && (setting?.options?.samebgcolorasbox && typeof setting?.options.samebgcolorasbox === "boolean" && setting.options.samebgcolorasbox)) {
-					window.count_label.style.color = "white";
-					window.count_label.style.borderColor = "white";
-					window.count_label.style.backgroundColor = setting.color.toString();
+				if ((setting?.color && typeof setting.color === "string") && (setting?.options && (setting.options).hasOwnProperty("samebgcolorasbox") && typeof setting.options.samebgcolorasbox === "boolean")) {
+					if (setting.options.samebgcolorasbox === true) {
+						window.count_label.style.color = "white";
+						window.count_label.style.borderColor = "white";
+						window.count_label.style.backgroundColor = setting.color.toString();
+					} else {
+						window.count_label.style.color = "black";
+						window.count_label.style.borderColor = "transparent";
+						window.count_label.style.backgroundColor = "transparent";
+					}
 				}
 				if (setting?.options?.fontsizeofcounter && (typeof setting.options.fontsizeofcounter === "number")) {
 					const num = setting.options.fontsizeofcounter;
