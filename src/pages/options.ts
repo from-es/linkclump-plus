@@ -1,3 +1,5 @@
+import { generateID, eventImportConfig, eventExportConfig } from '../libs/function.js';
+
 import "../libs/jquery-1.8.2.min.js";
 import "../libs/colorpicker/jquery.colorpicker.js";
 import "../libs/colorpicker/jquery.colorpicker.css";
@@ -48,7 +50,7 @@ const config: Config = {
 			"name": "counter font size",
 			"type": "number",
 			"data": [10, 8, 32], // [ default, min , max ]
-			"extra": "font size of the counter (default:10, range: 8-32)"
+			"extra": "font size of the counter (default: 10, range: 8-32)"
 		},
 		"samebgcolorasbox": {
 			"name": "bgcolor of the counter the same as the box",
@@ -132,6 +134,10 @@ function tour1() {
 function tour2() {
 	$("#page1").fadeOut(0);
 	$("#page2").fadeIn();
+}
+
+function tour3() {
+	chrome.tabs.create({ url: "https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm/reviews", active: true });
 }
 
 /**
@@ -246,11 +252,12 @@ function delete_action(id: string, div: JQuery) {
 function setup_action(param: ActionParam, id: string): JQuery {
 	var setting = $("<div class='setting' id='action_" + id + "'>");
 
-	setting.append("<h3>" + config.actions[param.action].name + "</h3>");
-	setting.append("Activate by " + config.triggers[param.mouse].name + " mouse button");
-	if (param.key > 0) {
-		setting.append(" and \"" + keys[param.key] + "\" key ");
-	}
+	const h3 = "<h3>" + config.actions[param.action].name + "</h3>";
+	const activateKey   = (param.key > 0) ? "\"<b>" + keys[param.key] + "</b>\" key and " : "";
+	const activateMouse = "\"<b>" + config.triggers[param.mouse].name + "</b>\" mouse button";
+	const activate      = "<p>Activate by " + activateKey + activateMouse + ".</p>";
+	setting.append(h3);
+	setting.append(activate);
 
 	var list = $("<ul>");
 	for (var j in param.options) {
@@ -271,9 +278,11 @@ function setup_action(param: ActionParam, id: string): JQuery {
 				text += param.options[j];
 				break;
 			case "checkbox":
+				/*
 				if (!param.options[j]) {
 					continue;
 				}
+				*/
 				text += param.options[j];
 				break;
 			case "selection-textbox":
@@ -295,18 +304,18 @@ function setup_action(param: ActionParam, id: string): JQuery {
 
 		list.append("<li>" + text + "</li>");
 	}
-	list.append("<li>selection box color: <div style='background-color: " + param.color + "' class='color'></div></li>");
+	list.append("<li>selection box color: <span style='background-color: " + param.color + "' class='color'></span></li>");
 
 	setting.append(list);
 
-	var edit = $("<a href='#' class='button edit'>Edit</a>").click({ 'i': id },
+	var edit = $("<button class='button edit'>Edit</button>").click({ 'i': id },
 		function (event) {
 			load_action(event.data.i, $(this).parent().parent());
 			return false;
 		}
 	);
 
-	var del = $("<a href='#' class='button delete'>Delete</a>").click({ "i": id },
+	var del = $("<button class='button delete'>Delete</button>").click({ "i": id },
 		function (event) {
 			delete_action(event.data.i, $(this).parent());
 			return false;
@@ -417,7 +426,7 @@ function displayOptions(action: string) {
 	for (var i in config.actions[action].options) {
 		var op = config.options[config.actions[action].options[i]];
 		var title = $("<label>" + op.name + "</label>");
-		var p = $("<p />");
+		var p = $("<p class=\"clearfix\"/>");
 		p.append(title);
 
 		switch (op.type) {
@@ -451,12 +460,13 @@ function displayOptions(action: string) {
 					selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
 				}
 				p.append(selector);
-				p.append('</p><label> </label><p>');
+				p.append('</p><label></label><p>');
 				p.append('<input type="text" name="' + op.name + '" id="form_option_text_' + config.actions[action].options[i] + '"/>');
 				break;
 		}
 
-		p.mouseover({ "extra": op.extra }, function (event) {
+		const label = p.find("label").eq(0);
+		label.mouseover({ "extra": op.extra }, function (event) {
 			var extra = $("#form_extra");
 			extra.html(event.data.extra);
 			extra.css("top", $(this).position().top);
@@ -603,6 +613,42 @@ function save_block() {
 	}
 }
 
+
+
+async function import_setting() {
+	const result = await eventImportConfig();
+
+	// ToDo : 値の検証を強化@2024/12/17
+	const valid = result && (typeof result === "object") && result?.actions;
+
+	if (valid) {
+		params = result;
+
+		const obj = params?.actions;
+		if (obj) {
+			$("#settings").empty();
+
+			for (const key in obj) {
+				$("#settings").append(setup_action(obj[key], key));
+			}
+
+			setup_text(keys);
+
+			save_params();
+
+			// debug
+			console.log("Debug, Import setting. params >>", { params });
+		} else {}
+	} else {
+		console.error("Error, can't import setting. result >>", result);
+	}
+}
+function export_setting() {
+	eventExportConfig(params);
+}
+
+
+
 $(function() {
 	var isFirstTime = window.location.href.indexOf("init=true") > -1;
 
@@ -611,7 +657,7 @@ $(function() {
 		return
 	}
 
-
+	document.getElementById("guide3").addEventListener("click", tour3);
 	document.getElementById("guide2").addEventListener("click", tour2);
 	document.getElementById("guide1").addEventListener("click", tour1);
 	document.getElementById("add").addEventListener("click", load_new_action);
@@ -620,12 +666,16 @@ $(function() {
 	document.getElementById("cancel").addEventListener("click", close_form);
 	document.getElementById("save").addEventListener("click", save_action);
 
+	// ToDo : 要、動作検証@2024/12/17
+	document.getElementById("import-setting").addEventListener("click", import_setting);
+	document.getElementById("export-setting").addEventListener("click", export_setting);
+
 	setup_form();
 
 	chrome.runtime.sendMessage({
 		message: "init",
 		debug: true
-	}, 
+	},
 	function (response) {
 		params = response;
 
