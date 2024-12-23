@@ -2,7 +2,7 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
+const config = {
   // Define entry points for each script in your extension
   entry: {
     background: './src/background.ts',
@@ -63,7 +63,20 @@ module.exports = {
         filename: 'pages/test_area.html',
         chunks: ['linkclump'],
     }),
-  ],
-  mode: 'production', // Use 'development' for non-minified output
-  devtool: 'source-map', // Generate source maps for debugging
+  ]
+};
+
+module.exports = (env, argv) => {
+  // Production
+  if (argv.mode === 'production') {
+    config.mode = 'production';
+  }
+
+  // Development
+  if (argv.mode === 'development') {
+    config.mode = 'development';    // Use 'development' for non-minified output
+    config.devtool = 'source-map';  // Generate source maps for debugging
+  }
+
+  return config;
 };
