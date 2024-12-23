@@ -35,7 +35,7 @@ declare global {
 const END_CODE = "End";
 const HOME_CODE = "Home";
 const Z_INDEX = "2147483647";
-const COUNTER_FONT_SIZE = 10;
+const COUNTER_FONT_SIZE = 16;
 const OS_WIN = 1;
 const OS_LINUX = 0;
 const LEFT_BUTTON = 0;

@@ -49,8 +49,8 @@ const config: Config = {
 		"fontsizeofcounter": {
 			"name": "counter font size",
 			"type": "number",
-			"data": [10, 8, 32], // [ default, min , max ]
-			"extra": "font size of the counter (default: 10, range: 8-32)"
+			"data": [16, 8, 64], // [ default, min , max ]
+			"extra": "font size of the counter (default: 16, range: 8-64)"
 		},
 		"samebgcolorasbox": {
 			"name": "bgcolor of the counter the same as the box",
