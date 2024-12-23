@@ -1,0 +1,24 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #A7977F;
+    background-image: url('background.png');
+    background-repeat: no-repeat;
+    background-position: 10% 0%;
+}
+
+div.box {
+    position: relative;
+    width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #FFFFFF;
+    border: 2px dashed #000000;
+    padding: 10px;
+    margin-top: 50px;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
