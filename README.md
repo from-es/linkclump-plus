@@ -4,7 +4,7 @@
 
 The [Linkclump](https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj "https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj") are no longer available when Google Chrome browser support for Manifest v2 ends. This [Linkclump Plus](https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm "https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm") is a fork of [linkclump-ng](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump") with some fixes and additional features.
 
-[linkclump-ng](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump") is a fork of the original [Linkclump](https://github.com/benblack86/linkclump "https://github.com/benblack86/linkclump") extension that has been updated to manifest v3.
+[linkclump-ng](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump") is a fork from [Linkclump](https://github.com/benblack86/linkclump "https://github.com/benblack86/linkclump") and has been updated to Manifest v3.
 
 Thanks to [benblack86](https://github.com/benblack86 "https://github.com/benblack86") for creating this amazing extension and [wvanderp](https://github.com/wvanderp "https://github.com/wvanderp") for updating it to manifest v3.
 
