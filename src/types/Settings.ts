@@ -17,6 +17,7 @@ export interface Action {
         reverse: boolean;
         end: boolean;
         fontsizeofcounter: number;
+        fontweightofcounter: number;
         samebgcolorasbox: boolean;
     }
 }
