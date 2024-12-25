@@ -40,10 +40,10 @@ const config: Config = {
 	"triggers":
 		[{ "name": "Left" }, { "name": "Middle" }, { "name": "Right" }],
 	"actions": {
-		"win": { "name": "Opened in a New Window", "options": ["fontsizeofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus"] },
-		"tabs": { "name": "Opened as New Tabs", "options": ["fontsizeofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end"] },
-		"bm": { "name": "Bookmarked", "options": ["fontsizeofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse"] },
-		"copy": { "name": "Copied to clipboard", "options": ["fontsizeofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse"] }
+		"win": { "name": "Opened in a New Window", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus"] },
+		"tabs": { "name": "Opened as New Tabs", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end"] },
+		"bm": { "name": "Bookmarked", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse"] },
+		"copy": { "name": "Copied to clipboard", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse"] }
 	},
 	"options": {
 		"fontsizeofcounter": {
@@ -51,6 +51,12 @@ const config: Config = {
 			"type": "number",
 			"data": [16, 8, 64], // [ default, min , max ]
 			"extra": "font size of the counter (default: 16, range: 8-64)"
+		},
+		"fontweightofcounter": {
+			"name": "counter font weight",
+			"type": "number",
+			"data": [400, 1, 1000], // [ default, min , max ]
+			"extra": "font weight of the counter (default: 400, range: 1-1000, thin: 100, normal: 400, bold: 700)"
 		},
 		"samebgcolorasbox": {
 			"name": "bgcolor of the counter the same as the box",
@@ -560,20 +566,20 @@ function save_action(event: JQuery.Event) {
 				}
 
 				param.options[name] = value;
-			} else if (name == "fontsizeofcounter") {
-				let fontsize= parseFloat($("#form_option_" + name).val());
+			} else if (name === "fontsizeofcounter" || name === "fontweightofcounter") {
+				let value = parseFloat($("#form_option_" + name).val());
 				const def: number = (config.options[name])["data"][0];
 				const min: number = (config.options[name])["data"][1];
 				const max: number = (config.options[name])["data"][2];
 
-				if (!fontsize || typeof fontsize !== "number") {
-					fontsize = def;
+				if (!value || typeof value !== "number") {
+					value = def;
 				}
-				if (fontsize < min || max < fontsize) {
-					fontsize = def;
+				if (value < min || max < value) {
+					value = def;
 				}
 
-				param.options[name] = fontsize;
+				param.options[name] = value;
 			} else {
 				param.options[name] = $("#form_option_" + name).val();
 			}

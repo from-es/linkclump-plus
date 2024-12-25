@@ -36,6 +36,7 @@ const END_CODE = "End";
 const HOME_CODE = "Home";
 const Z_INDEX = "2147483647";
 const COUNTER_FONT_SIZE = 16;
+const COUNTER_FONT_WEIGHT = 400;
 const OS_WIN = 1;
 const OS_LINUX = 0;
 const LEFT_BUTTON = 0;
@@ -179,7 +180,7 @@ function create_count_label() {
 	window.count_label.style.lineHeight = `${base * 1}px`;
 	window.count_label.style.fontSize = `${base * 1}px`;
 	window.count_label.style.font = "Arial, sans-serif";
-	window.count_label.style.fontWeight = "bold";
+	window.count_label.style.fontWeight = COUNTER_FONT_WEIGHT.toString();
 
 	window.count_label.style.color = "black";
 	window.count_label.style.backgroundColor = "transparent";
@@ -699,6 +700,14 @@ function allow_selection() {
 				} else {
 					// debug
 					console.error("Error, setting.options.fontsizeofcounter is not of type number. value >>", setting.options.fontsizeofcounter);
+				}
+				if (setting?.options?.fontweightofcounter && (typeof setting.options.fontweightofcounter === "number") && (1 <= setting.options.fontweightofcounter && setting.options.fontweightofcounter <= 1000)) {
+					const weight = setting.options.fontweightofcounter;
+
+					window.count_label.style.fontWeight = weight.toString();
+				} else {
+					// debug
+					console.error("Error, setting.options.fontweightofcounter is not of type number. value >>", setting.options.fontweightofcounter);
 				}
 			}
 
