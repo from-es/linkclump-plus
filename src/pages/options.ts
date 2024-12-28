@@ -143,7 +143,7 @@ function tour2() {
 }
 
 function tour3() {
-	chrome.tabs.create({ url: "https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm/reviews", active: true });
+	chrome.tabs.create({ url: "https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm/reviews", active: true });
 }
 
 /**
