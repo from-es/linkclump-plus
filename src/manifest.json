@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Linkclump Plus",
-  "version": "2.12.1",
+  "version": "2.12.2",
   "description": "Lets you open, copy or bookmark multiple links at the same time.",
   "background": {
     "service_worker": "background.js",
@@ -43,5 +43,6 @@
         "https://*/*"
       ]
     }
-  ]
+  ],
+  "action": {}
 }

@@ -1,4 +1,4 @@
-import { generateID, eventImportConfig, eventExportConfig } from '../libs/function.js';
+import { eventImportConfig, eventExportConfig } from '../libs/function.js';
 
 import "../libs/jquery-1.8.2.min.js";
 import "../libs/colorpicker/jquery.colorpicker.js";
