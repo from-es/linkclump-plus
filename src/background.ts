@@ -394,6 +394,11 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 
 chrome.runtime.onMessage.addListener(handleRequests);
 
+chrome.action.onClicked.addListener((tab) => {
+	chrome.runtime.openOptionsPage();
+});
+
+
 if (!settingsManager.isInit()) {
 	// initialize settings manager with defaults and to stop this appearing again
 	settingsManager.init();
