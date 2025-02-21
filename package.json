@@ -15,7 +15,6 @@
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
-    "@types/chrome": "^0.0.287",
     "@types/jquery": "^3.5.32",
     "babel-loader": "^9.2.1",
     "copy-webpack-plugin": "^12.0.2",
@@ -31,5 +30,9 @@
     "build:dev": "webpack --mode development",
     "build:prod": "webpack --mode production",
     "lint": "eslint src"
+  },
+  "dependencies": {
+    "@types/ace": "^0.0.52",
+    "@types/chrome": "^0.0.305"
   }
 }
