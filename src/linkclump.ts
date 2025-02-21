@@ -1,4 +1,3 @@
-import { generateID } from './libs/function.js';
 import { ActivateMessage, InitMessage, InitResponse } from './types/Messages';
 import { Settings } from './types/Settings';
 
@@ -43,7 +42,7 @@ const LEFT_BUTTON = 0;
 const EXCLUDE_LINKS = 0;
 const INCLUDE_LINKS = 1;
 
-const CUSTOM_TAG_LINKCLUMP = "linkclump" + "-" + generateID(8, { number: false, alphabet: { uppercase: false, lowercase: true }, symbol: false });
+const CUSTOM_TAG_LINKCLUMP = "linkclump-plus";
 
 window.settings = {};
 window.setting = -1;

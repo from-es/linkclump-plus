@@ -18,6 +18,8 @@ This "Linkclump Plus" is a fork of linkclump-ng with some fixes and additional f
 	include/exclude links that contain certain words.
 6. Delay
 	set a delay between the opening/closing of each tab.
+7. Display number of selected links
+	displays a counter with the number of selected links. The font size and color of the counter can be changed in the settings.
 
 ## System Requirements
 
