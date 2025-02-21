@@ -38,24 +38,22 @@ This occurs when the following style is specified for the body element of the ac
 
 ```
 bode {
-    margin: 0 auto;
-    max-width: 1080px;
+	margin: 0 auto;
+	width: 1080px; /* or "min-width: 1080px;" or "max-width: 1080px;" */
 }
 ```
 
 This issue may be resolved by using [Stylus](https://chromewebstore.google.com/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne "https://chromewebstore.google.com/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne") to overwrite the style specified for the body element of the page as follows.
 
 ```
-/*
-	How to deal with misalignment when selecting with mouse (reference example)
-*/
+/* How to deal with misalignment when selecting with mouse (reference example) */
 
 /*
 	The style sheet applied to the body element is overwritten
 */
 body {
-    margin: 0 !important;
-    max-width: initial !important;
+	margin: 0 !important;
+	width: initial !important; /* or "min-width: initial !important;" or "max-width: initial !important;" */
 }
 
 /*
@@ -63,10 +61,10 @@ body {
 	 to the element directly below the body element
 */
 header, nav, main, footer {
-    margin-left: auto;
-    margin-right: auto;
+	margin-left: auto;
+	margin-right: auto;
 
-    max-width: 1080px;
+	width: 1080px; /* or "min-width: 1080px;" or "max-width: 1080px;" */
 }
 ```
 
