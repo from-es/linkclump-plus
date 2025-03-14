@@ -113,9 +113,11 @@ chrome.runtime.sendMessage(
 	}
 );
 
-chrome.runtime.onMessage.addListener(function (request) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request.message === "update") {
 		window.settings = request.settings.actions;
+
+		sendResponse("Update settings of linkclump.js.");
 	}
 	if (request.message === "copyToClipboard") {
 		const textarea = document.createElement("textarea");
