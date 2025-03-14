@@ -23,13 +23,13 @@ This "Linkclump Plus" is a fork of linkclump-ng with some fixes and additional f
 
 ## System Requirements
 
-Works with Google Chrome & Chromium-based browsers on Windows, Mac and Linux.
+Works with Google Chrome & Chromium-based browsers.
 
 ## Support
 
 Please note that support can not be provided as this is a free extension.
 
-If you have issue or feature requests, please report them at https://github.com/from-es/linkclump-plus/issues.
+If you have issue or feature requests, please report them at issues (https://github.com/from-es/linkclump-plus/issues).
 
 ## Related Links
 
