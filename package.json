@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "@types/ace": "^0.0.52",
-    "@types/chrome": "^0.0.305"
+    "@types/chrome": "^0.0.309"
   }
 }
