@@ -374,15 +374,39 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 					if (!window.tabs) return;
 
 					window.tabs.forEach(async function (tab) {
-						if (!tab.id) return;
+						if (!(tab?.id && tab?.url)) {
+							return;
+						}
 
-						chrome.tabs.sendMessage(
+						const regex = /^(file|https?):\/\//i;
+						if (!regex.test(tab.url)) {
+							return;
+						}
+
+						const sendMessageToTab = chrome.tabs.sendMessage(
 							tab.id,
 							{
 								message: "update",
 								settings: await settingsManager.load()
 							} as UpdateMessage
 						);
+
+						sendMessageToTab
+							.then(
+								(response) => {
+									// debug
+									//console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from linkclump.js >>', { tab, response });
+								}
+							)
+							.catch(
+								(error) => {
+									// When sending a message to a tab other than "http or https or file",
+									// "Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist." occurs in "background.js".
+
+									// debug　
+									console.log('Debug, send an "update" message to the tab. Received a response from Tab. error >>', { tab, error });
+								}
+							);
 					})
 				})
 			});

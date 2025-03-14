@@ -24,7 +24,7 @@ Assuming that [Node.js](https://nodejs.org/ "https://nodejs.org/") is installed.
 
 1. clone this repository locally or download the file.
 2. place the file in any local directory.
-3. move it to the directory where ```package.json``` is located.
+3. move it to the directory where **package.json** is located.
 3. run ```npm install``` to install dependencies.
 4. build the extension.
 	- ```npm run build:dev``` build the extension in **Development** mode.
