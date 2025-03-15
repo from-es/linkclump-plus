@@ -149,7 +149,7 @@ function create_box() {
 	// @ts-expect-error -- all will be right at the end of the function
 	window.box = document.createElement("span");
 	window.box.style.margin = "0px auto";
-	window.box.style.border = "2px dotted " + (window.settings[window.setting]?.color ?? "red");
+	window.box.style.border = "0px dotted " + (window.settings[window.setting]?.color ?? "red");
 	window.box.style.position = "absolute";
 	window.box.style.zIndex = (parseFloat(Z_INDEX) - 1).toString();
 	window.box.style.visibility = "hidden";
@@ -213,7 +213,14 @@ function mousemove(event: MouseEvent) {
 
 function clean_up() {
 	// remove the box
-	if (window.box) window.box.style.visibility = "hidden";
+	if (window.box) {
+		window.box.style.borderWidth = "0px";
+		window.box.style.top = "";
+		window.box.style.left = "";
+		window.box.style.width = "";
+		window.box.style.height = "";
+		window.box.style.visibility = "hidden";
+	}
 	if (window.count_label) window.count_label.style.visibility = "hidden";
 	window.box_on = false;
 
