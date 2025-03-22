@@ -1,10 +1,21 @@
-import { ActivateMessage, ActivateMessage_bm, ActivateMessage_copy, ActivateMessage_tabs, ActivateMessage_win, CopyFormat, Messages, UpdateMessage } from './types/Messages';
-import { Settings } from './types/Settings';
+import { ActivateMessage, ActivateMessage_bm, ActivateMessage_copy, ActivateMessage_tabs, ActivateMessage_win, CopyFormat, Messages, UpdateMessage } from "@/assets/js/types/Messages";
+import { Settings } from "@/assets/js/types/Settings";
 
+// Format version
 var CURRENT_VERSION = "5";
 
+// key name for Stroage
 const linkclumpSettingsKey = "linkclumpSettings";
 const linkclumpVersionKey = "linkclumpVersion";
+
+// Link copy formats
+const URLS_WITH_TITLES = 0
+const URLS_ONLY = 1
+const URLS_ONLY_SPACE_SEPARATED = 2
+const TITLES_ONLY = 3
+const AS_LINK_HTML = 4
+const AS_LIST_LINK_HTML = 5
+const AS_MARKDOWN = 6
 
 class SettingsManager {
 
@@ -81,6 +92,61 @@ class SettingsManager {
 }
 
 var settingsManager = new SettingsManager();
+
+
+
+export default defineBackground(
+	main
+);
+
+
+
+function main() {
+	chrome.runtime.onMessage.addListener(handleRequests);
+
+	chrome.action.onClicked.addListener((tab) => {
+		chrome.runtime.openOptionsPage();
+	});
+
+	if (!settingsManager.isInit()) {
+		// initialize settings manager with defaults and to stop this appearing again
+		settingsManager.init();
+
+		// inject Linkclump into windows currently open to make it just work
+		chrome.windows.getAll(
+			{ populate: true },
+			function (windows) {
+				for (var i = 0; i < windows.length; ++i) {
+					const numberOfTabs = windows[i].tabs?.length
+					if (numberOfTabs === undefined) {
+						continue
+					}
+					for (var j = 0; j < numberOfTabs; ++j) {
+						const tab = windows[i]?.tabs?.[j]
+						const url = tab?.url
+						const id = tab?.id
+						if (!url || !id) {
+							continue
+						}
+						if (!/^https?:\/\//.test(url)) continue;
+						chrome.tabs.executeScript(id, { file: "/content-scripts/content.js" });
+					}
+				}
+			}
+		);
+
+		// pop up window to show tour and options page
+		chrome.windows.create({
+			url: document.location.protocol + "//" + document.location.host + "/options.html?init=true",
+			width: 800,
+			height: 850,
+			left: screen.width / 2 - 800 / 2,
+			top: screen.height / 2 - 700 / 2
+		});
+	} else if (!settingsManager.isLatest()) {
+		settingsManager.update();
+	}
+}
 
 function uniqueUrl<T extends { url: string }>(arr: T[]): T[] {
 	var a = [];
@@ -182,14 +248,7 @@ async function sendInit(callback: (response?: any) => void) {
 	callback(settings);
 }
 
-// Link copy formats
-const URLS_WITH_TITLES = 0
-const URLS_ONLY = 1
-const URLS_ONLY_SPACE_SEPARATED = 2
-const TITLES_ONLY = 3
-const AS_LINK_HTML = 4
-const AS_LIST_LINK_HTML = 5
-const AS_MARKDOWN = 6
+
 
 function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: CopyFormat) {
 	switch (Number.parseInt(copyFormat, 10)) {
@@ -395,7 +454,7 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 							.then(
 								(response) => {
 									// debug
-									//console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from linkclump.js >>', { tab, response });
+									//console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from content.js >>', { tab, response });
 								}
 							)
 							.catch(
@@ -415,51 +474,3 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 		}
 	}
 }
-
-chrome.runtime.onMessage.addListener(handleRequests);
-
-chrome.action.onClicked.addListener((tab) => {
-	chrome.runtime.openOptionsPage();
-});
-
-
-if (!settingsManager.isInit()) {
-	// initialize settings manager with defaults and to stop this appearing again
-	settingsManager.init();
-
-	// inject Linkclump into windows currently open to make it just work
-	chrome.windows.getAll(
-		{ populate: true },
-		function (windows) {
-			for (var i = 0; i < windows.length; ++i) {
-				const numberOfTabs = windows[i].tabs?.length
-				if (numberOfTabs === undefined) {
-					continue
-				}
-				for (var j = 0; j < numberOfTabs; ++j) {
-					const tab = windows[i]?.tabs?.[j]
-					const url = tab?.url
-					const id = tab?.id
-					if (!url || !id) {
-						continue
-					}
-					if (!/^https?:\/\//.test(url)) continue;
-					chrome.tabs.executeScript(id, { file: "linkclump.js" });
-				}
-			}
-		}
-	);
-
-	// pop up window to show tour and options page
-	chrome.windows.create({
-		url: document.location.protocol + "//" + document.location.host + "/pages/options.html?init=true",
-		width: 800,
-		height: 850,
-		left: screen.width / 2 - 800 / 2,
-		top: screen.height / 2 - 700 / 2
-	});
-} else if (!settingsManager.isLatest()) {
-	settingsManager.update();
-}
-
-

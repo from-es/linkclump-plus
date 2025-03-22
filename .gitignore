@@ -5,4 +5,7 @@
 *.iml
 node_modules/
 *.zip
-build
+
+# wxt
+.wxt
+.output

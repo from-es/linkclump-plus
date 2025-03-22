@@ -12,5 +12,5 @@
             "url": "https://json.schemastore.org/chrome-manifest"
         }
     ],
-    "editor.formatOnSave": true
+    "editor.formatOnSave": false
 }

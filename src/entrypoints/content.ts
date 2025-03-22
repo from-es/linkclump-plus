@@ -1,5 +1,6 @@
-import { ActivateMessage, InitMessage, InitResponse } from './types/Messages';
-import { Settings } from './types/Settings';
+import { ActivateMessage, InitMessage, InitResponse } from "@/assets/js/types/Messages";
+import { Settings } from "@/assets/js/types/Settings";
+
 
 
 // set all the properties of the window object
@@ -41,93 +42,124 @@ const OS_LINUX = 0;
 const LEFT_BUTTON = 0;
 const EXCLUDE_LINKS = 0;
 const INCLUDE_LINKS = 1;
-
 const CUSTOM_TAG_LINKCLUMP = "linkclump-plus";
 
-window.settings = {};
-window.setting = -1;
-window.key_pressed = 0;
-window.mouse_button = null;
-window.stop_menu = false;
-window.box_on = false;
-window.smart_select = false;
-window.mouse_x = -1;
-window.mouse_y = -1;
-window.scroll_id = 0;
-window.links = [];
-// @ts-expect-error -- all will be right at the end of the function
-window.linkclump = undefined;
-// @ts-expect-error -- all will be right at the end of the function
-window.box = undefined;
-// @ts-expect-error -- all will be right at the end of the function
-window.count_label = undefined;
-window.overlay = null;
-window.scroll_bug_ignore = false;
-window.os = ((navigator.appVersion.indexOf("Win") === -1) ? OS_LINUX : OS_WIN);
-window.timer = 0;
 
 
-chrome.runtime.sendMessage(
+// Content Scripts(https://wxt.dev/guide/essentials/entrypoints.html#content-scripts)
+export default defineContentScript(
 	{
-		message: "init"
-	} as InitMessage,
-	function (response: InitResponse | null) {
-		if (response === null) {
-			console.error("Unable to load linkclump due to null response");
-		} else {
-			if (response.hasOwnProperty("error")) {
-				console.error("Unable to properly load linkclump, returning to default settings: " + JSON.stringify(response));
-			}
+		/*
+			Notes: content scripts (content.js) are called twice
 
-			window.settings = response.actions;
+			When building with WXT,
+			specifying "run_at": "document_end" in the "content_scripts" of the manifest causes the content scripts to be called twice.
+		*/
 
-			var allowed = true;
-			for (var i in response.blocked) {
-				if (response.blocked[i] == "") continue;
-				var re = new RegExp(response.blocked[i], "i");
+		/*
+			Notes: Error during build if ‘matches: [’<all_urls>‘]’ is not specified within defineContentScript() in content.js
 
-				if (re.test(window.location.href)) {
-					allowed = false;
-					console.error("Linkclump is blocked on this site: " + response.blocked[i] + "~" + window.location.href);
-				}
-			}
+			ERROR  Entrypoint validation failed: 1 error, 0 warnings
+			src\entrypoints\content.js	- ERROR matches is required (recieved: undefined)
+		*/
+		matches: ["<all_urls>"],
 
-			if (allowed) {
-				// setting up the box and count label
-				window.linkclump   = createCustomElement(CUSTOM_TAG_LINKCLUMP);
-				window.box         = create_box();
-				window.count_label = create_count_label();
-
-				(window.linkclump).appendChild(window.box);
-				(window.linkclump).appendChild(window.count_label);
-				(document.body).appendChild(window.linkclump);
-
-				// add event listeners
-				window.addEventListener("mousedown", mousedown, true);
-				window.addEventListener("keydown", keydown, true);
-				window.addEventListener("keyup", keyup, true);
-				window.addEventListener("blur", blur, true);
-				window.addEventListener("contextmenu", contextmenu, true);
-			}
-		}
+		// Executed when content script is loaded, can be async
+		main
 	}
 );
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	if (request.message === "update") {
-		window.settings = request.settings.actions;
+function main() {
+	chrome.runtime.sendMessage(
+		{
+			message: "init"
+		} as InitMessage,
+		function (response: InitResponse | null) {
+			if (response === null) {
+				console.error("Unable to load linkclump due to null response");
+			} else {
+				if (response.hasOwnProperty("error")) {
+					console.error("Unable to properly load linkclump, returning to default settings: " + JSON.stringify(response));
+				}
 
-		sendResponse("Update settings of linkclump.js.");
-	}
-	if (request.message === "copyToClipboard") {
-		const textarea = document.createElement("textarea");
-		textarea.value = request.text;
-		document.body.appendChild(textarea);
-		textarea.select();
-		document.execCommand("copy");
-		document.body.removeChild(textarea);
-	}
-});
+				window.settings = response.actions;
+
+				var allowed = true;
+				for (var i in response.blocked) {
+					if (response.blocked[i] == "") continue;
+					var re = new RegExp(response.blocked[i], "i");
+
+					if (re.test(window.location.href)) {
+						allowed = false;
+						console.error("Linkclump is blocked on this site: " + response.blocked[i] + "~" + window.location.href);
+					}
+				}
+
+				if (allowed) {
+					// setting up the box and count label
+					window.linkclump = createCustomElement(CUSTOM_TAG_LINKCLUMP);
+					window.box = create_box();
+					window.count_label = create_count_label();
+
+					(window.linkclump).appendChild(window.box);
+					(window.linkclump).appendChild(window.count_label);
+					(document.body).appendChild(window.linkclump);
+
+					// add event listeners
+					window.addEventListener("mousedown", mousedown, true);
+					window.addEventListener("keydown", keydown, true);
+					window.addEventListener("keyup", keyup, true);
+					window.addEventListener("blur", blur, true);
+					window.addEventListener("contextmenu", contextmenu, true);
+				}
+			}
+		}
+	);
+
+	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+		if (request.message === "update") {
+			window.settings = request.settings.actions;
+
+			sendResponse("Update settings of content.js.");
+		}
+		if (request.message === "copyToClipboard") {
+			const textarea = document.createElement("textarea");
+			textarea.value = request.text;
+			document.body.appendChild(textarea);
+			textarea.select();
+			document.execCommand("copy");
+			document.body.removeChild(textarea);
+		}
+	});
+
+	init();
+}
+
+function init() {
+	window.settings = {};
+	window.setting = -1;
+	window.key_pressed = 0;
+	window.mouse_button = null;
+	window.stop_menu = false;
+	window.box_on = false;
+	window.smart_select = false;
+	window.mouse_x = -1;
+	window.mouse_y = -1;
+	window.scroll_id = 0;
+	window.links = [];
+	// @ts-expect-error -- all will be right at the end of the function
+	window.linkclump = undefined;
+	// @ts-expect-error -- all will be right at the end of the function
+	window.box = undefined;
+	// @ts-expect-error -- all will be right at the end of the function
+	window.count_label = undefined;
+	window.overlay = null;
+	window.scroll_bug_ignore = false;
+	window.os = ((navigator.appVersion.indexOf("Win") === -1) ? OS_LINUX : OS_WIN);
+	window.timer = 0;
+}
+
+
 
 /**
  * 
@@ -639,7 +671,6 @@ function allow_key(keyCode: number) {
 	return false;
 }
 
-
 function keydown(event: KeyboardEvent) {
 	if (event.code != END_CODE && event.code != HOME_CODE) {
 		window.key_pressed = event.keyCode;
@@ -669,7 +700,6 @@ function remove_key() {
 	}
 	window.key_pressed = 0;
 }
-
 
 function allow_selection() {
 	for (var i in window.settings) {

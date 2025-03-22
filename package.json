@@ -1,7 +1,7 @@
 {
   "name": "linkclump-plus",
   "description": "Chrome extension",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -11,28 +11,28 @@
     "url": "https://github.com/from-es/linkclump-plus/issues"
   },
   "homepage": "https://github.com/from-es/linkclump-plus",
-  "devDependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/preset-env": "^7.26.0",
-    "@babel/preset-typescript": "^7.26.0",
-    "@types/jquery": "^3.5.32",
-    "babel-loader": "^9.2.1",
-    "copy-webpack-plugin": "^12.0.2",
-    "css-loader": "^7.1.2",
-    "eslint": "^6.7.1",
-    "html-webpack-plugin": "^5.6.3",
-    "style-loader": "^4.0.0",
-    "typescript": "^5.7.2",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^5.1.4"
-  },
+  "type": "module",
   "scripts": {
-    "build:dev": "webpack --mode development",
-    "build:prod": "webpack --mode production",
-    "lint": "eslint src"
+    "dev": "wxt",
+    "build": "wxt build",
+    "build:sourcemap": "wxt build --mode sourcemap",
+    "zip": "wxt zip",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare",
+    "eslint": "eslint --format stylish src"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "eslint": "^9.22.0",
+    "globals": "^16.0.0",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.27.0",
+    "wxt": "^0.19.29"
   },
   "dependencies": {
-    "@types/ace": "^0.0.52",
-    "@types/chrome": "^0.0.309"
+    "@types/chrome": "^0.0.310",
+    "@types/jquery": "^3.5.32",
+    "dayjs": "^1.11.13",
+    "jquery": "^3.7.1"
   }
 }

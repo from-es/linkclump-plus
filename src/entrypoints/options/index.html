@@ -1,11 +1,21 @@
+<!doctype html>
 <html>
+
 <head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<meta name="manifest.open_in_tab" content="true" />
+
+	<link rel="stylesheet" href="./style.css">
+	<script type="module" src="./options.ts"></script>
+
 	<title>Options</title>
 </head>
 <body>
 	<div id="page1" class="page">
 		<div class="info-box">
-			<img src="../images/linkclump-plus.png" class="logo" alt="Linkclump Plus logo" title="Linkclump Plus" />
+			<img src="/img/linkclump-plus.png" class="logo" alt="Linkclump Plus logo" title="Linkclump Plus" />
 
 			<p>Welcome and thank you for trying out "<b>Linkclump Plus</b>". To use this extension you should press and hold <span
 					id="key_name"></span> the <b><span id="mouse_name"></span></b> mouse button, then drag the selection
@@ -16,7 +26,7 @@
 				<p>Use the test area below to try out operation or click the option button at the bottom of the page to
 					explore the many options available.</p>
 
-				<iframe id="test_area" src="test_area.html" height="300"></iframe>
+				<iframe id="test_area" src="/test/index.html" height="300"></iframe>
 			</div>
 
 			<button id="guide2" class="button">Options</button>
@@ -26,7 +36,7 @@
 	<div id="page2" class="page">
 		<div id="welcome" class="info-box">
 
-			<img src="../images/linkclump-plus.png" class="logo" alt="Linkclump Plus logo" title="Linkclump Plus" />
+			<img src="/img/linkclump-plus.png" class="logo" alt="Linkclump Plus logo" title="Linkclump Plus" />
 
 			<p>Welcome to the options page, where you can change the default behaviour and add new actions.</p>
 

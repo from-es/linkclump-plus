@@ -1,6 +1,6 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Bug Report
+about: Before creating a new issue, please search to see if a similar issue already exists.
 title: ''
 labels: ''
 assignees: ''
