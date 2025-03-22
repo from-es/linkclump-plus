@@ -61,7 +61,7 @@ function generateID(digit = 8, character = { number: true, alphabet: { uppercase
 		}
 
 		return str;
-	}
+	};
 
 	const typedArray = new Uint32Array(digit);
 	const cryptoArray = crypto.getRandomValues(typedArray);

@@ -416,7 +416,7 @@ function getXY(element: HTMLElement): { x: number, y: number } {
 }
 
 function start() {
-	const selectedAction = window.settings[window.setting]
+	const selectedAction = window.settings[window.setting];
 
 	if (selectedAction === undefined) {
 		console.error("No setting selected");
@@ -707,7 +707,7 @@ function allow_selection() {
 
 		// need to check if key is 0 as key_pressed might not be accurate
 		if (setting?.mouse == window.mouse_button && setting?.key == window.key_pressed) {
-			window.setting = Number.parseInt(i, 10)
+			window.setting = Number.parseInt(i, 10);
 
 			if (window.box !== null) {
 				// box

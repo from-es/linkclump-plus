@@ -6,7 +6,7 @@ import $ from "jquery";
 import "@/assets/js/lib/colorpicker/jquery.colorpicker.js";
 import "@/assets/js/lib/colorpicker/jquery.colorpicker.css";
 
-import "./style.css"
+import "./style.css";
 
 interface Trigger {
 	name: string;
@@ -147,7 +147,7 @@ function initEvent() {
 
 	// temp check to not load if in test mode
 	if (document.getElementById("guide2") === null) {
-		return
+		return;
 	}
 
 	document.getElementById("guide3").addEventListener("click", tour3);
@@ -423,11 +423,11 @@ function setup_form() {
 
 	var action = $("#form_action");
 	for (var i in config.actions) {
-		var act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + config.actions[i].name + '<br/>')
+		var act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + config.actions[i].name + '<br/>');
 
 
 		act.click(function (event) {
-			displayOptions(event.currentTarget.value)
+			displayOptions(event.currentTarget.value);
 		}
 		);
 
@@ -608,7 +608,7 @@ function save_action(event: JQuery.Event) {
 			param.options[name] = $("#form_option_" + name).is(":checked");
 		} else {
 			if (name === "ignore") {
-				var ignore = $("#form_option_text_" + name).val().replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",")
+				var ignore = $("#form_option_text_" + name).val().replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",");
 				// if the last entry is empty then just remove from array
 				if (ignore.length > 0 && ignore[ignore.length - 1] === "") {
 					ignore.pop();

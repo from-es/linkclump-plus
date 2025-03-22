@@ -9,13 +9,13 @@ const linkclumpSettingsKey = "linkclumpSettings";
 const linkclumpVersionKey = "linkclumpVersion";
 
 // Link copy formats
-const URLS_WITH_TITLES = 0
-const URLS_ONLY = 1
-const URLS_ONLY_SPACE_SEPARATED = 2
-const TITLES_ONLY = 3
-const AS_LINK_HTML = 4
-const AS_LIST_LINK_HTML = 5
-const AS_MARKDOWN = 6
+const URLS_WITH_TITLES = 0;
+const URLS_ONLY = 1;
+const URLS_ONLY_SPACE_SEPARATED = 2;
+const TITLES_ONLY = 3;
+const AS_LINK_HTML = 4;
+const AS_LIST_LINK_HTML = 5;
+const AS_MARKDOWN = 6;
 
 class SettingsManager {
 
@@ -117,16 +117,16 @@ function main() {
 			{ populate: true },
 			function (windows) {
 				for (var i = 0; i < windows.length; ++i) {
-					const numberOfTabs = windows[i].tabs?.length
+					const numberOfTabs = windows[i].tabs?.length;
 					if (numberOfTabs === undefined) {
-						continue
+						continue;
 					}
 					for (var j = 0; j < numberOfTabs; ++j) {
-						const tab = windows[i]?.tabs?.[j]
-						const url = tab?.url
-						const id = tab?.id
+						const tab = windows[i]?.tabs?.[j];
+						const url = tab?.url;
+						const id = tab?.id;
 						if (!url || !id) {
-							continue
+							continue;
 						}
 						if (!/^https?:\/\//.test(url)) continue;
 						chrome.tabs.executeScript(id, { file: "/content-scripts/content.js" });
@@ -175,7 +175,7 @@ function openTab(
 	if (!url || urls.length > 0) {
 		setTimeout(
 			function () {
-				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime)
+				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime);
 			},
 			delay * 1000
 		);
@@ -234,7 +234,7 @@ function pad(number: number, length: number) {
 
 function timeConverter(a: Date) {
 	var year = a.getFullYear();
-	var month = pad(a.getMonth() + 1, 2)
+	var month = pad(a.getMonth() + 1, 2);
 	var day = pad(a.getDate(), 2);
 	var hour = pad(a.getHours(), 2);
 	var min = pad(a.getMinutes(), 2);
@@ -278,7 +278,7 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>) {
 	}
 
 	if (request.setting.options.copy == AS_LIST_LINK_HTML) {
-		text = "<ul>\n" + text + "</ul>\n"
+		text = "<ul>\n" + text + "</ul>\n";
 	}
 
 	copyToClipboard(text);
@@ -376,7 +376,7 @@ function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: chrom
 				tab_index,
 				request.setting.options.close
 			);
-		})
+		});
 	});
 }
 
@@ -466,8 +466,8 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 									console.log('Debug, send an "update" message to the tab. Received a response from Tab. error >>', { tab, error });
 								}
 							);
-					})
-				})
+					});
+				});
 			});
 
 			return;
