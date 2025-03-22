@@ -533,7 +533,7 @@ function scroll() {
 		var y = window.mouse_y - window.scrollY;
 		var win_height = window.innerHeight;
 
-		if (y > win_height - 20) { //down
+		if (y > win_height - 20) { // down
 			let speed = win_height - y;
 			if (speed < 2) {
 				speed = 60;
@@ -549,7 +549,7 @@ function scroll() {
 
 			window.scroll_bug_ignore = true;
 			return;
-		} else if (window.scrollY > 0 && y < 20) { //up
+		} else if (window.scrollY > 0 && y < 20) { // up
 			let speed = y;
 			if (speed < 2) {
 				speed = 60;

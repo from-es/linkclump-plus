@@ -460,7 +460,7 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 							.then(
 								(response) => {
 									// debug
-									//console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from content.js >>', { tab, response });
+									// console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from content.js >>', { tab, response });
 								}
 							)
 							.catch(
