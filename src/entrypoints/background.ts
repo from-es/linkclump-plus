@@ -61,7 +61,7 @@ class SettingsManager {
 					"color": "#FFA500",
 					"options": {
 						"smart": 0,
-						"ignore": [0],
+						"ignore": [ 0 ],
 						"delay": 0,
 						"close": 0,
 						"block": true,

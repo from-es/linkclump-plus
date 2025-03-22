@@ -62,7 +62,7 @@ export default defineContentScript(
 			ERROR  Entrypoint validation failed: 1 error, 0 warnings
 			src\entrypoints\content.js	- ERROR matches is required (recieved: undefined)
 		*/
-		matches: ["<all_urls>"],
+		matches: [ "<all_urls>" ],
 
 		// Executed when content script is loaded, can be async
 		main

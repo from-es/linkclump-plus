@@ -40,24 +40,24 @@ interface ActionParam {
 
 const config: Config = {
 	"triggers":
-		[{ "name": "Left" }, { "name": "Middle" }, { "name": "Right" }],
+		[ { "name": "Left" }, { "name": "Middle" }, { "name": "Right" } ],
 	"actions": {
-		"win": { "name": "Opened in a New Window", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus"] },
-		"tabs": { "name": "Opened as New Tabs", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end"] },
-		"bm": { "name": "Bookmarked", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse"] },
-		"copy": { "name": "Copied to clipboard", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse"] }
+		"win": { "name": "Opened in a New Window", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus" ] },
+		"tabs": { "name": "Opened as New Tabs", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end" ] },
+		"bm": { "name": "Bookmarked", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse" ] },
+		"copy": { "name": "Copied to clipboard", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse" ] }
 	},
 	"options": {
 		"fontsizeofcounter": {
 			"name": "counter font size",
 			"type": "number",
-			"data": [16, 8, 64], // [ default, min , max ]
+			"data": [ 16, 8, 64 ], // [ default, min , max ]
 			"extra": "font size of the counter (default: 16, range: 8-64)"
 		},
 		"fontweightofcounter": {
 			"name": "counter font weight",
 			"type": "number",
-			"data": [400, 1, 1000], // [ default, min , max ]
+			"data": [ 400, 1, 1000 ], // [ default, min , max ]
 			"extra": "font weight of the counter (default: 400, range: 1-1000, thin: 100, normal: 400, bold: 700)"
 		},
 		"samebgcolorasbox": {
@@ -68,19 +68,19 @@ const config: Config = {
 		"smart": {
 			"name": "smart select",
 			"type": "selection",
-			"data": ["on", "off"],
+			"data": [ "on", "off" ],
 			"extra": "with smart select turned on linkclump tries to select only the important links"
 		},
 		"ignore": {
 			"name": "filter links",
 			"type": "selection-textbox",
-			"data": ["exclude links with words", "include links with words"],
+			"data": [ "exclude links with words", "include links with words" ],
 			"extra": "filter links that include/exclude these words; separate words with a comma ,"
 		},
 		"copy": {
 			"name": "copy format",
 			"type": "selection",
-			"data": ["URLS with titles", "URLS only", "URLS only space separated", "titles only", "as link HTML", "as list link HTML", "as Markdown"],
+			"data": [ "URLS with titles", "URLS only", "URLS only space separated", "titles only", "as link HTML", "as list link HTML", "as Markdown" ],
 			"extra": "format of the links saved to the clipboard"
 		},
 		"delay": {
@@ -120,7 +120,7 @@ const OS_WIN = 0;
 const OS_LINUX = 1;
 const OS_MAC = 2;
 
-const colors: string[] = ["458B74", "838B8B", "CCCCCC", "0000FF", "8A2BE2", "D2691E", "6495ED", "DC143C", "006400", "9400D3", "1E90FF", "228B22", "00FF00", "ADFF2F", "FF69B4", "4B0082", "F0E68C", "8B814C", "87CEFA", "32CD32", "000080", "FFA500", "FF4500", "DA70D6", "8B475D", "8B668B", "FF0000", "2E8B57", "8E388E", "FFFF00"];
+const colors: string[] = [ "458B74", "838B8B", "CCCCCC", "0000FF", "8A2BE2", "D2691E", "6495ED", "DC143C", "006400", "9400D3", "1E90FF", "228B22", "00FF00", "ADFF2F", "FF69B4", "4B0082", "F0E68C", "8B814C", "87CEFA", "32CD32", "000080", "FFA500", "FF4500", "DA70D6", "8B475D", "8B668B", "FF0000", "2E8B57", "8E388E", "FFFF00" ];
 let params: Settings | null = null;
 const div_history: Record<string, JQuery> = [];
 
