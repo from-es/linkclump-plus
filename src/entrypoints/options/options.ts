@@ -165,10 +165,11 @@ function initEvent() {
 
 	setup_form();
 
-	chrome.runtime.sendMessage({
-		message: "init",
-		debug: true
-	},
+	chrome.runtime.sendMessage(
+		{
+			message: "init",
+			debug: true
+		},
 		function (response) {
 			params = response;
 
@@ -184,7 +185,8 @@ function initEvent() {
 			} else {
 				tour2();
 			}
-		});
+		}
+	);
 }
 
 

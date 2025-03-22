@@ -296,10 +296,11 @@ function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 
 			// make assumption that bookmarkTreeNodes[0].children[1] refers to the "other bookmarks" folder
 			// as different languages will not use the english name to refer to the folder
-			chrome.bookmarks.create({
-				"parentId": folderID,
-				"title": "Linkclump " + timeConverter(new Date())
-			},
+			chrome.bookmarks.create(
+				{
+					"parentId": folderID,
+					"title": "Linkclump " + timeConverter(new Date())
+				},
 				function (newFolder) {
 					for (let j = 0; j < request.urls.length; j++) {
 						chrome.bookmarks.create({
