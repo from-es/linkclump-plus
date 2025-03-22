@@ -1,39 +1,41 @@
-import { eventImportConfig, eventExportConfig } from '../libs/function.js';
+import { Settings } from "@/assets/js/types/Settings";
+import { eventImportConfig, eventExportConfig } from "@/assets/js/lib/function.js";
 
-import "../libs/jquery-1.8.2.min.js";
-import "../libs/colorpicker/jquery.colorpicker.js";
-import "../libs/colorpicker/jquery.colorpicker.css";
+// jQuery
+import $ from "jquery";
+import "@/assets/js/lib/colorpicker/jquery.colorpicker.js";
+import "@/assets/js/lib/colorpicker/jquery.colorpicker.css";
+
 import "./style.css"
-import { Settings } from "../types/Settings";
 
 interface Trigger {
-    name: string;
+	name: string;
 }
 
 interface ActionOption {
-    name: string;
-    type: 'number' | 'selection' | 'selection-textbox' | 'textbox' | 'checkbox';
-    data?: number[] | string[];
-    extra: string;
+	name: string;
+	type: 'number' | 'selection' | 'selection-textbox' | 'textbox' | 'checkbox';
+	data?: number[] | string[];
+	extra: string;
 }
 
 interface Action {
-    name: string;
-    options: string[];
+	name: string;
+	options: string[];
 }
 
 interface Config {
-    triggers: Trigger[];
-    actions: Record<string, Action>;
-    options: Record<string, ActionOption>;
+	triggers: Trigger[];
+	actions: Record<string, Action>;
+	options: Record<string, ActionOption>;
 }
 
 interface ActionParam {
-    mouse: number;
-    key: number;
-    color: string;
-    action: string;
-    options: Record<string, any>;
+	mouse: number;
+	key: number;
+	color: string;
+	action: string;
+	options: Record<string, any>;
 }
 
 const config: Config = {
@@ -121,8 +123,71 @@ const OS_MAC = 2;
 const colors: string[] = ["458B74", "838B8B", "CCCCCC", "0000FF", "8A2BE2", "D2691E", "6495ED", "DC143C", "006400", "9400D3", "1E90FF", "228B22", "00FF00", "ADFF2F", "FF69B4", "4B0082", "F0E68C", "8B814C", "87CEFA", "32CD32", "000080", "FFA500", "FF4500", "DA70D6", "8B475D", "8B668B", "FF0000", "2E8B57", "8E388E", "FFFF00"];
 let params: Settings | null = null;
 const div_history: Record<string, JQuery> = [];
-const keys = displayKeys(0);
-const os = ((navigator.appVersion.indexOf("Win") === -1) ? ((navigator.appVersion.indexOf("Mac") === -1) ? OS_LINUX : OS_MAC) : OS_WIN);
+
+let keys: Record<number, string>;
+let os: 0 | 1 | 2;
+
+
+
+window.addEventListener("load", main);
+
+function main() {
+	initValue();
+
+	initEvent();
+}
+
+function initValue() {
+	keys = displayKeys(0);
+	os = ((navigator.appVersion.indexOf("Win") === -1) ? ((navigator.appVersion.indexOf("Mac") === -1) ? OS_LINUX : OS_MAC) : OS_WIN);
+}
+
+function initEvent() {
+	let isFirstTime = (window.location.href).indexOf("init=true") > -1;
+
+	// temp check to not load if in test mode
+	if (document.getElementById("guide2") === null) {
+		return
+	}
+
+	document.getElementById("guide3").addEventListener("click", tour3);
+	document.getElementById("guide2").addEventListener("click", tour2);
+	document.getElementById("guide1").addEventListener("click", tour1);
+	document.getElementById("add").addEventListener("click", load_new_action);
+	document.getElementById("form_block").addEventListener("keyup", save_block);
+	document.getElementById("form_key").addEventListener("change", check_selection);
+	document.getElementById("cancel").addEventListener("click", close_form);
+	document.getElementById("save").addEventListener("click", save_action);
+
+	// ToDo : 要、動作検証@2024/12/17
+	document.getElementById("import-setting").addEventListener("click", import_setting);
+	document.getElementById("export-setting").addEventListener("click", export_setting);
+
+	setup_form();
+
+	chrome.runtime.sendMessage({
+		message: "init",
+		debug: true
+	},
+		function (response) {
+			params = response;
+
+			for (var i in params.actions) {
+				$("#settings").append(setup_action(params.actions[i], i));
+			}
+			setup_text(keys);
+
+			$("#form_block").val(params.blocked.join("\n"));
+
+			if (isFirstTime) {
+				tour1();
+			} else {
+				tour2();
+			}
+		});
+}
+
+
 
 function close_form(event: JQuery.Event) {
 	$("#form-background").fadeOut();
@@ -259,9 +324,9 @@ function setup_action(param: ActionParam, id: string): JQuery {
 	var setting = $("<div class='setting' id='action_" + id + "'>");
 
 	const h3 = "<h3>" + config.actions[param.action].name + "</h3>";
-	const activateKey   = (param.key > 0) ? "\"<b>" + keys[param.key] + "</b>\" key and " : "";
+	const activateKey = (param.key > 0) ? "\"<b>" + keys[param.key] + "</b>\" key and " : "";
 	const activateMouse = "\"<b>" + config.triggers[param.mouse].name + "</b>\" mouse button";
-	const activate      = "<p>Activate by " + activateKey + activateMouse + ".</p>";
+	const activate = "<p>Activate by " + activateKey + activateMouse + ".</p>";
 	setting.append(h3);
 	setting.append(activate);
 
@@ -623,8 +688,6 @@ function save_block() {
 
 async function import_setting() {
 	const result = await eventImportConfig();
-
-	// ToDo : 値の検証を強化@2024/12/17
 	const valid = result && (typeof result === "object") && result?.actions;
 
 	if (valid) {
@@ -644,58 +707,12 @@ async function import_setting() {
 
 			// debug
 			console.log("Debug, Import setting. params >>", { params });
-		} else {}
+		} else { }
 	} else {
 		console.error("Error, can't import setting. result >>", result);
 	}
 }
+
 function export_setting() {
 	eventExportConfig(params);
 }
-
-
-
-$(function() {
-	var isFirstTime = window.location.href.indexOf("init=true") > -1;
-
-	// temp check to not load if in test mode
-	if (document.getElementById("guide2") === null) {
-		return
-	}
-
-	document.getElementById("guide3").addEventListener("click", tour3);
-	document.getElementById("guide2").addEventListener("click", tour2);
-	document.getElementById("guide1").addEventListener("click", tour1);
-	document.getElementById("add").addEventListener("click", load_new_action);
-	document.getElementById("form_block").addEventListener("keyup", save_block);
-	document.getElementById("form_key").addEventListener("change", check_selection);
-	document.getElementById("cancel").addEventListener("click", close_form);
-	document.getElementById("save").addEventListener("click", save_action);
-
-	// ToDo : 要、動作検証@2024/12/17
-	document.getElementById("import-setting").addEventListener("click", import_setting);
-	document.getElementById("export-setting").addEventListener("click", export_setting);
-
-	setup_form();
-
-	chrome.runtime.sendMessage({
-		message: "init",
-		debug: true
-	},
-	function (response) {
-		params = response;
-
-		for (var i in params.actions) {
-			$("#settings").append(setup_action(params.actions[i], i));
-		}
-		setup_text(keys);
-
-		$("#form_block").val(params.blocked.join("\n"));
-
-		if (isFirstTime) {
-			tour1();
-		} else {
-			tour2();
-		}
-	});
-});
