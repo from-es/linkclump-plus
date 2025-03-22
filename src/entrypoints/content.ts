@@ -86,7 +86,9 @@ function main() {
 
 				var allowed = true;
 				for (var i in response.blocked) {
-					if (response.blocked[i] == "") continue;
+					if (response.blocked[i] == "") {
+						continue;
+					}
 					var re = new RegExp(response.blocked[i], "i");
 
 					if (re.test(window.location.href)) {
@@ -253,7 +255,9 @@ function clean_up() {
 		window.box.style.height = "";
 		window.box.style.visibility = "hidden";
 	}
-	if (window.count_label) window.count_label.style.visibility = "hidden";
+	if (window.count_label) {
+		window.count_label.style.visibility = "hidden";
+	}
 	window.box_on = false;
 
 	// remove the link boxes

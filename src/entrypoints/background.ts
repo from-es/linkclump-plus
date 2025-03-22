@@ -128,7 +128,9 @@ function main() {
 						if (!url || !id) {
 							continue;
 						}
-						if (!/^https?:\/\//.test(url)) continue;
+						if (!/^https?:\/\//.test(url)) {
+							continue;
+						}
 						chrome.tabs.executeScript(id, { file: "/content-scripts/content.js" });
 					}
 				}
@@ -153,8 +155,9 @@ function uniqueUrl<T extends { url: string }>(arr: T[]): T[] {
 	var l = arr.length;
 	for (var i = 0; i < l; i++) {
 		for (var j = i + 1; j < l; j++) {
-			if (arr[i].url === arr[j].url)
+			if (arr[i].url === arr[j].url) {
 				j = ++i;
+			}
 		}
 		a.push(arr[i]);
 	}
@@ -431,7 +434,9 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 				populate: true
 			}, function (windowList) {
 				windowList.forEach(function (window) {
-					if (!window.tabs) return;
+					if (!window.tabs) {
+						return;
+					}
 
 					window.tabs.forEach(async function (tab) {
 						if (!(tab?.id && tab?.url)) {
