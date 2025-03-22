@@ -164,7 +164,7 @@ function init() {
 
 
 /**
- * 
+ *
  * @param {string} tagName
  * @param {ElementCreationOptions} options - { is: "Custom Element Tag Name" }
  * @returns {HTMLElement}

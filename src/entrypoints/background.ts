@@ -215,7 +215,7 @@ function openTab(
 }
 
 /**
- * 
+ *
  * @param {string} text - Text to copy to clipboard
  */
 function copyToClipboard(text: string) {
@@ -468,7 +468,7 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 									// When sending a message to a tab other than "http or https or file",
 									// "Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist." occurs in "background.js".
 
-									// debug　
+									// debug
 									console.log('Debug, send an "update" message to the tab. Received a response from Tab. error >>', { tab, error });
 								}
 							);

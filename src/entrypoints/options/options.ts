@@ -214,8 +214,8 @@ function tour3() {
 }
 
 /**
- * 
- * @param {string | null} id 
+ *
+ * @param {string | null} id
  */
 function load_action(id: string | null) {  // into form
 	if (id === null) {
@@ -293,8 +293,8 @@ function load_action(id: string | null) {  // into form
 }
 
 /**
- * 
- * @param {string} id 
+ *
+ * @param {string} id
  * @param {JQuery<HTMLElement>} div
  */
 function delete_action(id: string, div: JQuery) {
