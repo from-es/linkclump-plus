@@ -78,7 +78,7 @@ function main() {
 			if (response === null) {
 				console.error("Unable to load linkclump due to null response");
 			} else {
-				if (response.hasOwnProperty("error")) {
+				if (Object.hasOwn(response, "error")) {
 					console.error("Unable to properly load linkclump, returning to default settings: " + JSON.stringify(response));
 				}
 
@@ -718,7 +718,7 @@ function allow_selection() {
 				window.box.style.border = "2px dotted " + (setting?.color ?? "red");
 
 				// counter
-				if ((setting?.color && typeof setting.color === "string") && (setting?.options && (setting.options).hasOwnProperty("samebgcolorasbox") && typeof setting.options.samebgcolorasbox === "boolean")) {
+				if ((setting?.color && typeof setting.color === "string") && (setting?.options && Object.hasOwn(setting.options, "samebgcolorasbox") && typeof setting.options.samebgcolorasbox === "boolean")) {
 					if (setting.options.samebgcolorasbox === true) {
 						window.count_label.style.color = "white";
 						window.count_label.style.borderColor = "white";
