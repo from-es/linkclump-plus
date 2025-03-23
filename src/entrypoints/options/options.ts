@@ -503,31 +503,31 @@ function displayOptions(action: string) {
 		p.append(title);
 
 		switch (op.type) {
-			case "number":
+			case "number": {
 				const def = op?.data[0];
 				const min = op?.data[1];
 				const max = op?.data[2];
 
 				p.append(`<input type="number" name="${op.name}" id="form_option_${config.actions[action].options[i]}" value="${def}" step="1" min="${min}" max="${max}" />`);
 				break;
-
-			case "selection":
+			}
+			case "selection": {
 				var selector = $("<select id='form_option_" + config.actions[action].options[i] + "'>");
 				for (var j in op.data) {
 					selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
 				}
 				p.append(selector);
 				break;
-
-			case "textbox":
+			}
+			case "textbox": {
 				p.append('<input type="text" name="' + op.name + '" id="form_option_' + config.actions[action].options[i] + '"/>');
 				break;
-
-			case "checkbox":
+			}
+			case "checkbox": {
 				p.append('<input type="checkbox" name="' + op.name + '" id="form_option_' + config.actions[action].options[i] + '"/>');
 				break;
-
-			case "selection-textbox":
+			}
+			case "selection-textbox": {
 				var selector = $("<select id='form_option_selection_" + config.actions[action].options[i] + "'>");
 				for (var j in op.data) {
 					selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
@@ -536,6 +536,7 @@ function displayOptions(action: string) {
 				p.append('</p><label></label><p>');
 				p.append('<input type="text" name="' + op.name + '" id="form_option_text_' + config.actions[action].options[i] + '"/>');
 				break;
+			}
 		}
 
 		const label = p.find("label").eq(0);
