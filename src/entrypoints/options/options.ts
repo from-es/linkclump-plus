@@ -709,7 +709,7 @@ async function import_setting() {
 
 			// debug
 			console.log("Debug, Import setting. params >>", { params });
-		} else { }
+		}
 	} else {
 		console.error("Error, can't import setting. result >>", result);
 	}
