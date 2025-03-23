@@ -143,7 +143,7 @@ function initValue() {
 }
 
 function initEvent() {
-	let isFirstTime = (window.location.href).indexOf("init=true") > -1;
+	const isFirstTime = (window.location.href).indexOf("init=true") > -1;
 
 	// temp check to not load if in test mode
 	if (document.getElementById("guide2") === null) {
