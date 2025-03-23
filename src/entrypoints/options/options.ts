@@ -337,20 +337,23 @@ function setup_action(param: ActionParam, id: string): JQuery {
 		const op = config.options[j];
 		let text = op.name + ": ";
 		switch (op.type) {
-			case "number":
+			case "number": {
 				text += param.options[j];
 				break;
-			case "selection":
+			}
+			case "selection": {
 				text += op.data[param.options[j]];
 				break;
-			case "textbox":
+			}
+			case "textbox": {
 				// TODO not sure if param.options[j] returns a string or int
 				if (param.options[j] === "" || param.options[j] == "0") {
 					continue;
 				}
 				text += param.options[j];
 				break;
-			case "checkbox":
+			}
+			case "checkbox": {
 				/*
 				if (!param.options[j]) {
 					continue;
@@ -358,7 +361,8 @@ function setup_action(param: ActionParam, id: string): JQuery {
 				*/
 				text += param.options[j];
 				break;
-			case "selection-textbox":
+			}
+			case "selection-textbox": {
 				if (param.options[j].length < 2) {
 					continue;
 				}
@@ -373,6 +377,7 @@ function setup_action(param: ActionParam, id: string): JQuery {
 				}
 				text += op.data[selection] + "; " + words;
 				break;
+			}
 		}
 
 		list.append("<li>" + text + "</li>");
