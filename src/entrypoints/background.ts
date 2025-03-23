@@ -2,7 +2,7 @@ import { ActivateMessage, ActivateMessage_bm, ActivateMessage_copy, ActivateMess
 import { Settings } from "@/assets/js/types/Settings";
 
 // Format version
-var CURRENT_VERSION = "5";
+const CURRENT_VERSION = "5";
 
 // key name for Stroage
 const linkclumpSettingsKey = "linkclumpSettings";
@@ -20,7 +20,7 @@ const AS_MARKDOWN = 6;
 class SettingsManager {
 
 	async load(): Promise<Settings> {
-		var { [linkclumpSettingsKey]: settings } = await chrome.storage.sync.get(linkclumpSettingsKey);
+		let { [linkclumpSettingsKey]: settings } = await chrome.storage.sync.get(linkclumpSettingsKey);
 
 		if (settings) {
 			return settings;
@@ -52,7 +52,7 @@ class SettingsManager {
 
 	init() {
 		// create default settings for first time user
-		var settings: Settings = {
+		const settings: Settings = {
 			"actions": {
 				"101": {
 					"mouse": 0,  // left mouse button
@@ -91,7 +91,7 @@ class SettingsManager {
 	};
 }
 
-var settingsManager = new SettingsManager();
+const settingsManager = new SettingsManager();
 
 
 
@@ -116,12 +116,12 @@ function main() {
 		chrome.windows.getAll(
 			{ populate: true },
 			function (windows) {
-				for (var i = 0; i < windows.length; ++i) {
+				for (let i = 0; i < windows.length; ++i) {
 					const numberOfTabs = windows[i].tabs?.length;
 					if (numberOfTabs === undefined) {
 						continue;
 					}
-					for (var j = 0; j < numberOfTabs; ++j) {
+					for (let j = 0; j < numberOfTabs; ++j) {
 						const tab = windows[i]?.tabs?.[j];
 						const url = tab?.url;
 						const id = tab?.id;
@@ -151,10 +151,10 @@ function main() {
 }
 
 function uniqueUrl<T extends { url: string }>(arr: T[]): T[] {
-	var a = [];
-	var l = arr.length;
-	for (var i = 0; i < l; i++) {
-		for (var j = i + 1; j < l; j++) {
+	const a = [];
+	const l = arr.length;
+	for (let i = 0; i < l; i++) {
+		for (let j = i + 1; j < l; j++) {
 			if (arr[i].url === arr[j].url) {
 				j = ++i;
 			}
@@ -227,7 +227,7 @@ function copyToClipboard(text: string) {
 }
 
 function pad(number: number, length: number) {
-	var str = "" + number;
+	let str = "" + number;
 	while (str.length < length) {
 		str = "0" + str;
 	}
@@ -236,13 +236,13 @@ function pad(number: number, length: number) {
 }
 
 function timeConverter(a: Date) {
-	var year = a.getFullYear();
-	var month = pad(a.getMonth() + 1, 2);
-	var day = pad(a.getDate(), 2);
-	var hour = pad(a.getHours(), 2);
-	var min = pad(a.getMinutes(), 2);
-	var sec = pad(a.getSeconds(), 2);
-	var time = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
+	const year = a.getFullYear();
+	const month = pad(a.getMonth() + 1, 2);
+	const day = pad(a.getDate(), 2);
+	const hour = pad(a.getHours(), 2);
+	const min = pad(a.getMinutes(), 2);
+	const sec = pad(a.getSeconds(), 2);
+	const time = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
 	return time;
 }
 
@@ -275,7 +275,7 @@ function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: Copy
 }
 
 function handleCopy(request: ActivateMessage<ActivateMessage_copy>) {
-	var text = "";
+	let text = "";
 	for (let i = 0; i < request.urls.length; i++) {
 		text += formatLink(request.urls[i], request.setting.options.copy);
 	}
@@ -364,7 +364,7 @@ function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: chrom
 
 	chrome.tabs.get(sender.tab.id, function (tab) {
 		chrome.windows.getCurrent(function (currentWindow) {
-			var tab_index = null;
+			let tab_index = null;
 
 			if (!request.setting.options.end) {
 				tab_index = tab.index + 1;

@@ -84,12 +84,12 @@ function main() {
 
 				window.settings = response.actions;
 
-				var allowed = true;
-				for (var i in response.blocked) {
+				let allowed = true;
+				for (const i in response.blocked) {
 					if (response.blocked[i] == "") {
 						continue;
 					}
-					var re = new RegExp(response.blocked[i], "i");
+					const re = new RegExp(response.blocked[i], "i");
 
 					if (re.test(window.location.href)) {
 						allowed = false;
@@ -261,7 +261,7 @@ function clean_up() {
 	window.box_on = false;
 
 	// remove the link boxes
-	for (var i = 0; i < window.links.length; i++) {
+	for (let i = 0; i < window.links.length; i++) {
 		if (window.links[i].box !== null) {
 			(window.linkclump).removeChild(window.links[i].box);
 			window.links[i].box = null;
@@ -320,8 +320,8 @@ function mousedown(event: MouseEvent) {
 }
 
 function update_box(x: number, y: number) {
-	var width = Math.max(document.documentElement["clientWidth"], document.body["scrollWidth"], document.documentElement["scrollWidth"], document.body["offsetWidth"], document.documentElement["offsetWidth"]); // taken from jquery
-	var height = Math.max(document.documentElement["clientHeight"], document.body["scrollHeight"], document.documentElement["scrollHeight"], document.body["offsetHeight"], document.documentElement["offsetHeight"]); // taken from jquery
+	const width = Math.max(document.documentElement["clientWidth"], document.body["scrollWidth"], document.documentElement["scrollWidth"], document.body["offsetWidth"], document.documentElement["offsetWidth"]); // taken from jquery
+	const height = Math.max(document.documentElement["clientHeight"], document.body["scrollHeight"], document.documentElement["scrollHeight"], document.body["offsetHeight"], document.documentElement["offsetHeight"]); // taken from jquery
 
 	const scrollbarWidth = window.innerWidth - document.body.clientWidth;
 	x = Math.min(x, width - scrollbarWidth);
@@ -389,12 +389,12 @@ function mouseup(event: MouseEvent) {
 }
 
 function getXY(element: HTMLElement): { x: number, y: number } {
-	var x = 0;
-	var y = 0;
+	let x = 0;
+	let y = 0;
 
-	var parent: Element | null = element;
-	var style;
-	var matrix;
+	let parent: Element | null = element;
+	let style;
+	let matrix;
 	do {
 		style = window.getComputedStyle(parent);
 		matrix = new WebKitCSSMatrix(style.webkitTransform);
@@ -437,15 +437,15 @@ function start() {
 	window.count_label.style.visibility = "visible";
 
 	// find all links (find them each time as they could have moved)
-	var page_links = document.links;
+	const page_links = document.links;
 
 
 	// create RegExp once
-	var re1 = new RegExp("^javascript:", "i");
-	var re2 = new RegExp(selectedAction.options.ignore.slice(1).join("|"), "i");
-	var re3 = new RegExp("^H\\d$");
+	const re1 = new RegExp("^javascript:", "i");
+	const re2 = new RegExp(selectedAction.options.ignore.slice(1).join("|"), "i");
+	const re3 = new RegExp("^H\\d$");
 
-	for (var i = 0; i < page_links.length; i++) {
+	for (let i = 0; i < page_links.length; i++) {
 		// reject javascript: links
 		if (re1.test(page_links[i].href)) {
 			continue;
@@ -468,17 +468,17 @@ function start() {
 		}
 
 		// attempt to ignore invisible links (can't ignore overflow)
-		var comp = window.getComputedStyle(page_links[i], null);
+		const comp = window.getComputedStyle(page_links[i], null);
 		if (comp.visibility == "hidden" || comp.display == "none") {
 			continue;
 		}
 
-		var pos = getXY(page_links[i]);
-		var width = page_links[i].offsetWidth;
-		var height = page_links[i].offsetHeight;
+		const pos = getXY(page_links[i]);
+		let width = page_links[i].offsetWidth;
+		let height = page_links[i].offsetHeight;
 
 		// attempt to get the actual size of the link
-		for (var k = 0; k < page_links[i].childNodes.length; k++) {
+		for (let k = 0; k < page_links[i].childNodes.length; k++) {
 			if (page_links[i].childNodes[k].nodeName == "IMG") {
 				const pos2 = getXY(page_links[i].childNodes[k]);
 				if (pos.y >= pos2.y) {
@@ -532,8 +532,8 @@ function stop() {
 
 function scroll() {
 	if (allow_selection()) {
-		var y = window.mouse_y - window.scrollY;
-		var win_height = window.innerHeight;
+		const y = window.mouse_y - window.scrollY;
+		const win_height = window.innerHeight;
 
 		if (y > win_height - 20) { // down
 			let speed = win_height - y;
@@ -591,10 +591,10 @@ function detect(x: number, y: number, open: boolean) {
 		window.scroll_id = setInterval(scroll, 100);
 	}
 
-	var count = 0;
-	var count_tabs = new Set;
-	var open_tabs = [];
-	for (var i = 0; i < window.links.length; i++) {
+	let count = 0;
+	const count_tabs = new Set;
+	const open_tabs = [];
+	for (let i = 0; i < window.links.length; i++) {
 		if (
 			(!window.smart_select || window.links[i].important)
 			&& !(
@@ -669,7 +669,7 @@ function detect(x: number, y: number, open: boolean) {
 }
 
 function allow_key(keyCode: number) {
-	for (var i in window.settings) {
+	for (const i in window.settings) {
 		if (window.settings[i]?.key == keyCode) {
 			return true;
 		}
@@ -708,7 +708,7 @@ function remove_key() {
 }
 
 function allow_selection() {
-	for (var i in window.settings) {
+	for (const i in window.settings) {
 		const setting = window.settings[i];
 
 		// need to check if key is 0 as key_pressed might not be accurate
