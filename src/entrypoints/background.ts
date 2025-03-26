@@ -195,7 +195,7 @@ function openTab(
 		obj.openerTabId = openerTabId;
 	}
 
-	if (tabIndex != null) {
+	if (typeof tabIndex === "number" && Number.isSafeInteger(tabIndex) && tabIndex >= 0) {
 		obj.index = tabIndex;
 		tabIndex++;
 	}
@@ -280,7 +280,7 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>) {
 		text += formatLink(request.urls[i], request.setting.options.copy);
 	}
 
-	if (request.setting.options.copy == AS_LIST_LINK_HTML) {
+	if (request.setting.options.copy === AS_LIST_LINK_HTML) {
 		text = "<ul>\n" + text + "</ul>\n";
 	}
 

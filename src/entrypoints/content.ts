@@ -86,7 +86,7 @@ function main() {
 
 				let allowed = true;
 				for (const i in response.blocked) {
-					if (response.blocked[i] == "") {
+					if (response.blocked[i] === "" || !(response.blocked[i]).match(/\S/g)) {
 						continue;
 					}
 					const re = new RegExp(response.blocked[i], "i");
@@ -469,7 +469,7 @@ function start() {
 
 		// attempt to ignore invisible links (can't ignore overflow)
 		const comp = window.getComputedStyle(page_links[i], null);
-		if (comp.visibility == "hidden" || comp.display == "none") {
+		if (comp.visibility === "hidden" || comp.display === "none") {
 			continue;
 		}
 
@@ -479,7 +479,7 @@ function start() {
 
 		// attempt to get the actual size of the link
 		for (let k = 0; k < page_links[i].childNodes.length; k++) {
-			if (page_links[i].childNodes[k].nodeName == "IMG") {
+			if (page_links[i].childNodes[k].nodeName === "IMG") {
 				const pos2 = getXY(page_links[i].childNodes[k]);
 				if (pos.y >= pos2.y) {
 					pos.y = pos2.y;
@@ -678,7 +678,7 @@ function allow_key(keyCode: number) {
 }
 
 function keydown(event: KeyboardEvent) {
-	if (event.code != END_CODE && event.code != HOME_CODE) {
+	if (event.code !== END_CODE && event.code !== HOME_CODE) {
 		window.key_pressed = event.keyCode;
 		// turn menu off for linux
 		if (window.os === OS_LINUX && allow_key(window.key_pressed)) {
@@ -694,7 +694,7 @@ function blur() {
 }
 
 function keyup(event: KeyboardEvent) {
-	if (event.code != END_CODE && event.code != HOME_CODE) {
+	if (event.code !== END_CODE && event.code !== HOME_CODE) {
 		remove_key();
 	}
 }

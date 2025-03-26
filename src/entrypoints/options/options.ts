@@ -574,7 +574,8 @@ function displayKeys(mouseButton: number): Record<number, string> {
 
 	// if not left or windows then allow no key
 	// NOTE mouseButton is sometimes a string, sometimes an int
-	if (mouseButton != 2 || os === OS_WIN) {
+	const mb = (typeof mouseButton === "string") ? Number.parseInt(mouseButton, 10) : mouseButton;
+	if (mb !== 2 || os === OS_WIN) {
 		keys[0] = '';
 	}
 
