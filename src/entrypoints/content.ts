@@ -62,7 +62,7 @@ export default defineContentScript(
 			ERROR  Entrypoint validation failed: 1 error, 0 warnings
 			src\entrypoints\content.js	- ERROR matches is required (recieved: undefined)
 		*/
-		matches: ["<all_urls>"],
+		matches: [ "<all_urls>" ],
 
 		// Executed when content script is loaded, can be async
 		main
@@ -78,16 +78,18 @@ function main() {
 			if (response === null) {
 				console.error("Unable to load linkclump due to null response");
 			} else {
-				if (response.hasOwnProperty("error")) {
+				if (Object.hasOwn(response, "error")) {
 					console.error("Unable to properly load linkclump, returning to default settings: " + JSON.stringify(response));
 				}
 
 				window.settings = response.actions;
 
-				var allowed = true;
-				for (var i in response.blocked) {
-					if (response.blocked[i] == "") continue;
-					var re = new RegExp(response.blocked[i], "i");
+				let allowed = true;
+				for (const i in response.blocked) {
+					if (response.blocked[i] === "" || !(response.blocked[i]).match(/\S/g)) {
+						continue;
+					}
+					const re = new RegExp(response.blocked[i], "i");
 
 					if (re.test(window.location.href)) {
 						allowed = false;
@@ -162,7 +164,7 @@ function init() {
 
 
 /**
- * 
+ *
  * @param {string} tagName
  * @param {ElementCreationOptions} options - { is: "Custom Element Tag Name" }
  * @returns {HTMLElement}
@@ -253,11 +255,13 @@ function clean_up() {
 		window.box.style.height = "";
 		window.box.style.visibility = "hidden";
 	}
-	if (window.count_label) window.count_label.style.visibility = "hidden";
+	if (window.count_label) {
+		window.count_label.style.visibility = "hidden";
+	}
 	window.box_on = false;
 
 	// remove the link boxes
-	for (var i = 0; i < window.links.length; i++) {
+	for (let i = 0; i < window.links.length; i++) {
 		if (window.links[i].box !== null) {
 			(window.linkclump).removeChild(window.links[i].box);
 			window.links[i].box = null;
@@ -316,8 +320,8 @@ function mousedown(event: MouseEvent) {
 }
 
 function update_box(x: number, y: number) {
-	var width = Math.max(document.documentElement["clientWidth"], document.body["scrollWidth"], document.documentElement["scrollWidth"], document.body["offsetWidth"], document.documentElement["offsetWidth"]); // taken from jquery
-	var height = Math.max(document.documentElement["clientHeight"], document.body["scrollHeight"], document.documentElement["scrollHeight"], document.body["offsetHeight"], document.documentElement["offsetHeight"]); // taken from jquery
+	const width = Math.max(document.documentElement["clientWidth"], document.body["scrollWidth"], document.documentElement["scrollWidth"], document.body["offsetWidth"], document.documentElement["offsetWidth"]); // taken from jquery
+	const height = Math.max(document.documentElement["clientHeight"], document.body["scrollHeight"], document.documentElement["scrollHeight"], document.body["offsetHeight"], document.documentElement["offsetHeight"]); // taken from jquery
 
 	const scrollbarWidth = window.innerWidth - document.body.clientWidth;
 	x = Math.min(x, width - scrollbarWidth);
@@ -385,18 +389,20 @@ function mouseup(event: MouseEvent) {
 }
 
 function getXY(element: HTMLElement): { x: number, y: number } {
-	var x = 0;
-	var y = 0;
+	let x = 0;
+	let y = 0;
 
-	var parent: Element | null = element;
-	var style;
-	var matrix;
+	let parent: Element | null = element;
+	let style;
+	let matrix;
 	do {
 		style = window.getComputedStyle(parent);
 		matrix = new WebKitCSSMatrix(style.webkitTransform);
 		x += parent.offsetLeft + matrix.m41;
 		y += parent.offsetTop + matrix.m42;
-	} while (parent = parent.offsetParent);
+
+		parent = parent.offsetParent;
+	} while (parent);
 
 	parent = element;
 	while (parent && parent !== document.body) {
@@ -416,7 +422,7 @@ function getXY(element: HTMLElement): { x: number, y: number } {
 }
 
 function start() {
-	const selectedAction = window.settings[window.setting]
+	const selectedAction = window.settings[window.setting];
 
 	if (selectedAction === undefined) {
 		console.error("No setting selected");
@@ -431,15 +437,15 @@ function start() {
 	window.count_label.style.visibility = "visible";
 
 	// find all links (find them each time as they could have moved)
-	var page_links = document.links;
+	const page_links = document.links;
 
 
 	// create RegExp once
-	var re1 = new RegExp("^javascript:", "i");
-	var re2 = new RegExp(selectedAction.options.ignore.slice(1).join("|"), "i");
-	var re3 = new RegExp("^H\\d$");
+	const re1 = new RegExp("^javascript:", "i");
+	const re2 = new RegExp(selectedAction.options.ignore.slice(1).join("|"), "i");
+	const re3 = new RegExp("^H\\d$");
 
-	for (var i = 0; i < page_links.length; i++) {
+	for (let i = 0; i < page_links.length; i++) {
 		// reject javascript: links
 		if (re1.test(page_links[i].href)) {
 			continue;
@@ -462,18 +468,18 @@ function start() {
 		}
 
 		// attempt to ignore invisible links (can't ignore overflow)
-		var comp = window.getComputedStyle(page_links[i], null);
-		if (comp.visibility == "hidden" || comp.display == "none") {
+		const comp = window.getComputedStyle(page_links[i], null);
+		if (comp.visibility === "hidden" || comp.display === "none") {
 			continue;
 		}
 
-		var pos = getXY(page_links[i]);
-		var width = page_links[i].offsetWidth;
-		var height = page_links[i].offsetHeight;
+		const pos = getXY(page_links[i]);
+		let width = page_links[i].offsetWidth;
+		let height = page_links[i].offsetHeight;
 
 		// attempt to get the actual size of the link
-		for (var k = 0; k < page_links[i].childNodes.length; k++) {
-			if (page_links[i].childNodes[k].nodeName == "IMG") {
+		for (let k = 0; k < page_links[i].childNodes.length; k++) {
+			if (page_links[i].childNodes[k].nodeName === "IMG") {
 				const pos2 = getXY(page_links[i].childNodes[k]);
 				if (pos.y >= pos2.y) {
 					pos.y = pos2.y;
@@ -526,10 +532,10 @@ function stop() {
 
 function scroll() {
 	if (allow_selection()) {
-		var y = window.mouse_y - window.scrollY;
-		var win_height = window.innerHeight;
+		const y = window.mouse_y - window.scrollY;
+		const win_height = window.innerHeight;
 
-		if (y > win_height - 20) { //down
+		if (y > win_height - 20) { // down
 			let speed = win_height - y;
 			if (speed < 2) {
 				speed = 60;
@@ -545,7 +551,7 @@ function scroll() {
 
 			window.scroll_bug_ignore = true;
 			return;
-		} else if (window.scrollY > 0 && y < 20) { //up
+		} else if (window.scrollY > 0 && y < 20) { // up
 			let speed = y;
 			if (speed < 2) {
 				speed = 60;
@@ -585,10 +591,10 @@ function detect(x: number, y: number, open: boolean) {
 		window.scroll_id = setInterval(scroll, 100);
 	}
 
-	var count = 0;
-	var count_tabs = new Set;
-	var open_tabs = [];
-	for (var i = 0; i < window.links.length; i++) {
+	let count = 0;
+	const count_tabs = new Set;
+	const open_tabs = [];
+	for (let i = 0; i < window.links.length; i++) {
 		if (
 			(!window.smart_select || window.links[i].important)
 			&& !(
@@ -663,7 +669,7 @@ function detect(x: number, y: number, open: boolean) {
 }
 
 function allow_key(keyCode: number) {
-	for (var i in window.settings) {
+	for (const i in window.settings) {
 		if (window.settings[i]?.key == keyCode) {
 			return true;
 		}
@@ -672,7 +678,7 @@ function allow_key(keyCode: number) {
 }
 
 function keydown(event: KeyboardEvent) {
-	if (event.code != END_CODE && event.code != HOME_CODE) {
+	if (event.code !== END_CODE && event.code !== HOME_CODE) {
 		window.key_pressed = event.keyCode;
 		// turn menu off for linux
 		if (window.os === OS_LINUX && allow_key(window.key_pressed)) {
@@ -688,7 +694,7 @@ function blur() {
 }
 
 function keyup(event: KeyboardEvent) {
-	if (event.code != END_CODE && event.code != HOME_CODE) {
+	if (event.code !== END_CODE && event.code !== HOME_CODE) {
 		remove_key();
 	}
 }
@@ -702,19 +708,19 @@ function remove_key() {
 }
 
 function allow_selection() {
-	for (var i in window.settings) {
+	for (const i in window.settings) {
 		const setting = window.settings[i];
 
 		// need to check if key is 0 as key_pressed might not be accurate
 		if (setting?.mouse == window.mouse_button && setting?.key == window.key_pressed) {
-			window.setting = Number.parseInt(i, 10)
+			window.setting = Number.parseInt(i, 10);
 
 			if (window.box !== null) {
 				// box
 				window.box.style.border = "2px dotted " + (setting?.color ?? "red");
 
 				// counter
-				if ((setting?.color && typeof setting.color === "string") && (setting?.options && (setting.options).hasOwnProperty("samebgcolorasbox") && typeof setting.options.samebgcolorasbox === "boolean")) {
+				if ((setting?.color && typeof setting.color === "string") && (setting?.options && Object.hasOwn(setting.options, "samebgcolorasbox") && typeof setting.options.samebgcolorasbox === "boolean")) {
 					if (setting.options.samebgcolorasbox === true) {
 						window.count_label.style.color = "white";
 						window.count_label.style.borderColor = "white";

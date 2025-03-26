@@ -1,8 +1,8 @@
 ---
 name: Bug Report
 about: Before creating a new issue, please search to see if a similar issue already exists.
-title: ''
-labels: ''
+title: '[Bug] '
+labels: [bug]
 assignees: ''
 ---
 

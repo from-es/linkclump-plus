@@ -6,7 +6,7 @@ import $ from "jquery";
 import "@/assets/js/lib/colorpicker/jquery.colorpicker.js";
 import "@/assets/js/lib/colorpicker/jquery.colorpicker.css";
 
-import "./style.css"
+import "./style.css";
 
 interface Trigger {
 	name: string;
@@ -40,24 +40,24 @@ interface ActionParam {
 
 const config: Config = {
 	"triggers":
-		[{ "name": "Left" }, { "name": "Middle" }, { "name": "Right" }],
+		[ { "name": "Left" }, { "name": "Middle" }, { "name": "Right" } ],
 	"actions": {
-		"win": { "name": "Opened in a New Window", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus"] },
-		"tabs": { "name": "Opened as New Tabs", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end"] },
-		"bm": { "name": "Bookmarked", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse"] },
-		"copy": { "name": "Copied to clipboard", "options": ["fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse"] }
+		"win": { "name": "Opened in a New Window", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus" ] },
+		"tabs": { "name": "Opened as New Tabs", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end" ] },
+		"bm": { "name": "Bookmarked", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse" ] },
+		"copy": { "name": "Copied to clipboard", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse" ] }
 	},
 	"options": {
 		"fontsizeofcounter": {
 			"name": "counter font size",
 			"type": "number",
-			"data": [16, 8, 64], // [ default, min , max ]
+			"data": [ 16, 8, 64 ], // [ default, min , max ]
 			"extra": "font size of the counter (default: 16, range: 8-64)"
 		},
 		"fontweightofcounter": {
 			"name": "counter font weight",
 			"type": "number",
-			"data": [400, 1, 1000], // [ default, min , max ]
+			"data": [ 400, 1, 1000 ], // [ default, min , max ]
 			"extra": "font weight of the counter (default: 400, range: 1-1000, thin: 100, normal: 400, bold: 700)"
 		},
 		"samebgcolorasbox": {
@@ -68,19 +68,19 @@ const config: Config = {
 		"smart": {
 			"name": "smart select",
 			"type": "selection",
-			"data": ["on", "off"],
+			"data": [ "on", "off" ],
 			"extra": "with smart select turned on linkclump tries to select only the important links"
 		},
 		"ignore": {
 			"name": "filter links",
 			"type": "selection-textbox",
-			"data": ["exclude links with words", "include links with words"],
+			"data": [ "exclude links with words", "include links with words" ],
 			"extra": "filter links that include/exclude these words; separate words with a comma ,"
 		},
 		"copy": {
 			"name": "copy format",
 			"type": "selection",
-			"data": ["URLS with titles", "URLS only", "URLS only space separated", "titles only", "as link HTML", "as list link HTML", "as Markdown"],
+			"data": [ "URLS with titles", "URLS only", "URLS only space separated", "titles only", "as link HTML", "as list link HTML", "as Markdown" ],
 			"extra": "format of the links saved to the clipboard"
 		},
 		"delay": {
@@ -120,7 +120,7 @@ const OS_WIN = 0;
 const OS_LINUX = 1;
 const OS_MAC = 2;
 
-const colors: string[] = ["458B74", "838B8B", "CCCCCC", "0000FF", "8A2BE2", "D2691E", "6495ED", "DC143C", "006400", "9400D3", "1E90FF", "228B22", "00FF00", "ADFF2F", "FF69B4", "4B0082", "F0E68C", "8B814C", "87CEFA", "32CD32", "000080", "FFA500", "FF4500", "DA70D6", "8B475D", "8B668B", "FF0000", "2E8B57", "8E388E", "FFFF00"];
+const colors: string[] = [ "458B74", "838B8B", "CCCCCC", "0000FF", "8A2BE2", "D2691E", "6495ED", "DC143C", "006400", "9400D3", "1E90FF", "228B22", "00FF00", "ADFF2F", "FF69B4", "4B0082", "F0E68C", "8B814C", "87CEFA", "32CD32", "000080", "FFA500", "FF4500", "DA70D6", "8B475D", "8B668B", "FF0000", "2E8B57", "8E388E", "FFFF00" ];
 let params: Settings | null = null;
 const div_history: Record<string, JQuery> = [];
 
@@ -143,11 +143,11 @@ function initValue() {
 }
 
 function initEvent() {
-	let isFirstTime = (window.location.href).indexOf("init=true") > -1;
+	const isFirstTime = (window.location.href).indexOf("init=true") > -1;
 
 	// temp check to not load if in test mode
 	if (document.getElementById("guide2") === null) {
-		return
+		return;
 	}
 
 	document.getElementById("guide3").addEventListener("click", tour3);
@@ -165,14 +165,15 @@ function initEvent() {
 
 	setup_form();
 
-	chrome.runtime.sendMessage({
-		message: "init",
-		debug: true
-	},
+	chrome.runtime.sendMessage(
+		{
+			message: "init",
+			debug: true
+		},
 		function (response) {
 			params = response;
 
-			for (var i in params.actions) {
+			for (const i in params.actions) {
 				$("#settings").append(setup_action(params.actions[i], i));
 			}
 			setup_text(keys);
@@ -184,7 +185,8 @@ function initEvent() {
 			} else {
 				tour2();
 			}
-		});
+		}
+	);
 }
 
 
@@ -212,8 +214,8 @@ function tour3() {
 }
 
 /**
- * 
- * @param {string | null} id 
+ *
+ * @param {string | null} id
  */
 function load_action(id: string | null) {  // into form
 	if (id === null) {
@@ -224,7 +226,7 @@ function load_action(id: string | null) {  // into form
 		$("#form_key").val(90);   // and z key
 		$(".colorpicker-trigger").css("background-color", "#" + colors[Math.floor(Math.random() * colors.length)]);
 	} else {
-		var param = params?.actions[id];
+		const param = params?.actions[id];
 		$("#form_id").val(id);
 
 		$("#form_mouse").val(param.mouse);
@@ -237,7 +239,7 @@ function load_action(id: string | null) {  // into form
 
 		displayOptions(param.action);
 
-		for (var i in param.options) {
+		for (const i in param.options) {
 			switch (config.options[i].type) {
 				case "number":
 					$("#form_option_" + i).val(param.options[i]);
@@ -261,9 +263,9 @@ function load_action(id: string | null) {  // into form
 
 				case "selection-textbox":
 					if (param.options[i].length > 1) {
-						var selection = param.options[i][0];
-						var text = "";
-						for (var k = 1; k < param.options[i].length; k++) {
+						const selection = param.options[i][0];
+						let text = "";
+						for (let k = 1; k < param.options[i].length; k++) {
 							text += param.options[i][k] + ",";
 						}
 
@@ -291,14 +293,14 @@ function load_action(id: string | null) {  // into form
 }
 
 /**
- * 
- * @param {string} id 
+ *
+ * @param {string} id
  * @param {JQuery<HTMLElement>} div
  */
 function delete_action(id: string, div: JQuery) {
 	div.fadeOut("swing", function () {
-		var del = $("<div class='undo'>Action has been deleted </div>");
-		var undo = $("<a>undo</a>").click({ "i": id, "param": params.actions[id] },
+		const del = $("<div class='undo'>Action has been deleted </div>");
+		const undo = $("<a>undo</a>").click({ "i": id, "param": params.actions[id] },
 			function (event) {
 				div_history[event.data.i].replaceWith(setup_action(event.data.param, event.data.i));
 				params.actions[event.data.i] = event.data.param;
@@ -321,7 +323,7 @@ function delete_action(id: string, div: JQuery) {
 }
 
 function setup_action(param: ActionParam, id: string): JQuery {
-	var setting = $("<div class='setting' id='action_" + id + "'>");
+	const setting = $("<div class='setting' id='action_" + id + "'>");
 
 	const h3 = "<h3>" + config.actions[param.action].name + "</h3>";
 	const activateKey = (param.key > 0) ? "\"<b>" + keys[param.key] + "</b>\" key and " : "";
@@ -330,25 +332,28 @@ function setup_action(param: ActionParam, id: string): JQuery {
 	setting.append(h3);
 	setting.append(activate);
 
-	var list = $("<ul>");
-	for (var j in param.options) {
-		var op = config.options[j];
-		var text = op.name + ": ";
+	const list = $("<ul>");
+	for (const j in param.options) {
+		const op = config.options[j];
+		let text = op.name + ": ";
 		switch (op.type) {
-			case "number":
+			case "number": {
 				text += param.options[j];
 				break;
-			case "selection":
+			}
+			case "selection": {
 				text += op.data[param.options[j]];
 				break;
-			case "textbox":
+			}
+			case "textbox": {
 				// TODO not sure if param.options[j] returns a string or int
 				if (param.options[j] === "" || param.options[j] == "0") {
 					continue;
 				}
 				text += param.options[j];
 				break;
-			case "checkbox":
+			}
+			case "checkbox": {
 				/*
 				if (!param.options[j]) {
 					continue;
@@ -356,13 +361,14 @@ function setup_action(param: ActionParam, id: string): JQuery {
 				*/
 				text += param.options[j];
 				break;
-			case "selection-textbox":
+			}
+			case "selection-textbox": {
 				if (param.options[j].length < 2) {
 					continue;
 				}
-				var selection = param.options[j][0];
-				var words = "";
-				for (var i = 1; i < param.options[j].length; i++) {
+				const selection = param.options[j][0];
+				let words = "";
+				for (let i = 1; i < param.options[j].length; i++) {
 					words += param.options[j][i];
 
 					if (i < param.options[j].length - 1) {
@@ -371,6 +377,7 @@ function setup_action(param: ActionParam, id: string): JQuery {
 				}
 				text += op.data[selection] + "; " + words;
 				break;
+			}
 		}
 
 		list.append("<li>" + text + "</li>");
@@ -379,14 +386,14 @@ function setup_action(param: ActionParam, id: string): JQuery {
 
 	setting.append(list);
 
-	var edit = $("<button class='button edit'>Edit</button>").click({ 'i': id },
+	const edit = $("<button class='button edit'>Edit</button>").click({ 'i': id },
 		function (event) {
 			load_action(event.data.i, $(this).parent().parent());
 			return false;
 		}
 	);
 
-	var del = $("<button class='button delete'>Delete</button>").click({ "i": id },
+	const del = $("<button class='button delete'>Delete</button>").click({ "i": id },
 		function (event) {
 			delete_action(event.data.i, $(this).parent());
 			return false;
@@ -400,8 +407,8 @@ function setup_action(param: ActionParam, id: string): JQuery {
 }
 
 function setup_form() {
-	var mouse = $("#form_mouse");
-	for (var i = 0; i < config.triggers.length; i++) {
+	const mouse = $("#form_mouse");
+	for (let i = 0; i < config.triggers.length; i++) {
 		mouse.append('<option value="' + i + '">' + config.triggers[i].name + '</option>');
 	}
 
@@ -410,8 +417,8 @@ function setup_form() {
 		check_selection();
 	});
 
-	var color = $("#form_color");
-	for (var i in colors) {
+	const color = $("#form_color");
+	for (const i in colors) {
 		color.append("<option value='" + colors[i] + "'>" + colors[i] + "</option>");
 	}
 
@@ -421,13 +428,13 @@ function setup_form() {
 	});
 
 
-	var action = $("#form_action");
-	for (var i in config.actions) {
-		var act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + config.actions[i].name + '<br/>')
+	const action = $("#form_action");
+	for (const i in config.actions) {
+		const act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + config.actions[i].name + '<br/>');
 
 
 		act.click(function (event) {
-			displayOptions(event.currentTarget.value)
+			displayOptions(event.currentTarget.value);
 		}
 		);
 
@@ -438,8 +445,8 @@ function setup_form() {
 }
 
 function setup_text(keys: Record<number, string>) {
-	var param;
-	for (var i in params.actions) {
+	let param;
+	for (const i in params.actions) {
 		param = params.actions[i];
 		break;
 	}
@@ -456,12 +463,12 @@ function setup_text(keys: Record<number, string>) {
 }
 
 function check_selection() {
-	var m = $("#form_mouse").val();
-	var k = $("#form_key").val();
-	var id = $("#form_id").val();
+	const m = $("#form_mouse").val();
+	const k = $("#form_key").val();
+	const id = $("#form_id").val();
 
 
-	var keyWarning = $('#key_warning');
+	const keyWarning = $('#key_warning');
 	keyWarning.empty();
 	if (k === "0") {
 		keyWarning.append("WARNING: Not using a key could cause unexpected behavior on some websites");
@@ -474,7 +481,7 @@ function check_selection() {
 		}
 	}
 
-	for (var i in params.actions) {
+	for (const i in params.actions) {
 		// not sure if mouse/key are strings or ints
 		if (i != id && params.actions[i].mouse == m && params.actions[i].key == k) {
 			if ($(".warning").is(":hidden")) {
@@ -491,54 +498,55 @@ function check_selection() {
 }
 
 function displayOptions(action: string) {
-	var options = $("#form_options");
+	const options = $("#form_options");
 	options.empty();
 
-	for (var i in config.actions[action].options) {
-		var op = config.options[config.actions[action].options[i]];
-		var title = $("<label>" + op.name + "</label>");
-		var p = $("<p class=\"clearfix\"/>");
+	for (const i in config.actions[action].options) {
+		const op = config.options[config.actions[action].options[i]];
+		const title = $("<label>" + op.name + "</label>");
+		const p = $("<p class=\"clearfix\"/>");
 		p.append(title);
 
 		switch (op.type) {
-			case "number":
+			case "number": {
 				const def = op?.data[0];
 				const min = op?.data[1];
 				const max = op?.data[2];
 
 				p.append(`<input type="number" name="${op.name}" id="form_option_${config.actions[action].options[i]}" value="${def}" step="1" min="${min}" max="${max}" />`);
 				break;
-
-			case "selection":
-				var selector = $("<select id='form_option_" + config.actions[action].options[i] + "'>");
-				for (var j in op.data) {
+			}
+			case "selection": {
+				const selector = $("<select id='form_option_" + config.actions[action].options[i] + "'>");
+				for (const j in op.data) {
 					selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
 				}
 				p.append(selector);
 				break;
-
-			case "textbox":
+			}
+			case "textbox": {
 				p.append('<input type="text" name="' + op.name + '" id="form_option_' + config.actions[action].options[i] + '"/>');
 				break;
-
-			case "checkbox":
+			}
+			case "checkbox": {
 				p.append('<input type="checkbox" name="' + op.name + '" id="form_option_' + config.actions[action].options[i] + '"/>');
 				break;
-
-			case "selection-textbox":
-				var selector = $("<select id='form_option_selection_" + config.actions[action].options[i] + "'>");
-				for (var j in op.data) {
+			}
+			case "selection-textbox": {
+				const selector = $("<select id='form_option_selection_" + config.actions[action].options[i] + "'>");
+				for (const j in op.data) {
 					selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
 				}
 				p.append(selector);
 				p.append('</p><label></label><p>');
 				p.append('<input type="text" name="' + op.name + '" id="form_option_text_' + config.actions[action].options[i] + '"/>');
 				break;
+			}
 		}
 
 		const label = p.find("label").eq(0);
 		label.mouseover({ "extra": op.extra }, function (event) {
-			var extra = $("#form_extra");
+			const extra = $("#form_extra");
 			extra.html(event.data.extra);
 			extra.css("top", $(this).position().top);
 			extra.css("left", $(this).position().left + 500);
@@ -553,9 +561,9 @@ function displayOptions(action: string) {
 }
 
 function displayKeys(mouseButton: number): Record<number, string> {
-	var key = $("#form_key");
+	const key = $("#form_key");
 	key.empty();
-	var keys: Record<number, string> = [];
+	const keys: Record<number, string> = [];
 
 	keys[16] = "shift";
 	keys[17] = "ctrl";
@@ -566,16 +574,17 @@ function displayKeys(mouseButton: number): Record<number, string> {
 
 	// if not left or windows then allow no key
 	// NOTE mouseButton is sometimes a string, sometimes an int
-	if (mouseButton != 2 || os === OS_WIN) {
+	const mb = (typeof mouseButton === "string") ? Number.parseInt(mouseButton, 10) : mouseButton;
+	if (mb !== 2 || os === OS_WIN) {
 		keys[0] = '';
 	}
 
 	// add on alpha characters
-	for (var i = 0; i < 26; i++) {
+	for (let i = 0; i < 26; i++) {
 		keys[65 + i] = String.fromCharCode(97 + i);
 	}
 
-	for (var i in keys) {
+	for (const i in keys) {
 		key.append('<option value="' + i + '">' + keys[i] + '</option>');
 	}
 
@@ -591,9 +600,9 @@ function load_new_action(event: JQuery.Event) {
 }
 
 function save_action(event: JQuery.Event) {
-	var id = $("#form_id").val();
+	let id = $("#form_id").val();
 
-	var param: ActionParam = {} as ActionParam;
+	const param: ActionParam = {} as ActionParam;
 
 	param.mouse = $("#form_mouse").val();
 	param.key = $("#form_key").val();
@@ -601,14 +610,14 @@ function save_action(event: JQuery.Event) {
 	param.action = $("input[name=action]:radio:checked").val();
 	param.options = {};
 
-	for (var opt in config.actions[param.action].options) {
-		var name = config.actions[param.action].options[opt];
-		var type = config.options[name].type;
+	for (const opt in config.actions[param.action].options) {
+		const name = config.actions[param.action].options[opt];
+		const type = config.options[name].type;
 		if (type === "checkbox") {
 			param.options[name] = $("#form_option_" + name).is(":checked");
 		} else {
 			if (name === "ignore") {
-				var ignore = $("#form_option_text_" + name).val().replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",")
+				const ignore = $("#form_option_text_" + name).val().replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",");
 				// if the last entry is empty then just remove from array
 				if (ignore.length > 0 && ignore[ignore.length - 1] === "") {
 					ignore.pop();
@@ -618,7 +627,7 @@ function save_action(event: JQuery.Event) {
 
 				param.options[name] = ignore;
 			} else if (name === "delay" || name === "close" || name === "copy") {
-				var value: number;
+				let value: number;
 
 				try {
 					value = parseFloat($("#form_option_" + name).val());
@@ -652,14 +661,14 @@ function save_action(event: JQuery.Event) {
 	}
 
 	if (id === "" || params.actions[id] === null) {
-		var newDate = new Date;
+		const newDate = new Date;
 		id = newDate.getTime();
 
 		params.actions[id] = param;
 		$("#settings").append(setup_action(param, id));
 	} else {
 		params.actions[id] = param;
-		var update = setup_action(param, id);
+		const update = setup_action(param, id);
 		$("#action_" + id).replaceWith(update);
 	}
 
@@ -676,7 +685,7 @@ function save_params() {
 
 function save_block() {
 	// replace any whitespace at end to stop empty site listings
-	var sites = $("#form_block").val().replace(/^\s+|\s+$/g, "").split("\n");
+	const sites = $("#form_block").val().replace(/^\s+|\s+$/g, "").split("\n");
 
 	if (Array.isArray(sites)) {
 		params.blocked = sites;
@@ -707,7 +716,7 @@ async function import_setting() {
 
 			// debug
 			console.log("Debug, Import setting. params >>", { params });
-		} else { }
+		}
 	} else {
 		console.error("Error, can't import setting. result >>", result);
 	}
