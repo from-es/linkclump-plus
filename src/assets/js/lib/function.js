@@ -42,7 +42,7 @@ function generateID(digit = 8, character = { number: true, alphabet: { uppercase
 			uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 			lowercase: "abcdefghijklmnopqrstuvwxyz"
 		},
-		symbol: "`~!@#$%^&*()_+-={}[]\|:;\"'<>,.?/"
+		symbol: "`~!@#$%^&*()_+-={}[]|:;\"'<>,.?/"
 	};
 	const getCharacter = (chr) => {
 		let str = "";
@@ -61,7 +61,7 @@ function generateID(digit = 8, character = { number: true, alphabet: { uppercase
 		}
 
 		return str;
-	}
+	};
 
 	const typedArray = new Uint32Array(digit);
 	const cryptoArray = crypto.getRandomValues(typedArray);
@@ -134,13 +134,13 @@ async function importConfig(filetype) {
 function exportConfig(setting, filename, filetype) {
 	const config = JSON.stringify(setting, null, '\t');
 	const file = { minetype: filetype, name: filename };
-	const blob = new Blob([config], { type: file.minetype });
+	const blob = new Blob([ config ], { type: file.minetype });
 	const url = URL.createObjectURL(blob);
 	const ank = document.createElement('a');
 
 	ank.download = file.name;
 	ank.href = url;
-	ank.dataset.downloadurl = [file.minetype, ank.download, ank.href].join(':');
+	ank.dataset.downloadurl = [ file.minetype, ank.download, ank.href ].join(':');
 	ank.click();
 
 	URL.revokeObjectURL(url);

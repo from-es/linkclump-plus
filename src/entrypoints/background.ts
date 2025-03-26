@@ -2,25 +2,25 @@ import { ActivateMessage, ActivateMessage_bm, ActivateMessage_copy, ActivateMess
 import { Settings } from "@/assets/js/types/Settings";
 
 // Format version
-var CURRENT_VERSION = "5";
+const CURRENT_VERSION = "5";
 
 // key name for Stroage
 const linkclumpSettingsKey = "linkclumpSettings";
 const linkclumpVersionKey = "linkclumpVersion";
 
 // Link copy formats
-const URLS_WITH_TITLES = 0
-const URLS_ONLY = 1
-const URLS_ONLY_SPACE_SEPARATED = 2
-const TITLES_ONLY = 3
-const AS_LINK_HTML = 4
-const AS_LIST_LINK_HTML = 5
-const AS_MARKDOWN = 6
+const URLS_WITH_TITLES = 0;
+const URLS_ONLY = 1;
+const URLS_ONLY_SPACE_SEPARATED = 2;
+const TITLES_ONLY = 3;
+const AS_LINK_HTML = 4;
+const AS_LIST_LINK_HTML = 5;
+const AS_MARKDOWN = 6;
 
 class SettingsManager {
 
 	async load(): Promise<Settings> {
-		var { [linkclumpSettingsKey]: settings } = await chrome.storage.sync.get(linkclumpSettingsKey);
+		let { [linkclumpSettingsKey]: settings } = await chrome.storage.sync.get(linkclumpSettingsKey);
 
 		if (settings) {
 			return settings;
@@ -52,7 +52,7 @@ class SettingsManager {
 
 	init() {
 		// create default settings for first time user
-		var settings: Settings = {
+		const settings: Settings = {
 			"actions": {
 				"101": {
 					"mouse": 0,  // left mouse button
@@ -61,7 +61,7 @@ class SettingsManager {
 					"color": "#FFA500",
 					"options": {
 						"smart": 0,
-						"ignore": [0],
+						"ignore": [ 0 ],
 						"delay": 0,
 						"close": 0,
 						"block": true,
@@ -91,7 +91,7 @@ class SettingsManager {
 	};
 }
 
-var settingsManager = new SettingsManager();
+const settingsManager = new SettingsManager();
 
 
 
@@ -116,19 +116,21 @@ function main() {
 		chrome.windows.getAll(
 			{ populate: true },
 			function (windows) {
-				for (var i = 0; i < windows.length; ++i) {
-					const numberOfTabs = windows[i].tabs?.length
+				for (let i = 0; i < windows.length; ++i) {
+					const numberOfTabs = windows[i].tabs?.length;
 					if (numberOfTabs === undefined) {
-						continue
+						continue;
 					}
-					for (var j = 0; j < numberOfTabs; ++j) {
-						const tab = windows[i]?.tabs?.[j]
-						const url = tab?.url
-						const id = tab?.id
+					for (let j = 0; j < numberOfTabs; ++j) {
+						const tab = windows[i]?.tabs?.[j];
+						const url = tab?.url;
+						const id = tab?.id;
 						if (!url || !id) {
-							continue
+							continue;
 						}
-						if (!/^https?:\/\//.test(url)) continue;
+						if (!/^https?:\/\//.test(url)) {
+							continue;
+						}
 						chrome.tabs.executeScript(id, { file: "/content-scripts/content.js" });
 					}
 				}
@@ -149,12 +151,13 @@ function main() {
 }
 
 function uniqueUrl<T extends { url: string }>(arr: T[]): T[] {
-	var a = [];
-	var l = arr.length;
-	for (var i = 0; i < l; i++) {
-		for (var j = i + 1; j < l; j++) {
-			if (arr[i].url === arr[j].url)
+	const a = [];
+	const l = arr.length;
+	for (let i = 0; i < l; i++) {
+		for (let j = i + 1; j < l; j++) {
+			if (arr[i].url === arr[j].url) {
 				j = ++i;
+			}
 		}
 		a.push(arr[i]);
 	}
@@ -175,7 +178,7 @@ function openTab(
 	if (!url || urls.length > 0) {
 		setTimeout(
 			function () {
-				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime)
+				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime);
 			},
 			delay * 1000
 		);
@@ -192,7 +195,7 @@ function openTab(
 		obj.openerTabId = openerTabId;
 	}
 
-	if (tabIndex != null) {
+	if (typeof tabIndex === "number" && Number.isSafeInteger(tabIndex) && tabIndex >= 0) {
 		obj.index = tabIndex;
 		tabIndex++;
 	}
@@ -212,7 +215,7 @@ function openTab(
 }
 
 /**
- * 
+ *
  * @param {string} text - Text to copy to clipboard
  */
 function copyToClipboard(text: string) {
@@ -224,7 +227,7 @@ function copyToClipboard(text: string) {
 }
 
 function pad(number: number, length: number) {
-	var str = "" + number;
+	let str = "" + number;
 	while (str.length < length) {
 		str = "0" + str;
 	}
@@ -233,13 +236,13 @@ function pad(number: number, length: number) {
 }
 
 function timeConverter(a: Date) {
-	var year = a.getFullYear();
-	var month = pad(a.getMonth() + 1, 2)
-	var day = pad(a.getDate(), 2);
-	var hour = pad(a.getHours(), 2);
-	var min = pad(a.getMinutes(), 2);
-	var sec = pad(a.getSeconds(), 2);
-	var time = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
+	const year = a.getFullYear();
+	const month = pad(a.getMonth() + 1, 2);
+	const day = pad(a.getDate(), 2);
+	const hour = pad(a.getHours(), 2);
+	const min = pad(a.getMinutes(), 2);
+	const sec = pad(a.getSeconds(), 2);
+	const time = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
 	return time;
 }
 
@@ -272,13 +275,13 @@ function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: Copy
 }
 
 function handleCopy(request: ActivateMessage<ActivateMessage_copy>) {
-	var text = "";
+	let text = "";
 	for (let i = 0; i < request.urls.length; i++) {
 		text += formatLink(request.urls[i], request.setting.options.copy);
 	}
 
-	if (request.setting.options.copy == AS_LIST_LINK_HTML) {
-		text = "<ul>\n" + text + "</ul>\n"
+	if (request.setting.options.copy === AS_LIST_LINK_HTML) {
+		text = "<ul>\n" + text + "</ul>\n";
 	}
 
 	copyToClipboard(text);
@@ -296,10 +299,11 @@ function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 
 			// make assumption that bookmarkTreeNodes[0].children[1] refers to the "other bookmarks" folder
 			// as different languages will not use the english name to refer to the folder
-			chrome.bookmarks.create({
-				"parentId": folderID,
-				"title": "Linkclump " + timeConverter(new Date())
-			},
+			chrome.bookmarks.create(
+				{
+					"parentId": folderID,
+					"title": "Linkclump " + timeConverter(new Date())
+				},
 				function (newFolder) {
 					for (let j = 0; j < request.urls.length; j++) {
 						chrome.bookmarks.create({
@@ -360,7 +364,7 @@ function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: chrom
 
 	chrome.tabs.get(sender.tab.id, function (tab) {
 		chrome.windows.getCurrent(function (currentWindow) {
-			var tab_index = null;
+			let tab_index = null;
 
 			if (!request.setting.options.end) {
 				tab_index = tab.index + 1;
@@ -376,7 +380,7 @@ function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: chrom
 				tab_index,
 				request.setting.options.close
 			);
-		})
+		});
 	});
 }
 
@@ -430,7 +434,9 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 				populate: true
 			}, function (windowList) {
 				windowList.forEach(function (window) {
-					if (!window.tabs) return;
+					if (!window.tabs) {
+						return;
+					}
 
 					window.tabs.forEach(async function (tab) {
 						if (!(tab?.id && tab?.url)) {
@@ -454,7 +460,7 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 							.then(
 								(response) => {
 									// debug
-									//console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from content.js >>', { tab, response });
+									// console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from content.js >>', { tab, response });
 								}
 							)
 							.catch(
@@ -462,12 +468,12 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 									// When sending a message to a tab other than "http or https or file",
 									// "Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist." occurs in "background.js".
 
-									// debug　
+									// debug
 									console.log('Debug, send an "update" message to the tab. Received a response from Tab. error >>', { tab, error });
 								}
 							);
-					})
-				})
+					});
+				});
 			});
 
 			return;
