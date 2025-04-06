@@ -290,8 +290,44 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>) {
 function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 	chrome.bookmarks.getTree(
 		function (bookmarkTreeNodes) {
+			const selectBookmarks = (bookmarks: undefined | string | number): number => {
+				const regex = /^([0-9]+)$/;
+				const defaultValue = 1; // Other Bookmarks: bookmarkTreeNodes[0].children.[1];
+				let index: number;
 
-			const folderID = bookmarkTreeNodes[0].children?.[1]?.id;
+				if (!bookmarks) {
+					/*
+						Applies if the configuration has not been saved in Version 2.13 or later.
+						This maintains compatibility with the behavior of adding to "Other Bookmarks" until version 2.12.4.2 or earlier.
+					*/
+					index = defaultValue;
+				} else if (typeof bookmarks === "number" && Number.isSafeInteger(bookmarks)) {
+					index = bookmarks;
+				} else if (typeof bookmarks === "string" && regex.test(bookmarks)) {
+					index = Number.parseInt(bookmarks, 10);
+				} else {
+					console.warn("Invalid value passed to getBookmarksIndex()", { typeof: bookmarks, value: bookmarks });
+
+					index = defaultValue;
+				}
+
+				if (!(index === 0 || index === 1)) {
+					index = defaultValue;
+				}
+
+				return index;
+			};
+
+			/*
+				request.setting.options.bookmarks
+					undefined : This key does not exist until 2.12.4.2 or earlier
+					0 or "0"  : main   bookmarks
+					1 or "1"  : other  bookmarks >> Default designation until 2.12.4.2 or earlier
+					2 or "2"  : synced bookmarks
+			*/
+			const bookmarksIndex: number = selectBookmarks(request.setting.options?.bookmarks);
+			const folderID = bookmarkTreeNodes[0].children?.[bookmarksIndex]?.id;
+
 			if (!folderID) {
 				console.error("Folder ID is undefined");
 				return;

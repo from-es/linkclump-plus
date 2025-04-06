@@ -26,6 +26,7 @@ export type ActivateMessage_bm = {
 	"options": {
 		"block": boolean,
 		"reverse": boolean,
+		"bookmarks": number // string: "0" or "1"
 	}
 }
 

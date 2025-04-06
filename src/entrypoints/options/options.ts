@@ -44,7 +44,7 @@ const config: Config = {
 	"actions": {
 		"win": { "name": "Opened in a New Window", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus" ] },
 		"tabs": { "name": "Opened as New Tabs", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end" ] },
-		"bm": { "name": "Bookmarked", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse" ] },
+		"bm": { "name": "Bookmarked", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "bookmarks", "block", "reverse" ] },
 		"copy": { "name": "Copied to clipboard", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse" ] }
 	},
 	"options": {
@@ -76,6 +76,12 @@ const config: Config = {
 			"type": "selection-textbox",
 			"data": [ "exclude links with words", "include links with words" ],
 			"extra": "filter links that include/exclude these words; separate words with a comma ,"
+		},
+		"bookmarks": {
+			"name": "select bookmarks",
+			"type": "selection",
+			"data": [ "Main", "Other bookmarks" ],
+			"extra": "select the bookmarks you want to add, Main or Other bookmarks"
 		},
 		"copy": {
 			"name": "copy format",
