@@ -10,9 +10,9 @@ Thanks to [benblack86](https://github.com/benblack86 "https://github.com/benblac
 
 ## Support
 
-Support is not provided as this is a free extension.
+Please note that as this is a free extension the developer is unable to offer individual support.
 
-If you have any issues or feature requests with "Linkclump Plus", please report them on GitHub (https://github.com/from-es/linkclump-plus/issues).
+If you have any issues or feature requests, please report them at GitHub (https://github.com/from-es/linkclump-plus/issues).
 
 ## Installation
 
@@ -68,6 +68,23 @@ header, nav, main, footer {
 	width: 1080px; /* or "min-width: 1080px;" or "max-width: 1080px;" */
 }
 ```
+
+### "Linkclump Plus" Opened Links not marking as "Visited"
+
+If opened links are not marked as “visited”, then that is a Google Chrome specification; the behavioural specification changed in an update in early 2025/03. For more information on this change, see the following article.
+
+Partitioning :visited links history - Chrome Platform Status
+https://chromestatus.com/feature/5101991698628608
+
+Countermeasures include
+
+- Switching to a browser such as Vivaldi that is not affected by this change
+- Change Google Chrome settings to revert to the previous behavior
+
+Reddit showed how to change the settings in Google Chrome's "chrome://flags" to address this issue. If you use this as a reference, please do so at your own risk and be aware that there are security risks.
+
+Reddit links stay blue when using Imagus or opening them manually
+https://www.reddit.com/r/imagus/comments/1j0v8k2/reddit_links_stay_blue_when_using_imagus_or/
 
 ## Related Link
 

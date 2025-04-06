@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "Linkclump Plus",
 	"description": "Lets you open, copy or bookmark multiple links at the same time.",
-	"version": "2.12.4.2",
+	"version": "2.13.0",
 	"icons": {
 		"16": "img/icon_16.png",
 		"32": "img/icon_32.png",
