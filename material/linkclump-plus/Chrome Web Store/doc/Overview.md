@@ -25,11 +25,30 @@ This "Linkclump Plus" is a fork of linkclump-ng with some fixes and additional f
 
 Works with Google Chrome & Chromium-based browsers.
 
+## Known Issues
+
+### "Linkclump Plus" Opened Links not marking as "Visited"
+
+If opened links are not marked as “visited”, then that is a Google Chrome specification; the behavioural specification changed in an update in early 2025/03. For more information on this change, see the following article.
+
+Partitioning :visited links history - Chrome Platform Status
+https://chromestatus.com/feature/5101991698628608
+
+Countermeasures include
+
+- Switching to a browser such as Vivaldi that is not affected by this change
+- Change Google Chrome settings to revert to the previous behavior
+
+Reddit showed how to change the settings in Google Chrome's "chrome://flags" to address this issue. If you use this as a reference, please do so at your own risk and be aware that there are security risks.
+
+Reddit links stay blue when using Imagus or opening them manually
+https://www.reddit.com/r/imagus/comments/1j0v8k2/reddit_links_stay_blue_when_using_imagus_or/
+
 ## Support
 
-Please note that support can not be provided as this is a free extension.
+Please note that as this is a free extension the developer is unable to offer individual support.
 
-If you have issue or feature requests, please report them at issues (https://github.com/from-es/linkclump-plus/issues).
+If you have any issues or feature requests, please report them at GitHub (https://github.com/from-es/linkclump-plus/issues).
 
 ## Related Links
 
