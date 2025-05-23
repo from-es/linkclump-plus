@@ -73,18 +73,25 @@ header, nav, main, footer {
 
 If opened links are not marked as “visited”, then that is a Google Chrome specification; the behavioural specification changed in an update in early 2025/03. For more information on this change, see the following article.
 
-Partitioning :visited links history - Chrome Platform Status
+Partitioning :visited links history - Chrome Platform Status  
 https://chromestatus.com/feature/5101991698628608
 
 Countermeasures include
 
-- Switching to a browser such as Vivaldi that is not affected by this change
+- Switch to a browser that is not affected by this change
 - Change Google Chrome settings to revert to the previous behavior
 
-Reddit showed how to change the settings in Google Chrome's "chrome://flags" to address this issue. If you use this as a reference, please do so at your own risk and be aware that there are security risks.
+On Reddit, there were instructions on how to change browser settings to address this issue. If you refer to this, please be aware that there are security risks and do so at your own risk.
 
-Reddit links stay blue when using Imagus or opening them manually
+#### for Google Chrome or Chromium-based browsers
+
+Reddit links stay blue when using Imagus or opening them manually  
 https://www.reddit.com/r/imagus/comments/1j0v8k2/reddit_links_stay_blue_when_using_imagus_or/
+
+#### for Microsoft Edge
+
+Fix for visited links not turning purple on Edge  
+https://www.reddit.com/r/Enhancement/comments/1kecupw/fix_for_visited_links_not_turning_purple_on_edge/
 
 ## Related Link
 
