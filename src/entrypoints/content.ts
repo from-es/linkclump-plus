@@ -29,6 +29,8 @@ declare global {
 		os: 0 | 1;
 
 		timer: number | NodeJS.Timeout;
+
+		documentDimensions: { width: number, height: number, scrollbarWidth: number };
 	}
 }
 
@@ -113,6 +115,7 @@ function main() {
 					window.addEventListener("keyup", keyup, true);
 					window.addEventListener("blur", blur, true);
 					window.addEventListener("contextmenu", contextmenu, true);
+					window.addEventListener("resize", updateDocumentDimensions);
 				}
 			}
 		}
@@ -159,6 +162,10 @@ function init() {
 	window.scroll_bug_ignore = false;
 	window.os = ((navigator.appVersion.indexOf("Win") === -1) ? OS_LINUX : OS_WIN);
 	window.timer = 0;
+
+	// declaration & initialization, window.documentDimensions
+	window.documentDimensions = { width: 0, height: 0, scrollbarWidth: 0 };
+	updateDocumentDimensions();
 }
 
 
@@ -320,12 +327,8 @@ function mousedown(event: MouseEvent) {
 }
 
 function update_box(x: number, y: number) {
-	const width = Math.max(document.documentElement["clientWidth"], document.body["scrollWidth"], document.documentElement["scrollWidth"], document.body["offsetWidth"], document.documentElement["offsetWidth"]); // taken from jquery
-	const height = Math.max(document.documentElement["clientHeight"], document.body["scrollHeight"], document.documentElement["scrollHeight"], document.body["offsetHeight"], document.documentElement["offsetHeight"]); // taken from jquery
-
-	const scrollbarWidth = window.innerWidth - document.body.clientWidth;
-	x = Math.min(x, width - scrollbarWidth);
-	y = Math.min(y, height - scrollbarWidth);
+	x = Math.min(x, window.documentDimensions.width - window.documentDimensions.scrollbarWidth);
+	y = Math.min(y, window.documentDimensions.height - window.documentDimensions.scrollbarWidth);
 
 	if (x > window.box.x) {
 		window.box.x1 = window.box.x;
@@ -441,9 +444,9 @@ function start() {
 
 
 	// create RegExp once
-	const re1 = new RegExp("^javascript:", "i");
+	const re1 = /^javascript:/i;
 	const re2 = new RegExp(selectedAction.options.ignore.slice(1).join("|"), "i");
-	const re3 = new RegExp("^H\\d$");
+	const re3 = /^H\d$/i;
 
 	for (let i = 0; i < page_links.length; i++) {
 		// reject javascript: links
@@ -765,4 +768,22 @@ function contextmenu(event: MouseEvent) {
 	if (window.stop_menu) {
 		event.preventDefault();
 	}
+}
+
+function updateDocumentDimensions() {
+	window.documentDimensions.width = Math.max(
+		document.documentElement.clientWidth,
+		document.body.scrollWidth,
+		document.documentElement.scrollWidth,
+		document.body.offsetWidth,
+		document.documentElement.offsetWidth
+	);
+	window.documentDimensions.height = Math.max(
+		document.documentElement.clientHeight,
+		document.body.scrollHeight,
+		document.documentElement.scrollHeight,
+		document.body.offsetHeight,
+		document.documentElement.offsetHeight
+	);
+	window.documentDimensions.scrollbarWidth = window.innerWidth - document.body.clientWidth;
 }
