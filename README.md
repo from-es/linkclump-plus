@@ -1,5 +1,8 @@
 # Linkclump Plus
 
+<!-- badge -->
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/from-es/linkclump-plus)
+
 ## About
 
 The [Linkclump](https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj "https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj") are no longer available when Google Chrome browser support for Manifest v2 ends. This [Linkclump Plus](https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm "https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm") is a fork of [linkclump-ng](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump") with some fixes and additional features.

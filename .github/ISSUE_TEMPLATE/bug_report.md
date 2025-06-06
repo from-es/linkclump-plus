@@ -33,11 +33,11 @@ If applicable, add screenshots to help explain your problem.
 
 please complete the following information.
 
- 1. OS: [e.g. Windows 11, Debian 12, etc...]
+ 1. OS: [e.g. Windows 11, Debian 12, MacOS, etc...]
  2. Browser
  	- Name [e.g. Google Chrome, Microsoft Edge, Vivaldi, Brave, etc...]
-	- Version [e.g. 131.0.6778.205]
-3. Version of 'Linkclump Plus' [e.g. 2.11.0]
+	- Version [e.g. 137.0.7151.69]
+3. Version of 'Linkclump Plus' [e.g. 2.13.0]
 4. Setting for Action "..." where the issue occurs
 
 ## Additional context
