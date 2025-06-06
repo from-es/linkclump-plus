@@ -444,9 +444,9 @@ function start() {
 
 
 	// create RegExp once
-	const re1 = new RegExp("^javascript:", "i");
+	const re1 = /^javascript:/i;
 	const re2 = new RegExp(selectedAction.options.ignore.slice(1).join("|"), "i");
-	const re3 = new RegExp("^H\\d$");
+	const re3 = /^H\d$/i;
 
 	for (let i = 0; i < page_links.length; i++) {
 		// reject javascript: links
