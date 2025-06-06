@@ -151,17 +151,20 @@ function main() {
 }
 
 function uniqueUrl<T extends { url: string }>(arr: T[]): T[] {
-	const a = [];
-	const l = arr.length;
-	for (let i = 0; i < l; i++) {
-		for (let j = i + 1; j < l; j++) {
-			if (arr[i].url === arr[j].url) {
-				j = ++i;
+	const checklist = new Set<string>();
+	const unique = arr.filter(
+		(obj) => {
+			if (checklist.has(obj.url)) {
+				return false;
+			} else {
+				checklist.add(obj.url);
 			}
+
+			return true;
 		}
-		a.push(arr[i]);
-	}
-	return a;
+	);
+
+	return unique;
 };
 
 function openTab(
