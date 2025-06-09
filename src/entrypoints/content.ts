@@ -391,11 +391,27 @@ function getXY(element: HTMLElement): { x: number, y: number } {
 	let y = 0;
 
 	let parent: Element | null = element;
-	let style;
 	let matrix;
+
 	do {
-		style = window.getComputedStyle(parent);
-		matrix = new WebKitCSSMatrix(style.webkitTransform);
+		const style = window.getComputedStyle(parent);
+		const transform = style?.transform;
+
+		if (transform && transform !== "none") {
+			try {
+				matrix = new DOMMatrix(transform);
+			} catch (e) {
+				// Fallback, older browsers supported (Google Chrome 60 and earlier)
+				if ("WebKitCSSMatrix" in window) {
+					matrix = new WebKitCSSMatrix(style.webkitTransform);
+				} else {
+					matrix = { m41: 0, m42: 0 };
+				}
+			}
+		} else {
+			 matrix = { m41: 0, m42: 0 };
+		}
+
 		x += parent.offsetLeft + matrix.m41;
 		y += parent.offsetTop + matrix.m42;
 
