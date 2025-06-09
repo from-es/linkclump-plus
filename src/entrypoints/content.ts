@@ -29,8 +29,6 @@ declare global {
 		os: 0 | 1;
 
 		timer: number | NodeJS.Timeout;
-
-		documentDimensions: { width: number, height: number, scrollbarWidth: number };
 	}
 }
 
@@ -115,7 +113,6 @@ function main() {
 					window.addEventListener("keyup", keyup, true);
 					window.addEventListener("blur", blur, true);
 					window.addEventListener("contextmenu", contextmenu, true);
-					window.addEventListener("resize", updateDocumentDimensions);
 				}
 			}
 		}
@@ -162,10 +159,6 @@ function init() {
 	window.scroll_bug_ignore = false;
 	window.os = ((navigator.appVersion.indexOf("Win") === -1) ? OS_LINUX : OS_WIN);
 	window.timer = 0;
-
-	// declaration & initialization, window.documentDimensions
-	window.documentDimensions = { width: 0, height: 0, scrollbarWidth: 0 };
-	updateDocumentDimensions();
 }
 
 
@@ -327,8 +320,10 @@ function mousedown(event: MouseEvent) {
 }
 
 function update_box(x: number, y: number) {
-	x = Math.min(x, window.documentDimensions.width - window.documentDimensions.scrollbarWidth);
-	y = Math.min(y, window.documentDimensions.height - window.documentDimensions.scrollbarWidth);
+	const documentDimensions = updateDocumentDimensions();
+
+	x = Math.min(x, documentDimensions.width  - documentDimensions.scrollbarWidth);
+	y = Math.min(y, documentDimensions.height - documentDimensions.scrollbarWidth);
 
 	if (x > window.box.x) {
 		window.box.x1 = window.box.x;
@@ -771,19 +766,9 @@ function contextmenu(event: MouseEvent) {
 }
 
 function updateDocumentDimensions() {
-	window.documentDimensions.width = Math.max(
-		document.documentElement.clientWidth,
-		document.body.scrollWidth,
-		document.documentElement.scrollWidth,
-		document.body.offsetWidth,
-		document.documentElement.offsetWidth
-	);
-	window.documentDimensions.height = Math.max(
-		document.documentElement.clientHeight,
-		document.body.scrollHeight,
-		document.documentElement.scrollHeight,
-		document.body.offsetHeight,
-		document.documentElement.offsetHeight
-	);
-	window.documentDimensions.scrollbarWidth = window.innerWidth - document.body.clientWidth;
+	const width = Math.max(document.documentElement.clientWidth, document.body.scrollWidth, document.documentElement.scrollWidth, document.body.offsetWidth, document.documentElement.offsetWidth);
+	const height = Math.max(document.documentElement.clientHeight, document.body.scrollHeight, document.documentElement.scrollHeight, document.body.offsetHeight, document.documentElement.offsetHeight);
+	const scrollbarWidth = window.innerWidth - document.body.clientWidth;
+
+	return { width, height, scrollbarWidth };
 }
