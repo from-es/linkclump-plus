@@ -1,0 +1,114 @@
+@charset "utf-8";
+
+@import url("../../assets/css/common.css");
+
+
+
+html, body {
+	margin : 0;
+	padding: 0;
+
+	font-size: 16px;
+}
+
+html {
+	background-color: #000;
+}
+body {
+	background-color: #fff;
+}
+
+main {
+	padding: 1rem 0;
+}
+
+pre {
+	margin: 1rem auto;
+	padding: 1rem;
+
+	border: 1px solid #000;
+	border-radius: 0.5rem;
+
+	tab-size: 4;
+}
+
+
+.verification {
+	margin: 0 auto;
+	padding: 1rem;
+
+	border: 1px solid #000;
+	border-radius: 0.5rem;
+
+	width: 840px;
+}
+.verification:not(:first-child) {
+	margin-top: 1rem;
+}
+
+.verification label {
+  display: block;
+}
+
+#linklist-container {
+	background-color: #fff;
+}
+
+body:has(#css-add-style-margin-to-body:checked) {
+	margin: 3rem;;
+}
+body:has(#css-add-style-padding-to-body:checked) {
+	padding: 3rem;
+}
+
+body:has(#css-add-style-initwidth-to-body:checked) {
+	max-width: initial;
+	min-width: inherit;
+}
+body:has(#css-add-style-maxwidth-to-body:checked) {
+	max-width: 1280px;
+	min-width: inherit;
+}
+body:has(#css-add-style-minwidth-to-body:checked) {
+	max-width: initial;
+	min-width: 1280px;
+}
+
+body:has(#css-add-style-position-static:checked) #linklist-container {
+	position: static;
+}
+body:has(#css-add-style-position-relative:checked) #linklist-container {
+	position: relative;
+
+	top : 3rem;
+	left: 3rem;
+}
+body:has(#css-add-style-position-absolute:checked) #linklist-container {
+	position: absolute;
+
+	top : 3rem;
+	left: 3rem;
+
+}
+body:has(#css-add-style-position-fixed:checked) #linklist-container {
+	position: fixed;
+
+	top  : 3rem;
+	right: 3rem;
+}
+body:has(#css-add-style-position-sticky:checked) #linklist-container {
+	position: sticky;
+
+	top: 1rem;
+}
+
+#linklist {
+	border: 1px solid #000;
+	border-radius: 0.5rem;
+	padding: 1rem;
+}
+
+#linklist .legend {
+	font-weight: bold;
+	margin-bottom: 0.5rem;
+}

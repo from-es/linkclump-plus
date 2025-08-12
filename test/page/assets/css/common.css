@@ -1,0 +1,29 @@
+h1, h2, h3, h4, h5, h6 {
+	margin: 1.5rem 0;
+	padding-top: 0.50rem; padding-bottom: 0.25rem;
+	color: #333;
+}
+h1 {
+	padding-top: 0.25rem; padding-bottom: 0.25rem;
+}
+h2 {
+	padding-left: 0.5rem;
+	border: solid 1px #ccc;
+	border-radius: 5px;
+	border-left: solid 0.5rem darkorange;
+}
+h3 {
+	padding-left: 1rem;
+	border-top:    double 3px #888;
+	border-bottom: double 3px #888;
+}
+h4, h5, h6 {
+	padding-left: 1rem;
+	border-bottom: dotted 2px #888;
+}
+
+a         { font-style: normal; font-weight: normal; text-decoration: underline; }
+a:link    { color:#0068ff !important; }
+a:visited { color:#0068ff !important; }
+a:hover   { color:#8000ff !important; }
+a:active  { color:#ff8c00 !important; }
