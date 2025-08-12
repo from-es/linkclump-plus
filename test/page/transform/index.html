@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="referrer" content="no-referrer">
+
+	<link rel ="stylesheet" href="./css/style.css">
+
+	<!-- Tocbot -->
+	<script src="./js/lib/tocbot.min.js"></script>
+	<script src="./js/lib/make-ids.js"></script>
+	<script src="./js/script.js"></script>
+
+	<title>CSS Transform Link Selection Verification</title>
+</head>
+<body>
+
+<main>
+	<nav>
+		<!-- tocbot -->
+		<article class="js-toc toc toc-position-right"></article>
+	</nav>
+
+	<div id="contents" class="js-toc-content">
+		<article>
+			<h1>CSS Transform Link Selection Test</h1>
+
+			<h2>About</h2>
+
+			<p>This page is a test page to verify the Linkclump Plus's link selection function within elements to which the following CSS <code>transform</code> properties are applied:</p>
+			<ul>
+				<li>Translation (<code>translate</code>)</li>
+				<li>Rotation (<code>rotate</code>)</li>
+				<li>Scaling (<code>scale</code>)</li>
+			</ul>
+			<p>It confirms whether Linkclump Plus can accurately recognize and select links within elements visually transformed by CSS <code>transform</code>.</p>
+		</article>
+
+		<!-- Functional Testing -->
+		<article>
+			<h2>Functional Testing</h2>
+
+			<section id="css-layout-position">
+				<h3>CSS Positioning Properties</h3>
+
+				<fieldset>
+					<legend>Toggle Style</legend>
+
+					<div>
+						<input type="checkbox" id="css-layout-position-switch-style" name="css-layout-position-switch-style" />
+						<label for="css-layout-position-switch-style">Apply "CSS Positioning Properties"</label>
+					</div>
+				</fieldset>
+
+				<div class="boxes">
+					<div><a href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener" class="pattern01">01</a></div>
+					<div><a href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener" class="pattern02">02</a></div>
+					<div><a href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener" class="pattern03">03</a></div>
+					<div><a href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener" class="pattern04">04</a></div>
+					<div><a href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener" class="pattern05">05</a></div>
+				</div>
+			</section>
+
+			<section id="offset-with-transform">
+				<h3>Offset with Transform</h3>
+
+				<fieldset>
+					<legend>Toggle Style</legend>
+
+					<div>
+						<input type="checkbox" id="offset-with-transform-switch-style" name="offset-with-transform-switch-style" />
+						<label for="offset-with-transform-switch-style">Apply "offset with transform"</label>
+					</div>
+				</fieldset>
+
+				<h4>Using only transform</h4>
+
+				<div>
+					<div class="pattern01 item">
+						<a href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">https://wikipedia.org/wiki/01</a>
+					</div>
+
+					<div class="pattern02 item">
+						<a href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">https://wikipedia.org/wiki/02</a>
+					</div>
+
+					<div class="pattern03 item">
+						<a href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">https://wikipedia.org/wiki/03</a>
+					</div>
+				</div>
+
+				<h4>Using offset and transform</h4>
+
+				<div>
+					<div class="pattern04 item">
+						<a href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">https://wikipedia.org/wiki/04</a>
+					</div>
+
+					<div class="pattern05 item">
+						<a href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">https://wikipedia.org/wiki/05</a>
+					</div>
+
+					<div class="pattern06 item">
+						<a href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">https://wikipedia.org/wiki/06</a>
+					</div>
+				</div>
+			</section>
+
+			<section id="list-vertical-layout">
+				<h3>Vertical Alignment of Lists</h3>
+
+				<fieldset>
+					<legend>Toggle Style</legend>
+
+					<div>
+						<input type="checkbox" id="list-vertical-layout-switch-style" name="list-vertical-layout-switch-style" />
+						<label for="list-vertical-layout-switch-style">Apply "transform: matrix()" or "-webkit-transform: translate()"</label>
+					</div>
+				</fieldset>
+
+				<h4>Unified Styling</h4>
+
+				<ul id="unite">
+					<li><a href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener" class="pattern01">https://wikipedia.org/wiki/01</a></li>
+					<li><a href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener" class="pattern02">https://wikipedia.org/wiki/02</a></li>
+					<li><a href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener" class="pattern03">https://wikipedia.org/wiki/03</a></li>
+					<li><a href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener" class="pattern04">https://wikipedia.org/wiki/04</a></li>
+					<li><a href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener" class="pattern05">https://wikipedia.org/wiki/05</a></li>
+					<li><a href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener" class="pattern06">https://wikipedia.org/wiki/06</a></li>
+					<li><a href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener" class="pattern07">https://wikipedia.org/wiki/07</a></li>
+					<li><a href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener" class="pattern08">https://wikipedia.org/wiki/08</a></li>
+					<li><a href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener" class="pattern09">https://wikipedia.org/wiki/09</a></li>
+				</ul>
+
+				<h4>Nested/Individual Styling</h4>
+
+				<ul id="split">
+					<li class="pattern11"><span><a href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">https://wikipedia.org/wiki/11</a></span></li>
+					<li class="pattern12"><span><a href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">https://wikipedia.org/wiki/12</a></span></li>
+					<li class="pattern13"><span><a href="https://wikipedia.org/wiki/13" title="https://wikipedia.org/wiki/13" target="_blank" rel="noopener">https://wikipedia.org/wiki/13</a></span></li>
+					<li class="pattern14"><span><a href="https://wikipedia.org/wiki/14" title="https://wikipedia.org/wiki/14" target="_blank" rel="noopener">https://wikipedia.org/wiki/14</a></span></li>
+					<li class="pattern15"><span><a href="https://wikipedia.org/wiki/15" title="https://wikipedia.org/wiki/15" target="_blank" rel="noopener">https://wikipedia.org/wiki/15</a></span></li>
+					<li class="pattern16"><span><a href="https://wikipedia.org/wiki/16" title="https://wikipedia.org/wiki/16" target="_blank" rel="noopener">https://wikipedia.org/wiki/16</a></span></li>
+					<li class="pattern17"><span><a href="https://wikipedia.org/wiki/17" title="https://wikipedia.org/wiki/17" target="_blank" rel="noopener">https://wikipedia.org/wiki/17</a></span></li>
+					<li class="pattern18"><span><a href="https://wikipedia.org/wiki/18" title="https://wikipedia.org/wiki/18" target="_blank" rel="noopener">https://wikipedia.org/wiki/18</a></span></li>
+					<li class="pattern19"><span><a href="https://wikipedia.org/wiki/19" title="https://wikipedia.org/wiki/19" target="_blank" rel="noopener">https://wikipedia.org/wiki/19</a></span></li>
+				</ul>
+			</section>
+
+			<section id="circle-circular-arrangement">
+				<h3>Circular arrangement</h3>
+
+				<h4>CSS: a: translate() rotate()</h4>
+
+				<div class="circle pattern01">
+					<p>Pattern 01</p>
+
+					<a style="--a:  30" href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a>
+					<a style="--a:  60" href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a>
+					<a style="--a:  90" href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a>
+					<a style="--a: 120" href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a>
+					<a style="--a: 150" href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a>
+					<a style="--a: 180" href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a>
+					<a style="--a: 210" href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a>
+					<a style="--a: 240" href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a>
+					<a style="--a: 270" href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a>
+					<a style="--a: 300" href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a>
+					<a style="--a: 330" href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a>
+					<a style="--a: 360" href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a>
+				</div>
+
+				<h4>CSS: a: translate() rotate()</h4>
+
+				<div class="circle pattern02">
+					<p>Pattern 02</p>
+
+					<a style="--a:  30" href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a>
+					<a style="--a:  60" href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a>
+					<a style="--a:  90" href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a>
+					<a style="--a: 120" href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a>
+					<a style="--a: 150" href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a>
+					<a style="--a: 180" href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a>
+					<a style="--a: 210" href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a>
+					<a style="--a: 240" href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a>
+					<a style="--a: 270" href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a>
+					<a style="--a: 300" href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a>
+					<a style="--a: 330" href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a>
+					<a style="--a: 360" href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a>
+				</div>
+
+				<h4>CSS: div: translate() rotate()</h4>
+
+				<div class="circle pattern03">
+					<p>Pattern 03</p>
+
+					<div style="--a:  30"><a href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a></div>
+					<div style="--a:  60"><a href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a></div>
+					<div style="--a:  90"><a href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a></div>
+					<div style="--a: 120"><a href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a></div>
+					<div style="--a: 150"><a href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a></div>
+					<div style="--a: 180"><a href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a></div>
+					<div style="--a: 210"><a href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a></div>
+					<div style="--a: 240"><a href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a></div>
+					<div style="--a: 270"><a href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a></div>
+					<div style="--a: 300"><a href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a></div>
+					<div style="--a: 330"><a href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a></div>
+					<div style="--a: 360"><a href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a></div>
+				</div>
+
+				<h4>CSS: div: translate() &gt; a: rotate()</h4>
+
+				<div class="circle pattern04">
+					<p>Pattern 04</p>
+
+					<div style="--a:  30"><a href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a></div>
+					<div style="--a:  60"><a href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a></div>
+					<div style="--a:  90"><a href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a></div>
+					<div style="--a: 120"><a href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a></div>
+					<div style="--a: 150"><a href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a></div>
+					<div style="--a: 180"><a href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a></div>
+					<div style="--a: 210"><a href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a></div>
+					<div style="--a: 240"><a href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a></div>
+					<div style="--a: 270"><a href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a></div>
+					<div style="--a: 300"><a href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a></div>
+					<div style="--a: 330"><a href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a></div>
+					<div style="--a: 360"><a href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a></div>
+				</div>
+
+				<h4>CSS: div: rotate() &gt; a: translate()</h4>
+
+				<div class="circle pattern05">
+					<p>Pattern 05</p>
+
+					<div style="--a:  30"><a href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a></div>
+					<div style="--a:  60"><a href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a></div>
+					<div style="--a:  90"><a href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a></div>
+					<div style="--a: 120"><a href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a></div>
+					<div style="--a: 150"><a href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a></div>
+					<div style="--a: 180"><a href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a></div>
+					<div style="--a: 210"><a href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a></div>
+					<div style="--a: 240"><a href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a></div>
+					<div style="--a: 270"><a href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a></div>
+					<div style="--a: 300"><a href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a></div>
+					<div style="--a: 330"><a href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a></div>
+					<div style="--a: 360"><a href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a></div>
+				</div>
+
+				<h4>CSS: div: rotate(45deg) &gt; a: translate()</h4>
+
+				<div class="circle pattern06">
+					<p>Pattern 06</p>
+
+					<div style="--a:  30"><a href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a></div>
+					<div style="--a:  60"><a href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a></div>
+					<div style="--a:  90"><a href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a></div>
+					<div style="--a: 120"><a href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a></div>
+					<div style="--a: 150"><a href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a></div>
+					<div style="--a: 180"><a href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a></div>
+					<div style="--a: 210"><a href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a></div>
+					<div style="--a: 240"><a href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a></div>
+					<div style="--a: 270"><a href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a></div>
+					<div style="--a: 300"><a href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a></div>
+					<div style="--a: 330"><a href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a></div>
+					<div style="--a: 360"><a href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a></div>
+				</div>
+
+				<h4>CSS: a: translate() rotate() with rotation animation</h4>
+
+				<div class="circle pattern07">
+					<p>Pattern 07</p>
+
+					<a style="--a:  30" href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a>
+					<a style="--a:  60" href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a>
+					<a style="--a:  90" href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a>
+					<a style="--a: 120" href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a>
+					<a style="--a: 150" href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a>
+					<a style="--a: 180" href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a>
+					<a style="--a: 210" href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a>
+					<a style="--a: 240" href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a>
+					<a style="--a: 270" href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a>
+					<a style="--a: 300" href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a>
+					<a style="--a: 330" href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a>
+					<a style="--a: 360" href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a>
+				</div>
+			</section>
+
+			<section id="css-multiple-transforms-properties">
+				<h3>Nested CSS Transforms</h3>
+
+				<fieldset>
+					<legend>Toggle Style</legend>
+
+					<div>
+						<input type="checkbox" id="css-multiple-transforms-properties-switch-style" name="css-multiple-transforms-properties-switch-style" />
+						<label for="css-multiple-transforms-properties-switch-style">Apply "Nested CSS Transforms"</label>
+					</div>
+				</fieldset>
+
+				<h4>CSS: div: rotate() &gt; div: scaleX() &gt; div: scaleY() &gt; a: translate()</h4>
+
+				<div class="circle pattern01">
+					<div class="first">
+						<div class="second">
+							<div class="third">
+								<a href="https://www.google.com/" title="https://www.google.com/" target="_blank" rel="noopener">Google</a>
+							</div>
+						</div>
+					</div>
+
+					<a style="--a:  30" href="https://wikipedia.org/wiki/01" title="https://wikipedia.org/wiki/01" target="_blank" rel="noopener">01</a>
+					<a style="--a:  60" href="https://wikipedia.org/wiki/02" title="https://wikipedia.org/wiki/02" target="_blank" rel="noopener">02</a>
+					<a style="--a:  90" href="https://wikipedia.org/wiki/03" title="https://wikipedia.org/wiki/03" target="_blank" rel="noopener">03</a>
+					<a style="--a: 120" href="https://wikipedia.org/wiki/04" title="https://wikipedia.org/wiki/04" target="_blank" rel="noopener">04</a>
+					<a style="--a: 150" href="https://wikipedia.org/wiki/05" title="https://wikipedia.org/wiki/05" target="_blank" rel="noopener">05</a>
+					<a style="--a: 180" href="https://wikipedia.org/wiki/06" title="https://wikipedia.org/wiki/06" target="_blank" rel="noopener">06</a>
+					<a style="--a: 210" href="https://wikipedia.org/wiki/07" title="https://wikipedia.org/wiki/07" target="_blank" rel="noopener">07</a>
+					<a style="--a: 240" href="https://wikipedia.org/wiki/08" title="https://wikipedia.org/wiki/08" target="_blank" rel="noopener">08</a>
+					<a style="--a: 270" href="https://wikipedia.org/wiki/09" title="https://wikipedia.org/wiki/09" target="_blank" rel="noopener">09</a>
+					<a style="--a: 300" href="https://wikipedia.org/wiki/10" title="https://wikipedia.org/wiki/10" target="_blank" rel="noopener">10</a>
+					<a style="--a: 330" href="https://wikipedia.org/wiki/11" title="https://wikipedia.org/wiki/11" target="_blank" rel="noopener">11</a>
+					<a style="--a: 360" href="https://wikipedia.org/wiki/12" title="https://wikipedia.org/wiki/12" target="_blank" rel="noopener">12</a>
+				</div>
+			</section>
+		</article>
+
+		<!-- Reference -->
+		<article>
+			<h2>Reference</h2>
+
+			<h3>CSS transform: matrix()</h3>
+
+			<ul>
+				<li>MDN Web Docs
+					<ul>
+						<li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform" target="_blank" rel="noopener">transform - CSS | MDN</a></li>
+						<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Matrix_math_for_the_web" target="_blank" rel="noopener">Matrix math for the web - Web APIs | MDN</a></li>
+						<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMMatrix/multiplySelf" target="_blank" rel="noopener">DOMMatrix: multiplySelf() method - Web APIs | MDN</a></li>
+					</ul>
+				</li>
+				<li><a href="https://zenn.dev/yend724/articles/20231215-zr8hugr5vrjxkxwn" target="_blank" rel="noopener">【CSS】transformのmatrixって何ですか？ - yend724@Zenn</a></li>
+				<li><a href="https://fuuno.net/ani/ani44/ani44.html" target="_blank" rel="noopener">transform:matrixの使い方 - フーノページ</a></li>
+				<li><a href="https://www.kabuku.co.jp/developers/dommatrix" target="_blank" rel="noopener">DOMMatrix: 2D / 3D 変形（アフィン変換）の行列を扱う DOM API - KABUKU</a></li>
+				<li><a href="https://shanabrian.com/web/css3/transform2d-matrix.php" target="_blank" rel="noopener">CSS3によるトランスフォームの行列による一括変形 - ShanaBrian Website</a></li>
+				<li><a href="https://www.tak-dcxi.com/article/are-you-still-using-the-transform-property/" target="_blank" rel="noopener">えっ！？まだtransformプロパティを使ってるの！？ - TAKLOG</a></li>
+			</ul>
+
+			<h3>HTML &amp; CSS</h3>
+
+			<ul>
+				<li><a href="https://untype.jp/blog/202407261600" target="_blank" rel="noopener">コピペでOK！CSSだけで要素を円周上（円形）に並べる方法 - untype</a></li>
+			</ul>
+
+		</article>
+	</div>
+</main>
+
+</body>
+</html>

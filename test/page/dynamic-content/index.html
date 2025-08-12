@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Dynamic Content Link Selection Test</title>
+	<style>
+		:root {
+			--base-font-size: 16px;
+		}
+		body {
+			font-family: sans-serif;
+			margin: 20px;
+			font-size: var(--base-font-size);
+		}
+		#dynamic-links { margin-top: 20px; border: 1px solid #eee; padding: 10px; min-height: 100px; }
+		.link-item { margin-bottom: 5px; }
+		#loading-indicator { text-align: center; padding: 10px; font-style: italic; color: #888; display: none; }
+	</style>
+</head>
+<body>
+
+	<h1>Dynamic Content Link Selection Test</h1>
+	<p>This page verifies Linkclump Plus's behavior with dynamically added/removed links, with an option to enable infinite scrolling.</p>
+
+	<button id="addLinkBtn">Add Link</button>
+	<button id="removeLinkBtn">Remove Last Link</button>
+
+	<fieldset>
+		<legend>Infinite Scroll</legend>
+		<label>
+			<input type="checkbox" id="enableInfiniteScroll" />
+			Enable Infinite Scroll (similar to X/Twitter)
+		</label>
+	</fieldset>
+
+	<div id="dynamic-links"></div>
+
+	<div id="loading-indicator">Loading more...</div>
+
+	<script src="./js/script.js"></script>
+
+</body>
+</html>

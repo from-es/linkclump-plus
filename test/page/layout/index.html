@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+
+	<link rel="stylesheet" href="./css/style.css" type="text/css">
+
+	<title>CSS Layout Functionality Test</title>
+</head>
+<body>
+
+<main>
+	<article>
+		<div class="verification">
+			<h1>CSS Layout Functionality Test</h1>
+
+			<h2>About</h2>
+
+			<p>This page is a test page to verify the Linkclump Plus's link selection function within elements to which the following basic CSS layout properties are applied:</p>
+
+			<ul>
+				<li><code>margin</code></li>
+				<li><code>padding</code></li>
+				<li><code>max-width</code></li>
+				<li><code>min-width</code></li>
+				<li><code>position</code></li>
+			</ul>
+
+			<p>It confirms whether Linkclump Plus can correctly select links under various CSS layout settings.</p>
+
+			<h2>Default Style</h2>
+
+<pre><code>
+html, body {
+	margin : 0;
+	padding: 0;
+
+	font-size: 16px;
+}
+
+html {
+	background-color: #000;
+}
+
+body {
+	background-color: #fff;
+}
+
+main {
+	padding: 1rem 0;
+}
+</code></pre>
+
+			<h2>Style Selection</h2>
+
+			<fieldset>
+				<legend>Add Style</legend>
+
+					<label>
+						<input type="checkbox" id="css-add-style-margin-to-body" />
+						Apply "body &gt;&gt; margin: 3rem;"
+					</label>
+					<label>
+						<input type="checkbox" id="css-add-style-padding-to-body" />
+						Apply "body &gt;&gt; padding: 3rem;"
+					</label>
+			</fieldset>
+
+			<fieldset>
+				<legend>Add Style</legend>
+					<label>
+						<input type="radio" id="css-add-style-initwidth-to-body" name="maxmin-width" checked />
+						Apply "body &gt;&gt; max-width & min-width initial"
+					</label>
+					<label>
+						<input type="radio" id="css-add-style-maxwidth-to-body" name="maxmin-width" />
+						Apply "body &gt;&gt; max-width: 1280px;"
+					</label>
+					<label>
+						<input type="radio" id="css-add-style-minwidth-to-body" name="maxmin-width" />
+						Apply "body &gt;&gt; min-width: 1280px;"
+					</label>
+			</fieldset>
+
+			<fieldset>
+				<legend>Add Style</legend>
+					<label>
+						<input type="radio" id="css-add-style-position-static" name="position" checked />
+						Apply "#linklist-container &gt;&gt; position: static;"
+					</label>
+					<label>
+						<input type="radio" id="css-add-style-position-relative" name="position" />
+						Apply "#linklist-container &gt;&gt; position: relative; top: 3rem; left: 3rem;"
+					</label>
+					<label>
+						<input type="radio" id="css-add-style-position-absolute" name="position" />
+						Apply "#linklist-container &gt;&gt; position: absolute; top: 3rem; left: 3rem;"
+					</label>
+					<label>
+						<input type="radio" id="css-add-style-position-fixed" name="position" />
+						Apply "#linklist-container &gt;&gt; position: fixed; top: 3rem; right: 3rem;"
+					</label>
+					<label>
+						<input type="radio" id="css-add-style-position-sticky" name="position" />
+						Apply "#linklist-container &gt;&gt; position: sticky; top: 1rem;"
+					</label>
+			</fieldset>
+		</div>
+
+		<div class="verification" id="linklist-container">
+			<h2>Link for operation check</h2>
+
+			<div id="linklist">
+				<ul>
+					<li><a href="https://www.google.com" target="_blank" rel="noopener">Google</a></li>
+					<li><a href="https://www.bing.com" target="_blank" rel="noopener">Bing</a></li>
+					<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">Yahoo</a></li>
+					<li><a href="https://duckduckgo.com" target="_blank" rel="noopener">DuckDuckGo</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div style="height: 1280px;"></div>
+	</article>
+</main>
+
+</body>
+</html>

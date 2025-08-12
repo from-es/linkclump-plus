@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Visibility and Overlap Test Page</title>
+	<style>
+		body { font-family: sans-serif; margin: 20px; }
+		.container { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; }
+		.hidden-display { display: none; }
+		.hidden-visibility { visibility: hidden; }
+		.hidden-opacity { opacity: 0; }
+		.hidden-size { width: 0; height: 0; overflow: hidden; }
+		.hidden-position { position: absolute; left: -9999px; }
+		.overlapping-container { position: relative; width: 300px; height: 150px; border: 2px solid blue; margin-bottom: 20px; }
+		.box { position: absolute; width: 100px; height: 100px; border: 1px solid black; display: flex; justify-content: center; align-items: center; }
+		.box-a { background-color: rgba(255, 0, 0, 0.5); top: 10px; left: 10px; z-index: 1; }
+		.box-b { background-color: rgba(0, 255, 0, 0.5); top: 50px; left: 50px; z-index: 2; }
+		.box-c { background-color: rgba(0, 0, 255, 0.5); top: 90px; left: 90px; z-index: 3; }
+		.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 0, 0.3); z-index: 4; display: flex; justify-content: center; align-items: center; }
+	</style>
+</head>
+<body>
+
+	<h1>Visibility and Overlap Test Page</h1>
+	<p>This page verifies Linkclump Plus's behavior with hidden and overlapping elements.</p>
+
+	<h2>Hidden Elements</h2>
+	<div class="container">
+		<h3>Display: none</h3>
+		<p class="hidden-display"><a href="#hidden-display">Hidden Link (display: none)</a></p>
+		<p>Visible text after hidden link.</p>
+
+		<h3>Visibility: hidden</h3>
+		<p class="hidden-visibility"><a href="#hidden-visibility">Hidden Link (visibility: hidden)</a></p>
+		<p>Visible text after hidden link.</p>
+
+		<h3>Opacity: 0</h3>
+		<p class="hidden-opacity"><a href="#hidden-opacity">Hidden Link (opacity: 0)</a></p>
+		<p>Visible text after hidden link.</p>
+
+		<h3>Zero Size</h3>
+		<div class="hidden-size"><a href="#hidden-size">Hidden Link (zero size)</a></div>
+		<p>Visible text after hidden link.</p>
+
+		<h3>Off-screen Position</h3>
+		<div class="hidden-position"><a href="#hidden-position">Hidden Link (off-screen)</a></div>
+		<p>Visible text after hidden link.</p>
+	</div>
+
+	<h2>Overlapping Elements</h2>
+	<div class="overlapping-container">
+		<div class="box box-a"><a href="#box-a">Box A</a></div>
+		<div class="box box-b"><a href="#box-b">Box B</a></div>
+		<div class="box box-c"><a href="#box-c">Box C</a></div>
+		<div class="overlay">Overlay Text</div>
+	</div>
+
+</body>
+</html>
