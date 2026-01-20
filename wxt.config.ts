@@ -19,8 +19,9 @@ const getViteConfig: (env: ConfigEnv) => WxtViteConfig | Promise<WxtViteConfig> 
 
 // InlineConfig(https://wxt.dev/api/config.html)
 export default defineConfig({
-	srcDir: 'src',
-	extensionApi: 'chrome',
+	srcDir        : "src",
+	publicDir     : "src/public",
+	outDirTemplate: "{{browser}}-mv{{manifestVersion}}",
 
 	vite: getViteConfig,
 
