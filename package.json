@@ -22,17 +22,17 @@
     "eslint": "eslint --format stylish src"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "eslint": "^9.39.4",
-    "globals": "^17.4.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.2",
-    "wxt": "^0.20.20"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "globals": "^17.6.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0",
+    "wxt": "^0.20.26"
   },
   "dependencies": {
-    "@types/chrome": "^0.1.38",
-    "@types/jquery": "^4.0.0",
-    "dayjs": "^1.11.20",
+    "@types/chrome": "^0.1.43",
+    "@types/jquery": "^4.0.1",
+    "dayjs": "^1.11.21",
     "jquery": "^4.0.0"
   }
 }
