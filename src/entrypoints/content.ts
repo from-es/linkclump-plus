@@ -228,6 +228,10 @@ function create_count_label() {
 }
 
 function mousemove(event: MouseEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+
 	prevent_escalation(event);
 	if (allow_selection() || window.scroll_bug_ignore) {
 		window.scroll_bug_ignore = false;
@@ -276,6 +280,10 @@ function clean_up() {
 }
 
 function mousedown(event: MouseEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+
 	window.mouse_button = event.button;
 
 	// turn on menu for windows
@@ -367,6 +375,10 @@ function prevent_escalation(event: MouseEvent) {
 }
 
 function mouseup(event: MouseEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+
 	prevent_escalation(event);
 
 	if (window.box_on) {
@@ -692,6 +704,10 @@ function allow_key(keyCode: number) {
 }
 
 function keydown(event: KeyboardEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+
 	if (event.code !== END_CODE && event.code !== HOME_CODE) {
 		window.key_pressed = event.keyCode;
 		// turn menu off for linux
@@ -703,11 +719,19 @@ function keydown(event: KeyboardEvent) {
 	}
 }
 
-function blur() {
+function blur(event: FocusEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+
 	remove_key();
 }
 
 function keyup(event: KeyboardEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+
 	if (event.code !== END_CODE && event.code !== HOME_CODE) {
 		remove_key();
 	}
@@ -776,6 +800,10 @@ function allow_selection() {
 }
 
 function contextmenu(event: MouseEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+
 	if (window.stop_menu) {
 		event.preventDefault();
 	}
@@ -787,4 +815,16 @@ function updateDocumentDimensions() {
 	const scrollbarWidth = window.innerWidth - document.body.clientWidth;
 
 	return { width, height, scrollbarWidth };
+}
+
+/**
+ * Validates if the event is a trusted user gesture originating from the browser.
+ * This is a security measure to prevent Confused Deputy attacks where a malicious
+ * webpage attempts to trigger privileged actions via synthesized DOM events.
+ *
+ * @param {Event} event - The DOM event to validate.
+ * @returns {boolean} True if the event is trusted (user-initiated), false otherwise.
+ */
+function isTrustedEvent(event: Event): boolean {
+	return event?.isTrusted ?? false;
 }
