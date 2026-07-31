@@ -23,14 +23,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.5.0",
-    "globals": "^17.6.0",
+    "eslint": "^10.8.0",
+    "globals": "^17.8.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0",
-    "wxt": "^0.20.26"
+    "typescript-eslint": "^8.65.0",
+    "wxt": "^0.21.2"
   },
   "dependencies": {
-    "@types/chrome": "^0.1.43",
+    "@types/chrome": "^0.2.2",
     "@types/jquery": "^4.0.1",
     "dayjs": "^1.11.21",
     "jquery": "^4.0.0"
