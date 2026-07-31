@@ -5,7 +5,15 @@ import type { UserManifest } from "wxt";
 import pkg from "../package.json";
 
 export const manifest: UserManifest = {
-	"manifest_version": 3,
+	/**
+	 * WXT manages the manifest version internally, so specifying it here has no effect
+	 * and causes a build-time warning. To change the manifest version, use the
+	 * `manifestVersion` option in wxt.config.ts or the `--mv2/--mv3` CLI flags instead.
+	 *
+	 * @see {@link https://wxt.dev/guide/essentials/target-different-browsers.html#target-a-manifest-version|Target a Manifest Version - WXT}
+	 */
+	// "manifest_version": 3,
+
 	"name": "Linkclump Plus",
 	"description": "Lets you open, copy or bookmark multiple links at the same time.",
 

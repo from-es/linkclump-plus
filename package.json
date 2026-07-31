@@ -13,10 +13,10 @@
   "homepage": "https://github.com/from-es/linkclump-plus",
   "type": "module",
   "scripts": {
-    "dev": "wxt",
-    "build": "wxt build",
-    "build:sourcemap": "wxt build --mode sourcemap",
-    "zip": "wxt zip",
+    "dev": "wxt --mv3",
+    "build": "wxt build --mv3",
+    "build:sourcemap": "wxt build --mv3 --mode sourcemap",
+    "zip": "wxt zip --mv3",
     "compile": "tsc --noEmit",
     "postinstall": "wxt prepare",
     "eslint": "eslint --format stylish src"
