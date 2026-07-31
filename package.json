@@ -1,6 +1,6 @@
 {
   "name": "linkclump-plus",
-  "description": "Chrome extension",
+  "description": "Lets you open, copy or bookmark multiple links at the same time.",
   "version": "2.15.1",
   "license": "MIT",
   "repository": {
