@@ -1,8 +1,25 @@
-{
-	"manifest_version": 3,
+// WXT provided cross-browser compatible Types.
+import type { UserManifest } from "wxt";
+
+// Import Object
+import pkg from "../package.json";
+
+export const manifest: UserManifest = {
+	/**
+	 * WXT manages the manifest version internally, so specifying it here has no effect
+	 * and causes a build-time warning. To change the manifest version, use the
+	 * `manifestVersion` option in wxt.config.ts or the `--mv2/--mv3` CLI flags instead.
+	 *
+	 * @see {@link https://wxt.dev/guide/essentials/target-different-browsers.html#target-a-manifest-version|Target a Manifest Version - WXT}
+	 */
+	// "manifest_version": 3,
+
 	"name": "Linkclump Plus",
 	"description": "Lets you open, copy or bookmark multiple links at the same time.",
-	"version": "2.15.1",
+
+	// Obtained from package.json
+	"version": pkg.version,
+
 	"icons": {
 		"16": "img/icon_16.png",
 		"32": "img/icon_32.png",
@@ -39,4 +56,4 @@
 		"open_in_tab": true,
 		"page": "/options.html"
 	}
-}
+};

@@ -1,7 +1,7 @@
 {
   "name": "linkclump-plus",
-  "description": "Chrome extension",
-  "version": "2.15.1",
+  "description": "Lets you open, copy or bookmark multiple links at the same time.",
+  "version": "2.15.2",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -13,24 +13,24 @@
   "homepage": "https://github.com/from-es/linkclump-plus",
   "type": "module",
   "scripts": {
-    "dev": "wxt",
-    "build": "wxt build",
-    "build:sourcemap": "wxt build --mode sourcemap",
-    "zip": "wxt zip",
+    "dev": "wxt --mv3",
+    "build": "wxt build --mv3",
+    "build:sourcemap": "wxt build --mv3 --mode sourcemap",
+    "zip": "wxt zip --mv3",
     "compile": "tsc --noEmit",
     "postinstall": "wxt prepare",
     "eslint": "eslint --format stylish src"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.5.0",
-    "globals": "^17.6.0",
+    "eslint": "^10.8.0",
+    "globals": "^17.8.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0",
-    "wxt": "^0.20.26"
+    "typescript-eslint": "^8.65.0",
+    "wxt": "^0.21.2"
   },
   "dependencies": {
-    "@types/chrome": "^0.1.43",
+    "@types/chrome": "^0.2.2",
     "@types/jquery": "^4.0.1",
     "dayjs": "^1.11.21",
     "jquery": "^4.0.0"

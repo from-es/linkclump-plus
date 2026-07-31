@@ -1,5 +1,5 @@
-import { ActivateMessage, InitMessage, InitResponse } from "@/assets/js/types/Messages";
-import { Settings } from "@/assets/js/types/Settings";
+import type { ActivateMessage, InitMessage, InitResponse } from "@/assets/js/types/Messages";
+import type { Settings } from "@/assets/js/types/Settings";
 
 
 

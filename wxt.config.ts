@@ -1,7 +1,6 @@
 import { defineConfig } from 'wxt';
 import { type ConfigEnv, type WxtViteConfig } from 'wxt';
-
-import manifest from './src/manifest.json' with { type: 'json' };
+import { manifest } from "./src/manifest";
 
 
 
@@ -12,7 +11,21 @@ const getViteConfig: (env: ConfigEnv) => WxtViteConfig | Promise<WxtViteConfig> 
 
 	return {
 		build: {
-			sourcemap: ((env.mode === 'sourcemap') ? true : false)
+			sourcemap: ((env.mode === 'sourcemap') ? true : false),
+
+			/**
+			 * Workaround for security and Isolated World behavior changes in
+			 * Chrome v151.0.7912.0 (Dev) and later.
+			 *
+			 * Loading resources with the `crossorigin` attribute in popups or
+			 * the options page can trigger errors such as:
+			 *
+			 * - "cross-world extension resource mismatch"
+			 * - "not used within a few seconds"
+			 *
+			 * To avoid these issues, module preloading is disabled.
+			 */
+			modulePreload: false
 		}
 	};
 };
