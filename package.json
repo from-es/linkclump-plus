@@ -1,7 +1,7 @@
 {
   "name": "linkclump-plus",
   "description": "Lets you open, copy or bookmark multiple links at the same time.",
-  "version": "2.15.1",
+  "version": "2.15.2",
   "license": "MIT",
   "repository": {
     "type": "git",
