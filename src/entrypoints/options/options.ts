@@ -1,5 +1,5 @@
-import { Settings } from "@/assets/js/types/Settings";
 import { eventImportConfig, eventExportConfig } from "@/assets/js/lib/function.js";
+import type { Settings } from "@/assets/js/types/Settings";
 
 // jQuery
 import $ from "jquery";

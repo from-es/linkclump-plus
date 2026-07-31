@@ -1,5 +1,14 @@
-import { ActivateMessage, ActivateMessage_bm, ActivateMessage_copy, ActivateMessage_tabs, ActivateMessage_win, CopyFormat, Messages, UpdateMessage } from "@/assets/js/types/Messages";
-import { Settings } from "@/assets/js/types/Settings";
+import { CopyFormat } from "@/assets/js/types/Messages";
+import type {
+	ActivateMessage,
+	ActivateMessage_bm,
+	ActivateMessage_copy,
+	ActivateMessage_tabs,
+	ActivateMessage_win,
+	Messages,
+	UpdateMessage
+} from "@/assets/js/types/Messages";
+import type { Settings } from "@/assets/js/types/Settings";
 
 // Format version
 const CURRENT_VERSION = "5";
