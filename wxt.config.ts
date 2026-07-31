@@ -1,7 +1,6 @@
 import { defineConfig } from 'wxt';
 import { type ConfigEnv, type WxtViteConfig } from 'wxt';
-
-import manifest from './src/manifest.json' with { type: 'json' };
+import { manifest } from "./src/manifest";
 
 
 
