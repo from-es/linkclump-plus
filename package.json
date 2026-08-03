@@ -13,13 +13,17 @@
   "homepage": "https://github.com/from-es/linkclump-plus",
   "type": "module",
   "scripts": {
-    "dev": "wxt --mv3",
-    "build": "wxt build --mv3",
-    "build:sourcemap": "wxt build --mv3 --mode sourcemap",
-    "zip": "wxt zip --mv3",
-    "compile": "tsc --noEmit",
-    "postinstall": "wxt prepare",
-    "eslint": "eslint --format stylish src"
+    "dev:chrome": "wxt --browser chrome --mv3",
+    "dev:firefox": "wxt --browser firefox --mv3",
+    "build:chrome:prod": "wxt build --browser chrome --mv3",
+    "build:chrome:prod:sourcemap": "wxt build --browser chrome --mv3 --mode sourcemap",
+    "build:firefox:prod": "wxt build --browser firefox --mv3",
+    "build:firefox:prod:sourcemap": "wxt build --browser firefox --mv3 --mode sourcemap",
+    "zip:chrome": "wxt zip --browser chrome --mv3",
+    "zip:firefox": "wxt zip --browser firefox --mv3",
+    "typecheck": "tsc --noEmit",
+    "eslint": "eslint --format stylish src",
+    "postinstall": "wxt prepare"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -34,5 +38,9 @@
     "@types/jquery": "^4.0.1",
     "dayjs": "^1.11.21",
     "jquery": "^4.0.0"
+  },
+
+  "_comment": {
+    "scripts": "Note: The script for Firefox was created with future cross-browser development in mind. It is not intended for use in the current environment."
   }
 }
