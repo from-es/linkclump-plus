@@ -28,11 +28,14 @@ Assuming that [Node.js](https://nodejs.org/ "https://nodejs.org/") is installed.
 1. clone this repository locally or download the file.
 2. place the file in any local directory.
 3. move it to the directory where **package.json** is located.
-3. run ```npm install``` to install dependencies.
-4. build the extension into the **.output** directory.
-	- ```npm run dev``` build the extension in **Development** mode.
-	- ```npm run build``` build the extension in **Production** mode.
-	- ```npm run build:sourcemap``` build the extension (with **source maps**) in **Production** mode.
+4. run `npm ci` to install the dependencies required for development.
+5. build the extension into the **.output** directory.
+	- `npm run dev:chrome`: build the extension in **Development** mode (with auto-reload).
+	- `npm run build:chrome:prod`: build the extension in **Production** mode.
+	- `npm run build:chrome:prod:sourcemap`: build the extension in **Production** mode (with **source maps**).
+	- `npm run zip:chrome`: package the extension into a zip file.
+	- `npm run typecheck`: run TypeScript type checking without emitting files.
+	- `npm run eslint`: run ESLint linting check.
 
 ## Known Issues
 

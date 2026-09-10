@@ -1,17 +1,26 @@
-import { defineConfig } from 'wxt';
-import { type ConfigEnv, type WxtViteConfig } from 'wxt';
+import { defineConfig } from "wxt";
+import type { ConfigEnv, UserManifest, WxtViteConfig } from "wxt";
 import { manifest } from "./src/manifest";
 
+// eslint-disable-next-line no-unused-vars
+type GetViteConfig = (env: ConfigEnv) => WxtViteConfig;
 
+// eslint-disable-next-line no-unused-vars
+type GetManifest = (env: ConfigEnv) => UserManifest;
 
-// Add, Source Map
-const getViteConfig: (env: ConfigEnv) => WxtViteConfig | Promise<WxtViteConfig> = (env) => {
-	// debug
-	// console.log("Debug, wxt.config.ts >> getViteConfig(env) >> env >>", env);
-
-	return {
+/**
+ * Generates the Vite configuration based on the environment.
+ *
+ * @param {ConfigEnv} env - The configuration environment provided by WXT.
+ * @returns {WxtViteConfig} The generated Vite configuration.
+ *
+ * @see {@link https://wxt.dev/api/config.html#vite|Interface: InlineConfig, Vite - WXT}
+ */
+const getViteConfig: GetViteConfig = (env: ConfigEnv): WxtViteConfig => {
+	const viteConfig: WxtViteConfig = {
 		build: {
-			sourcemap: ((env.mode === 'sourcemap') ? true : false),
+			// Add, Source Map
+			sourcemap: env.mode === "sourcemap",
 
 			/**
 			 * Workaround for security and Isolated World behavior changes in
@@ -28,21 +37,50 @@ const getViteConfig: (env: ConfigEnv) => WxtViteConfig | Promise<WxtViteConfig> 
 			modulePreload: false
 		}
 	};
+
+	// console.debug("Debug, [wxt.config.ts] Generated Vite Config:", { env, viteConfig });
+
+	return viteConfig;
 };
 
-// InlineConfig(https://wxt.dev/api/config.html)
+/**
+ * Generates the manifest based on the environment.
+ *
+ * @param {ConfigEnv} env - The configuration environment provided by WXT.
+ * @returns {UserManifest} The generated manifest.
+ *
+ * @see {@link https://wxt.dev/api/config.html#manifest|Interface: InlineConfig, Manifest - WXT}
+ */
+const getManifest: GetManifest = (env: ConfigEnv): UserManifest => {
+	const { browser } = env;
+	const mf: UserManifest = structuredClone(manifest);  // Create a deep copy to avoid modifying the original manifest
+
+	switch (browser) {
+		case "chrome":
+			delete mf.browser_specific_settings;
+			break;
+		case "firefox":
+			delete mf.minimum_chrome_version;
+			break;
+		default:
+			break;
+	}
+
+	// console.debug("Debug, [wxt.config.ts] Generated Manifest:", { env, manifest: JSON.stringify(mf, null, 2) });
+
+	return mf;
+};
+
+/**
+ * Defines the WXT configuration.
+ *
+ * @see {@link https://wxt.dev/api/config.html|Interface: InlineConfig - WXT}
+ */
 export default defineConfig({
 	srcDir        : "src",
 	publicDir     : "src/public",
 	outDirTemplate: "{{browser}}-mv{{manifestVersion}}",
 
-	vite: getViteConfig,
-
-	// Manifest(https://wxt.dev/guide/essentials/config/manifest#global-options)
-	manifest: ({ browser, manifestVersion, mode, command }) => {
-		// debug
-		// console.log({ browser, manifestVersion, mode, command, manifest });
-
-		return manifest;
-	}
+	vite    : getViteConfig,
+	manifest: getManifest
 });
