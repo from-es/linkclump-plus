@@ -35,6 +35,7 @@ interface ActionParam {
 	key: number;
 	color: string;
 	action: string;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	options: Record<string, any>;
 }
 
@@ -353,7 +354,7 @@ function setup_action(param: ActionParam, id: string): JQuery {
 			}
 			case "textbox": {
 				// TODO not sure if param.options[j] returns a string or int
-				if (param.options[j] === "" || param.options[j] == "0") {
+				if (param.options[j] === "" || String(param.options[j]) === "0") {
 					continue;
 				}
 				text += param.options[j];
@@ -418,7 +419,7 @@ function setup_form() {
 		mouse.append('<option value="' + i + '">' + config.triggers[i].name + '</option>');
 	}
 
-	mouse.change(function (event) {
+	mouse.change(function () {
 		displayKeys($(this)[0][$(this)[0].selectedIndex].value);
 		check_selection();
 	});
@@ -489,7 +490,7 @@ function check_selection() {
 
 	for (const i in params.actions) {
 		// not sure if mouse/key are strings or ints
-		if (i != id && params.actions[i].mouse == m && params.actions[i].key == k) {
+		if (i !== id && Number(params.actions[i].mouse) === Number(m) && Number(params.actions[i].key) === Number(k)) {
 			if ($(".warning").is(":hidden")) {
 				$(".warning").fadeIn();
 			}
@@ -637,7 +638,7 @@ function save_action(event: JQuery.Event) {
 
 				try {
 					value = parseFloat($("#form_option_" + name).val());
-				} catch (err) {
+				} catch {
 					value = 0;
 				}
 
