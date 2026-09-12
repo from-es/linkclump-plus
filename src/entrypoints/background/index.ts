@@ -113,7 +113,7 @@ export default defineBackground(
 function main() {
 	chrome.runtime.onMessage.addListener(handleRequests);
 
-	chrome.action.onClicked.addListener((tab) => {
+	chrome.action.onClicked.addListener(() => {
 		chrome.runtime.openOptionsPage();
 	});
 
@@ -258,7 +258,7 @@ function timeConverter(a: Date) {
 	return time;
 }
 
-async function sendInit(callback: (response?: any) => void) {
+async function sendInit(callback: (response?: Settings) => void) {
 	const settings = await settingsManager.load();
 	callback(settings);
 }
@@ -432,7 +432,7 @@ function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: chrom
 	});
 }
 
-function handleRequests(request: Messages, sender: chrome.runtime.MessageSender, callback: (response?: any) => void) {
+function handleRequests(request: Messages, sender: chrome.runtime.MessageSender, callback: (response?: Settings) => void) {
 	switch (request.message) {
 		case "activate": {
 			if (request.setting.options.block) {
@@ -506,7 +506,7 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 
 						sendMessageToTab
 							.then(
-								(response) => {
+								() => {
 									// debug
 									// console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from content.js >>', { tab, response });
 								}

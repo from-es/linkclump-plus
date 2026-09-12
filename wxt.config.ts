@@ -2,10 +2,10 @@ import { defineConfig } from "wxt";
 import type { ConfigEnv, UserManifest, WxtViteConfig } from "wxt";
 import { manifest } from "./src/manifest";
 
-// eslint-disable-next-line no-unused-vars
+
 type GetViteConfig = (env: ConfigEnv) => WxtViteConfig;
 
-// eslint-disable-next-line no-unused-vars
+
 type GetManifest = (env: ConfigEnv) => UserManifest;
 
 /**
