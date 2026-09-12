@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "eslint": "^10.10.0",
     "globals": "^17.12.0",
     "typescript": "^6.0.3",
@@ -39,7 +40,6 @@
     "dayjs": "^1.11.23",
     "jquery": "^4.0.0"
   },
-
   "_comment": {
     "scripts": "Note: The script for Firefox was created with future cross-browser development in mind. It is not intended for use in the current environment."
   }
