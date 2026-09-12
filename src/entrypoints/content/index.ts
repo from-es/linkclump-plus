@@ -20,7 +20,16 @@ declare global {
 		mouse_y: number;
 
 		scroll_id: number;
-		links: any[];
+		links: (HTMLAnchorElement & {
+			x1?: number;
+			y1?: number;
+			x2?: number;
+			y2?: number;
+			height?: number;
+			width?: number;
+			box?: HTMLElement | null;
+			important?: boolean;
+		})[];
 		box: HTMLElement & { x: number, y: number, x1: number, x2: number, y1: number, y2: number };
 		count_label: HTMLElement;
 		linkclump: HTMLElement;
@@ -412,7 +421,7 @@ function getXY(element: HTMLElement): { x: number, y: number } {
 		if (transform && transform !== "none") {
 			try {
 				matrix = new DOMMatrix(transform);
-			} catch (e) {
+			} catch {
 				// Fallback, older browsers supported (Google Chrome 60 and earlier)
 				if ("WebKitCSSMatrix" in window) {
 					matrix = new WebKitCSSMatrix(style.webkitTransform);
@@ -485,10 +494,10 @@ function start() {
 		// include/exclude links
 		if (selectedAction.options.ignore.length > 1) {
 			if (re2.test(page_links[i].href) || re2.test(page_links[i].innerHTML)) {
-				if (selectedAction.options.ignore[0] == EXCLUDE_LINKS) {
+				if (Number(selectedAction.options.ignore[0]) === EXCLUDE_LINKS) {
 					continue;
 				}
-			} else if (selectedAction.options.ignore[0] == INCLUDE_LINKS) {
+			} else if (Number(selectedAction.options.ignore[0]) === INCLUDE_LINKS) {
 				continue;
 			}
 		}
@@ -523,7 +532,7 @@ function start() {
 		page_links[i].height = height;
 		page_links[i].width = width;
 		page_links[i].box = null;
-		page_links[i].important = selectedAction.options.smart == 0 && page_links[i].parentNode != null && re3.test(page_links[i].parentNode.nodeName);
+		page_links[i].important = Number(selectedAction.options.smart) === 0 && page_links[i].parentNode !== null && re3.test(page_links[i].parentNode.nodeName);
 
 		window.links.push(page_links[i]);
 	}
@@ -551,7 +560,7 @@ function stop() {
 	}
 
 	// turn on menu for linux
-	if (window.os === OS_LINUX && window.settings[window.setting]?.key != window.key_pressed) {
+	if (window.os === OS_LINUX && window.settings[window.setting]?.key !== window.key_pressed) {
 		window.stop_menu = false;
 	}
 }
@@ -696,7 +705,7 @@ function detect(x: number, y: number, open: boolean) {
 
 function allow_key(keyCode: number) {
 	for (const i in window.settings) {
-		if (window.settings[i]?.key == keyCode) {
+		if (Number(window.settings[i]?.key) === keyCode) {
 			return true;
 		}
 	}
@@ -750,7 +759,7 @@ function allow_selection() {
 		const setting = window.settings[i];
 
 		// need to check if key is 0 as key_pressed might not be accurate
-		if (setting?.mouse == window.mouse_button && setting?.key == window.key_pressed) {
+		if (Number(setting?.mouse) === window.mouse_button && Number(setting?.key) === window.key_pressed) {
 			window.setting = Number.parseInt(i, 10);
 
 			if (window.box !== null) {

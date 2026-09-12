@@ -1,11 +1,87 @@
-# Source code
-*.js     text eol=lf
-*.json   text eol=lf
-*.ts     text eol=lf
+# ==============================================================
+# Source code (Manual edits)
+# ==============================================================
+/src/**/*.js          text eol=lf
+/src/**/*.ts          text eol=lf
+/src/**/*.json        text eol=lf
 
+/tests/**/*.js        text eol=lf
+/tests/**/*.ts        text eol=lf
+
+# ==============================================================
+# Root configuration files (Explicitly managed)
+# ==============================================================
+/*.config.js          text eol=lf
+/*.config.ts          text eol=lf
+/package.json         text eol=lf
+/tsconfig.json        text eol=lf
+/.gitattributes       text eol=lf
+/.gitignore           text eol=lf
+/.vscode/*.json       text eol=lf
+
+# ==============================================================
+# Workflows & CI Configuration
+# ==============================================================
+/.github/**/*.yml     text eol=lf
+/.github/**/*.yaml    text eol=lf
+/*.yml                text eol=lf
+/*.yaml               text eol=lf
+
+# ==============================================================
 # Documentation
-*.txt    text eol=lf
-*.md     text eol=lf
-*.htm    text eol=lf
-*.html   text eol=lf
-*.css    text eol=lf
+# ==============================================================
+/*.md                 text eol=lf
+
+/src/**/*.html        text eol=lf
+/src/**/*.css         text eol=lf
+
+/tests/**/*.html      text eol=lf
+/tests/**/*.css       text eol=lf
+
+/material/**/*.md     text eol=lf
+/material/**/*.html   text eol=lf
+/material/**/*.css    text eol=lf
+
+/.github/**/*.md      text eol=lf
+
+# ==============================================================
+# Images
+# ==============================================================
+# Vector images (Text format)
+/material/**/*.svg    text eol=lf
+
+# Raster & Icon images (Binary format)
+*.png                 binary
+*.jpg                 binary
+*.jpeg                binary
+*.gif                 binary
+*.webp                binary
+*.avif                binary
+*.ico                 binary
+*.bmp                 binary
+
+# Design & Artwork source files (Binary format)
+*.psd                 binary
+*.ai                  binary
+
+# ==============================================================
+# Documents (Binary format)
+# ==============================================================
+*.pdf                 binary
+*.docx                binary
+*.xlsx                binary
+
+# ==============================================================
+# Media & Fonts (Binary format)
+# ==============================================================
+# Web Fonts
+*.woff                binary
+*.woff2               binary
+*.ttf                 binary
+*.otf                 binary
+*.eot                 binary
+
+# Audio
+*.mp3                 binary
+*.wav                 binary
+*.ogg                 binary
