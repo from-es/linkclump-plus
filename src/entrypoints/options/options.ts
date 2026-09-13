@@ -1,4 +1,4 @@
-import { eventImportConfig, eventExportConfig } from "@/assets/js/lib/function.js";
+import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import type { Settings } from "@/assets/js/types/Settings";
 
 // jQuery
@@ -701,10 +701,15 @@ function save_block() {
 }
 
 
-
 async function import_setting() {
-	const result = await eventImportConfig();
-	const valid = result && (typeof result === "object") && result?.actions;
+	const result = await importFile<Settings>();
+
+	// If the user cancels the file selection, result will be null
+	if (result === null) {
+		return;
+	}
+
+	const valid = (typeof result === "object") && result?.actions;
 
 	if (valid) {
 		params = result;
@@ -720,9 +725,6 @@ async function import_setting() {
 			setup_text(keys);
 
 			save_params();
-
-			// debug
-			console.log("Debug, Import setting. params >>", { params });
 		}
 	} else {
 		console.error("Error, can't import setting. result >>", result);
@@ -730,5 +732,5 @@ async function import_setting() {
 }
 
 function export_setting() {
-	eventExportConfig(params);
+	exportFile(params);
 }
