@@ -8,6 +8,7 @@ import type {
 	Messages,
 	UpdateMessage
 } from "@/assets/js/types/Messages";
+import { isSettings } from "@/assets/js/types/Settings";
 import type { Settings } from "@/assets/js/types/Settings";
 
 // Format version
@@ -29,15 +30,14 @@ const AS_MARKDOWN = 6;
 class SettingsManager {
 
 	async load(): Promise<Settings> {
-		let { [linkclumpSettingsKey]: settings } = await chrome.storage.sync.get(linkclumpSettingsKey);
+		const result = await chrome.storage.sync.get(linkclumpSettingsKey);
+		const settings = result[linkclumpSettingsKey];
 
-		if (settings) {
+		if (isSettings(settings)) {
 			return settings;
 		}
 
-		settings = this.init();
-		return settings;
-
+		return this.init();
 	};
 
 	save(settings: Settings & { error?: string }) {
@@ -126,12 +126,16 @@ function main() {
 			{ populate: true },
 			function (windows) {
 				for (let i = 0; i < windows.length; ++i) {
-					const numberOfTabs = windows[i].tabs?.length;
+					const win = windows[i];
+					if (!win) {
+						continue;
+					}
+					const numberOfTabs = win.tabs?.length;
 					if (numberOfTabs === undefined) {
 						continue;
 					}
 					for (let j = 0; j < numberOfTabs; ++j) {
-						const tab = windows[i]?.tabs?.[j];
+						const tab = win.tabs?.[j];
 						const url = tab?.url;
 						const id = tab?.id;
 						if (!url || !id) {
@@ -230,15 +234,16 @@ function openTab(
  *
  * @param {string} text - Text to copy to clipboard
  */
-function copyToClipboard(text: string) {
+function copyToClipboard(text: string): void {
 	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-		if (tabs[0].id) {
-			chrome.tabs.sendMessage(tabs[0].id, { message: "copyToClipboard", text: text });
+		const tab = tabs[0];
+		if (tab?.id) {
+			chrome.tabs.sendMessage(tab.id, { message: "copyToClipboard", text: text });
 		}
 	});
 }
 
-function pad(number: number, length: number) {
+function pad(number: number, length: number): string {
 	let str = "" + number;
 	while (str.length < length) {
 		str = "0" + str;
@@ -247,7 +252,7 @@ function pad(number: number, length: number) {
 	return str;
 }
 
-function timeConverter(a: Date) {
+function timeConverter(a: Date): string {
 	const year = a.getFullYear();
 	const month = pad(a.getMonth() + 1, 2);
 	const day = pad(a.getDate(), 2);
@@ -258,15 +263,15 @@ function timeConverter(a: Date) {
 	return time;
 }
 
-async function sendInit(callback: (response?: Settings) => void) {
+async function sendInit(callback: (response?: Settings) => void): Promise<void> {
 	const settings = await settingsManager.load();
 	callback(settings);
 }
 
 
 
-function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: CopyFormat) {
-	switch (Number.parseInt(copyFormat, 10)) {
+function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: CopyFormat): string {
+	switch (Number(copyFormat)) {
 		case URLS_WITH_TITLES:
 			return title + "\t" + url + "\n";
 		case URLS_ONLY:
@@ -286,10 +291,14 @@ function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: Copy
 	}
 }
 
-function handleCopy(request: ActivateMessage<ActivateMessage_copy>) {
+function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
 	let text = "";
 	for (let i = 0; i < request.urls.length; i++) {
-		text += formatLink(request.urls[i], request.setting.options.copy);
+		const urlItem = request.urls[i];
+		if (!urlItem) {
+			continue;
+		}
+		text += formatLink(urlItem, request.setting.options.copy);
 	}
 
 	if (request.setting.options.copy === AS_LIST_LINK_HTML) {
@@ -338,7 +347,8 @@ function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 					2 or "2"  : synced bookmarks
 			*/
 			const bookmarksIndex: number = selectBookmarks(request.setting.options?.bookmarks);
-			const folderID = bookmarkTreeNodes[0].children?.[bookmarksIndex]?.id;
+			const rootNode = bookmarkTreeNodes[0];
+			const folderID = rootNode?.children?.[bookmarksIndex]?.id;
 
 			if (!folderID) {
 				console.error("Folder ID is undefined");
@@ -354,10 +364,14 @@ function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 				},
 				function (newFolder) {
 					for (let j = 0; j < request.urls.length; j++) {
+						const urlItem = request.urls[j];
+						if (!urlItem) {
+							continue;
+						}
 						chrome.bookmarks.create({
 							"parentId": newFolder.id,
-							"title": request.urls[j].title,
-							"url": request.urls[j].url
+							"title": urlItem.title,
+							"url": urlItem.url
 						});
 					}
 				}

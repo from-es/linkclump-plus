@@ -1,5 +1,7 @@
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
-import type { Settings } from "@/assets/js/types/Settings";
+import { isSettings } from "@/assets/js/types/Settings";
+import type { ActionSetting, Settings } from "@/assets/js/types/Settings";
+import type { OptionsSchema } from "@/assets/js/types/Options";
 
 // jQuery
 import $ from "jquery";
@@ -8,38 +10,7 @@ import "@/assets/js/lib/colorpicker/jquery.colorpicker.css";
 
 import "./style.css";
 
-interface Trigger {
-	name: string;
-}
-
-interface ActionOption {
-	name: string;
-	type: 'number' | 'selection' | 'selection-textbox' | 'textbox' | 'checkbox';
-	data?: number[] | string[];
-	extra: string;
-}
-
-interface Action {
-	name: string;
-	options: string[];
-}
-
-interface Config {
-	triggers: Trigger[];
-	actions: Record<string, Action>;
-	options: Record<string, ActionOption>;
-}
-
-interface ActionParam {
-	mouse: number;
-	key: number;
-	color: string;
-	action: string;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	options: Record<string, any>;
-}
-
-const config: Config = {
+const config: OptionsSchema = {
 	"triggers":
 		[ { "name": "Left" }, { "name": "Middle" }, { "name": "Right" } ],
 	"actions": {
@@ -128,8 +99,8 @@ const OS_LINUX = 1;
 const OS_MAC = 2;
 
 const colors: string[] = [ "458B74", "838B8B", "CCCCCC", "0000FF", "8A2BE2", "D2691E", "6495ED", "DC143C", "006400", "9400D3", "1E90FF", "228B22", "00FF00", "ADFF2F", "FF69B4", "4B0082", "F0E68C", "8B814C", "87CEFA", "32CD32", "000080", "FFA500", "FF4500", "DA70D6", "8B475D", "8B668B", "FF0000", "2E8B57", "8E388E", "FFFF00" ];
-let params: Settings | null = null;
-const div_history: Record<string, JQuery> = [];
+let currentSettings: Settings | null = null;
+const div_history: Record<string, JQuery> = {};
 
 let keys: Record<number, string>;
 let os: 0 | 1 | 2;
@@ -157,18 +128,18 @@ function initEvent() {
 		return;
 	}
 
-	document.getElementById("guide3").addEventListener("click", tour3);
-	document.getElementById("guide2").addEventListener("click", tour2);
-	document.getElementById("guide1").addEventListener("click", tour1);
-	document.getElementById("add").addEventListener("click", load_new_action);
-	document.getElementById("form_block").addEventListener("keyup", save_block);
-	document.getElementById("form_key").addEventListener("change", check_selection);
-	document.getElementById("cancel").addEventListener("click", close_form);
-	document.getElementById("save").addEventListener("click", save_action);
+	document.getElementById("guide3")?.addEventListener("click", tour3);
+	document.getElementById("guide2")?.addEventListener("click", tour2);
+	document.getElementById("guide1")?.addEventListener("click", tour1);
+	document.getElementById("add")?.addEventListener("click", load_new_action);
+	document.getElementById("form_block")?.addEventListener("keyup", save_block);
+	document.getElementById("form_key")?.addEventListener("change", check_selection);
+	document.getElementById("cancel")?.addEventListener("click", close_form);
+	document.getElementById("save")?.addEventListener("click", save_action);
 
 	// ToDo : 要、動作検証@2024/12/17
-	document.getElementById("import-setting").addEventListener("click", import_setting);
-	document.getElementById("export-setting").addEventListener("click", export_setting);
+	document.getElementById("import-setting")?.addEventListener("click", import_setting);
+	document.getElementById("export-setting")?.addEventListener("click", export_setting);
 
 	setup_form();
 
@@ -177,15 +148,19 @@ function initEvent() {
 			message: "init",
 			debug: true
 		},
-		function (response) {
-			params = response;
+		function (response: Settings) {
+			currentSettings = response;
 
-			for (const i in params.actions) {
-				$("#settings").append(setup_action(params.actions[i], i));
+			for (const i in currentSettings.actions) {
+				const action = currentSettings.actions[i];
+				if (!action) {
+					continue;
+				}
+				$("#settings").append(setup_action(action, i));
 			}
 			setup_text(keys);
 
-			$("#form_block").val(params.blocked.join("\n"));
+			$("#form_block").val(currentSettings.blocked.join("\n"));
 
 			if (isFirstTime) {
 				tour1();
@@ -198,10 +173,10 @@ function initEvent() {
 
 
 
-function close_form(event: JQuery.Event) {
+function close_form(event?: Event | JQuery.TriggeredEvent) {
 	$("#form-background").fadeOut();
 
-	event.preventDefault();
+	event?.preventDefault();
 }
 
 function tour1() {
@@ -233,50 +208,48 @@ function load_action(id: string | null) {  // into form
 		$("#form_key").val(90);   // and z key
 		$(".colorpicker-trigger").css("background-color", "#" + colors[Math.floor(Math.random() * colors.length)]);
 	} else {
-		const param = params?.actions[id];
+		const actionSetting = currentSettings?.actions[id];
+		if (!actionSetting) {
+			return;
+		}
 		$("#form_id").val(id);
 
-		$("#form_mouse").val(param.mouse);
-		displayKeys(param.mouse);
-		$("#form_key").val(param.key);
+		$("#form_mouse").val(actionSetting.mouse);
+		displayKeys(actionSetting.mouse);
+		$("#form_key").val(actionSetting.key);
 
-		$(".colorpicker-trigger").css("background-color", param.color);
+		$(".colorpicker-trigger").css("background-color", actionSetting.color);
 
-		$("#form_" + param.action).attr("checked", "checked");
+		$("#form_" + actionSetting.action).attr("checked", "checked");
 
-		displayOptions(param.action);
+		displayOptions(actionSetting.action);
 
-		for (const i in param.options) {
-			switch (config.options[i].type) {
+		for (const i in actionSetting.options) {
+			const optDef = config.options[i];
+			if (!optDef) {
+				continue;
+			}
+			const optVal = actionSetting.options[i];
+			switch (optDef.type) {
 				case "number":
-					$("#form_option_" + i).val(param.options[i]);
-					break;
-
 				case "selection":
-					$("#form_option_" + i).val(param.options[i]);
-					break;
-
 				case "textbox":
-					$("#form_option_" + i).val(param.options[i]);
+					$("#form_option_" + i).val(String(optVal ?? ""));
 					break;
 
 				case "checkbox":
-					if (param.options[i]) {
-						$("#form_option_" + i).prop("checked", true);
-					} else {
-						$("#form_option_" + i).prop("checked", false);
-					}
+					$("#form_option_" + i).prop("checked", Boolean(optVal));
 					break;
 
 				case "selection-textbox":
-					if (param.options[i].length > 1) {
-						const selection = param.options[i][0];
+					if (Array.isArray(optVal) && optVal.length > 1) {
+						const selection = optVal[0];
 						let text = "";
-						for (let k = 1; k < param.options[i].length; k++) {
-							text += param.options[i][k] + ",";
+						for (let k = 1; k < optVal.length; k++) {
+							text += optVal[k] + ",";
 						}
 
-						$("#form_option_selection_" + i).val(selection);
+						$("#form_option_selection_" + i).val(String(selection ?? ""));
 						$("#form_option_text_" + i).val(text);
 					}
 
@@ -290,11 +263,11 @@ function load_action(id: string | null) {  // into form
 	$(".warning").hide();
 
 	// place the form at the top of the window+10
-	$(".form").css("margin-top", $(window).scrollTop() + 10);
+	$(".form").css("margin-top", ($(window).scrollTop() ?? 0) + 10);
 
 	// fade in the form and set the background to cover the whole page
 	$("#form-background").fadeIn();
-	$("#form-background").css("height", $(document).height());
+	$("#form-background").css("height", $(document).height() ?? 0);
 
 	check_selection();
 }
@@ -305,16 +278,30 @@ function load_action(id: string | null) {  // into form
  * @param {JQuery<HTMLElement>} div
  */
 function delete_action(id: string, div: JQuery) {
+	if (!currentSettings) {
+		return;
+	}
 	div.fadeOut("swing", function () {
+		if (!currentSettings) {
+			return;
+		}
 		const del = $("<div class='undo'>Action has been deleted </div>");
-		const undo = $("<a>undo</a>").click({ "i": id, "param": params.actions[id] },
+		const undo = $("<a>undo</a>").click({ "i": id, "param": currentSettings.actions[id] },
 			function (event) {
-				div_history[event.data.i].replaceWith(setup_action(event.data.param, event.data.i));
-				params.actions[event.data.i] = event.data.param;
+				if (!currentSettings) {
+					return false;
+				}
+				const hist = div_history[event.data.i];
+				if (hist && event.data.param) {
+					hist.replaceWith(setup_action(event.data.param, event.data.i));
+				}
+				if (event.data.param) {
+					currentSettings.actions[event.data.i] = event.data.param;
+				}
 
 				delete (div_history[event.data.i]);
 
-				save_params();
+				save_settings();
 				return false;
 			}
 		);
@@ -323,79 +310,85 @@ function delete_action(id: string, div: JQuery) {
 		$(this).replaceWith(del).fadeIn("swing");
 
 		div_history[id] = del;
-		delete (params.actions[id]);
+		delete (currentSettings.actions[id]);
 
-		save_params();
+		save_settings();
 	});
 }
 
-function setup_action(param: ActionParam, id: string): JQuery {
+function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 	const setting = $("<div class='setting' id='action_" + id + "'>");
 
-	const h3 = "<h3>" + config.actions[param.action].name + "</h3>";
-	const activateKey = (param.key > 0) ? "\"<b>" + keys[param.key] + "</b>\" key and " : "";
-	const activateMouse = "\"<b>" + config.triggers[param.mouse].name + "</b>\" mouse button";
+	const actionDef = config.actions[actionSetting.action];
+	const actionName = actionDef ? actionDef.name : actionSetting.action;
+	const h3 = "<h3>" + actionName + "</h3>";
+	const activateKey = (actionSetting.key > 0 && keys[actionSetting.key]) ? "\"<b>" + keys[actionSetting.key] + "</b>\" key and " : "";
+	const triggerDef = config.triggers[actionSetting.mouse];
+	const triggerName = triggerDef ? triggerDef.name : String(actionSetting.mouse);
+	const activateMouse = "\"<b>" + triggerName + "</b>\" mouse button";
 	const activate = "<p>Activate by " + activateKey + activateMouse + ".</p>";
 	setting.append(h3);
 	setting.append(activate);
 
 	const list = $("<ul>");
-	for (const j in param.options) {
+	for (const j in actionSetting.options) {
 		const op = config.options[j];
+		if (!op) {
+			continue;
+		}
+		const optVal = actionSetting.options[j];
 		let text = op.name + ": ";
 		switch (op.type) {
 			case "number": {
-				text += param.options[j];
+				text += String(optVal ?? "");
 				break;
 			}
 			case "selection": {
-				text += op.data[param.options[j]];
+				const idx = Number(optVal ?? 0);
+				const dataVal = op.data ? op.data[idx] : "";
+				text += String(dataVal ?? "");
 				break;
 			}
 			case "textbox": {
-				// TODO not sure if param.options[j] returns a string or int
-				if (param.options[j] === "" || String(param.options[j]) === "0") {
+				// TODO not sure if actionSetting.options[j] returns a string or int
+				if (optVal === "" || String(optVal) === "0") {
 					continue;
 				}
-				text += param.options[j];
+				text += String(optVal);
 				break;
 			}
 			case "checkbox": {
-				/*
-				if (!param.options[j]) {
-					continue;
-				}
-				*/
-				text += param.options[j];
+				text += String(optVal);
 				break;
 			}
 			case "selection-textbox": {
-				if (param.options[j].length < 2) {
+				if (!Array.isArray(optVal) || optVal.length < 2) {
 					continue;
 				}
-				const selection = param.options[j][0];
+				const selection = Number(optVal[0]);
 				let words = "";
-				for (let i = 1; i < param.options[j].length; i++) {
-					words += param.options[j][i];
+				for (let i = 1; i < optVal.length; i++) {
+					words += optVal[i];
 
-					if (i < param.options[j].length - 1) {
+					if (i < optVal.length - 1) {
 						words += ", ";
 					}
 				}
-				text += op.data[selection] + "; " + words;
+				const selText = op.data ? op.data[selection] : "";
+				text += (selText ?? "") + "; " + words;
 				break;
 			}
 		}
 
 		list.append("<li>" + text + "</li>");
 	}
-	list.append("<li>selection box color: <span style='background-color: " + param.color + "' class='color'></span></li>");
+	list.append("<li>selection box color: <span style='background-color: " + actionSetting.color + "' class='color'></span></li>");
 
 	setting.append(list);
 
 	const edit = $("<button class='button edit'>Edit</button>").click({ 'i': id },
 		function (event) {
-			load_action(event.data.i, $(this).parent().parent());
+			load_action(event.data.i);
 			return false;
 		}
 	);
@@ -416,11 +409,15 @@ function setup_action(param: ActionParam, id: string): JQuery {
 function setup_form() {
 	const mouse = $("#form_mouse");
 	for (let i = 0; i < config.triggers.length; i++) {
-		mouse.append('<option value="' + i + '">' + config.triggers[i].name + '</option>');
+		const trg = config.triggers[i];
+		if (trg) {
+			mouse.append('<option value="' + i + '">' + trg.name + '</option>');
+		}
 	}
 
 	mouse.change(function () {
-		displayKeys($(this)[0][$(this)[0].selectedIndex].value);
+		const select = this as HTMLSelectElement;
+		displayKeys(Number(select.value));
 		check_selection();
 	});
 
@@ -437,13 +434,16 @@ function setup_form() {
 
 	const action = $("#form_action");
 	for (const i in config.actions) {
-		const act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + config.actions[i].name + '<br/>');
-
+		const actDef = config.actions[i];
+		if (!actDef) {
+			continue;
+		}
+		const act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + actDef.name + '<br/>');
 
 		act.click(function (event) {
-			displayOptions(event.currentTarget.value);
-		}
-		);
+			const target = event.currentTarget as HTMLInputElement;
+			displayOptions(target.value);
+		});
 
 		action.append(act);
 	}
@@ -452,18 +452,27 @@ function setup_form() {
 }
 
 function setup_text(keys: Record<number, string>) {
-	let param;
-	for (const i in params.actions) {
-		param = params.actions[i];
-		break;
-	}
-	if (param === undefined) {
+	if (!currentSettings) {
 		return;
 	}
-	$("#mouse_name").text(config.triggers[param.mouse].name);
-	$("#action_name").text(config.actions[param.action].name);
-	if (param.key > 0) {
-		$("#key_name").html("the <b>" + keys[param.key] + "</b> key and");
+	let actionSetting: ActionSetting | undefined;
+	for (const i in currentSettings.actions) {
+		actionSetting = currentSettings.actions[i];
+		break;
+	}
+	if (actionSetting === undefined) {
+		return;
+	}
+	const trigger = config.triggers[actionSetting.mouse];
+	const actionDef = config.actions[actionSetting.action];
+	if (trigger) {
+		$("#mouse_name").text(trigger.name);
+	}
+	if (actionDef) {
+		$("#action_name").text(actionDef.name);
+	}
+	if (actionSetting.key > 0 && keys[actionSetting.key]) {
+		$("#key_name").html("the <b>" + keys[actionSetting.key] + "</b> key and");
 	} else {
 		$("#key_name").html("");
 	}
@@ -488,9 +497,17 @@ function check_selection() {
 		}
 	}
 
-	for (const i in params.actions) {
+	if (!currentSettings) {
+		return;
+	}
+
+	for (const i in currentSettings.actions) {
+		const act = currentSettings.actions[i];
+		if (!act) {
+			continue;
+		}
 		// not sure if mouse/key are strings or ints
-		if (i !== id && Number(params.actions[i].mouse) === Number(m) && Number(params.actions[i].key) === Number(k)) {
+		if (i !== id && Number(act.mouse) === Number(m) && Number(act.key) === Number(k)) {
 			if ($(".warning").is(":hidden")) {
 				$(".warning").fadeIn();
 			}
@@ -508,45 +525,57 @@ function displayOptions(action: string) {
 	const options = $("#form_options");
 	options.empty();
 
-	for (const i in config.actions[action].options) {
-		const op = config.options[config.actions[action].options[i]];
+	const actionDef = config.actions[action];
+	if (!actionDef) {
+		return;
+	}
+
+	for (const optKey of actionDef.options) {
+		const op = config.options[optKey];
+		if (!op) {
+			continue;
+		}
 		const title = $("<label>" + op.name + "</label>");
 		const p = $("<p class=\"clearfix\"/>");
 		p.append(title);
 
 		switch (op.type) {
 			case "number": {
-				const def = op?.data[0];
-				const min = op?.data[1];
-				const max = op?.data[2];
+				const def = op.data ? op.data[0] : 0;
+				const min = op.data ? op.data[1] : 0;
+				const max = op.data ? op.data[2] : 100;
 
-				p.append(`<input type="number" name="${op.name}" id="form_option_${config.actions[action].options[i]}" value="${def}" step="1" min="${min}" max="${max}" />`);
+				p.append(`<input type="number" name="${op.name}" id="form_option_${optKey}" value="${def}" step="1" min="${min}" max="${max}" />`);
 				break;
 			}
 			case "selection": {
-				const selector = $("<select id='form_option_" + config.actions[action].options[i] + "'>");
-				for (const j in op.data) {
-					selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
+				const selector = $("<select id='form_option_" + optKey + "'>");
+				if (op.data) {
+					for (const j in op.data) {
+						selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
+					}
 				}
 				p.append(selector);
 				break;
 			}
 			case "textbox": {
-				p.append('<input type="text" name="' + op.name + '" id="form_option_' + config.actions[action].options[i] + '"/>');
+				p.append('<input type="text" name="' + op.name + '" id="form_option_' + optKey + '"/>');
 				break;
 			}
 			case "checkbox": {
-				p.append('<input type="checkbox" name="' + op.name + '" id="form_option_' + config.actions[action].options[i] + '"/>');
+				p.append('<input type="checkbox" name="' + op.name + '" id="form_option_' + optKey + '"/>');
 				break;
 			}
 			case "selection-textbox": {
-				const selector = $("<select id='form_option_selection_" + config.actions[action].options[i] + "'>");
-				for (const j in op.data) {
-					selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
+				const selector = $("<select id='form_option_selection_" + optKey + "'>");
+				if (op.data) {
+					for (const j in op.data) {
+						selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
+					}
 				}
 				p.append(selector);
 				p.append('</p><label></label><p>');
-				p.append('<input type="text" name="' + op.name + '" id="form_option_text_' + config.actions[action].options[i] + '"/>');
+				p.append('<input type="text" name="' + op.name + '" id="form_option_text_' + optKey + '"/>');
 				break;
 			}
 		}
@@ -601,102 +630,117 @@ function displayKeys(mouseButton: number): Record<number, string> {
 	return keys;
 }
 
-function load_new_action(event: JQuery.Event) {
+function load_new_action(event: Event | JQuery.TriggeredEvent) {
 	load_action(null);
 	event.preventDefault();
 }
 
-function save_action(event: JQuery.Event) {
-	let id = $("#form_id").val();
+function save_action(event: Event | JQuery.TriggeredEvent) {
+	if (!currentSettings) {
+		return;
+	}
+	let id = String($("#form_id").val() ?? "");
 
-	const param: ActionParam = {} as ActionParam;
+	const mouseVal = Number($("#form_mouse").val() ?? 0);
+	const keyVal = Number($("#form_key").val() ?? 0);
+	const colorVal = $(".colorpicker-trigger").css("background-color") || "";
+	const actionVal = String($("input[name=action]:radio:checked").val() ?? "tabs");
 
-	param.mouse = $("#form_mouse").val();
-	param.key = $("#form_key").val();
-	param.color = $(".colorpicker-trigger").css("background-color");
-	param.action = $("input[name=action]:radio:checked").val();
-	param.options = {};
+	const actionSetting: ActionSetting = {
+		mouse: mouseVal,
+		key: keyVal,
+		color: colorVal,
+		action: actionVal,
+		options: {}
+	};
 
-	for (const opt in config.actions[param.action].options) {
-		const name = config.actions[param.action].options[opt];
-		const type = config.options[name].type;
-		if (type === "checkbox") {
-			param.options[name] = $("#form_option_" + name).is(":checked");
-		} else {
-			if (name === "ignore") {
-				const ignore = $("#form_option_text_" + name).val().replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",");
+	const actionDef = config.actions[actionSetting.action];
+	if (actionDef) {
+		for (const name of actionDef.options) {
+			const op = config.options[name];
+			if (!op) {
+				continue;
+			}
+			if (op.type === "checkbox") {
+				actionSetting.options[name] = $("#form_option_" + name).is(":checked");
+			} else if (name === "ignore") {
+				const rawText = String($("#form_option_text_" + name).val() ?? "");
+				const ignore: (number | string)[] = rawText.replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",");
 				// if the last entry is empty then just remove from array
 				if (ignore.length > 0 && ignore[ignore.length - 1] === "") {
 					ignore.pop();
 				}
-				// add selection to the start of the array
-				ignore.unshift(param.options[name] = $("#form_option_selection_" + name).val());
+				const selVal = Number($("#form_option_selection_" + name).val() ?? 0);
+				ignore.unshift(selVal);
 
-				param.options[name] = ignore;
+				actionSetting.options[name] = ignore;
 			} else if (name === "delay" || name === "close" || name === "copy") {
-				let value: number;
-
-				try {
-					value = parseFloat($("#form_option_" + name).val());
-				} catch {
-					value = 0;
-				}
-
+				let value = parseFloat(String($("#form_option_" + name).val() ?? "0"));
 				if (isNaN(value)) {
 					value = 0;
 				}
 
-				param.options[name] = value;
+				actionSetting.options[name] = value;
 			} else if (name === "fontsizeofcounter" || name === "fontweightofcounter") {
-				let value = parseFloat($("#form_option_" + name).val());
-				const def: number = (config.options[name])["data"][0];
-				const min: number = (config.options[name])["data"][1];
-				const max: number = (config.options[name])["data"][2];
+				let value = parseFloat(String($("#form_option_" + name).val() ?? "0"));
+				const def = op.data ? Number(op.data[0]) : 0;
+				const min = op.data ? Number(op.data[1]) : 0;
+				const max = op.data ? Number(op.data[2]) : 100;
 
-				if (!value || typeof value !== "number") {
+				if (!value || isNaN(value)) {
 					value = def;
 				}
 				if (value < min || max < value) {
 					value = def;
 				}
 
-				param.options[name] = value;
+				actionSetting.options[name] = value;
 			} else {
-				param.options[name] = $("#form_option_" + name).val();
+				actionSetting.options[name] = String($("#form_option_" + name).val() ?? "");
 			}
 		}
 	}
 
-	if (id === "" || params.actions[id] === null) {
-		const newDate = new Date;
-		id = newDate.getTime();
+	if (id === "" || !currentSettings.actions[id]) {
+		const newDate = new Date();
+		id = String(newDate.getTime());
 
-		params.actions[id] = param;
-		$("#settings").append(setup_action(param, id));
+		currentSettings.actions[id] = actionSetting;
+		$("#settings").append(setup_action(actionSetting, id));
 	} else {
-		params.actions[id] = param;
-		const update = setup_action(param, id);
+		currentSettings.actions[id] = actionSetting;
+		const update = setup_action(actionSetting, id);
 		$("#action_" + id).replaceWith(update);
 	}
 
-	save_params();
+	save_settings();
 	close_form(event);
 }
 
-function save_params() {
+function save_settings() {
+	if (!currentSettings) {
+		return;
+	}
+
 	chrome.runtime.sendMessage({
 		message: "update",
-		settings: params
+		settings: currentSettings
 	});
 }
 
 function save_block() {
+	if (!currentSettings) {
+		return;
+	}
+
 	// replace any whitespace at end to stop empty site listings
-	const sites = $("#form_block").val().replace(/^\s+|\s+$/g, "").split("\n");
+	const rawSites = String($("#form_block").val() ?? "");
+	const sites = rawSites.replace(/^\s+|\s+$/g, "").split("\n");
 
 	if (Array.isArray(sites)) {
-		params.blocked = sites;
-		save_params();
+		currentSettings.blocked = sites;
+
+		save_settings();
 	}
 }
 
@@ -709,28 +753,30 @@ async function import_setting() {
 		return;
 	}
 
-	const valid = (typeof result === "object") && result?.actions;
+	if (isSettings(result)) {
+		currentSettings = result;
 
-	if (valid) {
-		params = result;
+		const obj = currentSettings.actions;
+		$("#settings").empty();
 
-		const obj = params?.actions;
-		if (obj) {
-			$("#settings").empty();
-
-			for (const key in obj) {
-				$("#settings").append(setup_action(obj[key], key));
+		for (const key in obj) {
+			const act = obj[key];
+			if (!act) {
+				continue;
 			}
-
-			setup_text(keys);
-
-			save_params();
+			$("#settings").append(setup_action(act, key));
 		}
+
+		setup_text(keys);
+
+		save_settings();
 	} else {
 		console.error("Error, can't import setting. result >>", result);
 	}
 }
 
 function export_setting() {
-	exportFile(params);
+	if (currentSettings) {
+		exportFile(currentSettings);
+	}
 }

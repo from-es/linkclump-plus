@@ -1,5 +1,6 @@
+import type { LinkItem } from "@/assets/js/types/Content";
 import type { ActivateMessage, InitMessage, InitResponse } from "@/assets/js/types/Messages";
-import type { Settings } from "@/assets/js/types/Settings";
+import type { ActionSetting } from "@/assets/js/types/Settings";
 
 
 
@@ -7,7 +8,7 @@ import type { Settings } from "@/assets/js/types/Settings";
 // to avoid typescript errors
 declare global {
 	interface Window {
-		settings: Settings["actions"] | Record<string, undefined>;
+		settings: Record<string, ActionSetting>;
 		setting: number;
 
 		key_pressed: number;
@@ -20,16 +21,7 @@ declare global {
 		mouse_y: number;
 
 		scroll_id: number;
-		links: (HTMLAnchorElement & {
-			x1?: number;
-			y1?: number;
-			x2?: number;
-			y2?: number;
-			height?: number;
-			width?: number;
-			box?: HTMLElement | null;
-			important?: boolean;
-		})[];
+		links: LinkItem[];
 		box: HTMLElement & { x: number, y: number, x1: number, x2: number, y1: number, y2: number };
 		count_label: HTMLElement;
 		linkclump: HTMLElement;
@@ -37,7 +29,7 @@ declare global {
 		scroll_bug_ignore: boolean;
 		os: 0 | 1;
 
-		timer: number | NodeJS.Timeout;
+		timer: number;
 	}
 }
 
@@ -94,15 +86,15 @@ function main() {
 				window.settings = response.actions;
 
 				let allowed = true;
-				for (const i in response.blocked) {
-					if (response.blocked[i] === "" || !(response.blocked[i]).match(/\S/g)) {
+				for (const blocked of response.blocked) {
+					if (!blocked || !blocked.match(/\S/g)) {
 						continue;
 					}
-					const re = new RegExp(response.blocked[i], "i");
+					const re = new RegExp(blocked, "i");
 
 					if (re.test(window.location.href)) {
 						allowed = false;
-						console.error("Linkclump is blocked on this site: " + response.blocked[i] + "~" + window.location.href);
+						console.error("Linkclump is blocked on this site: " + blocked + "~" + window.location.href);
 					}
 				}
 
@@ -178,7 +170,7 @@ function init() {
  * @param {ElementCreationOptions} options - { is: "Custom Element Tag Name" }
  * @returns {HTMLElement}
  */
-function createCustomElement(tagName: string, options?: ElementCreationOptions) {
+function createCustomElement(tagName: string, options?: ElementCreationOptions): HTMLElement {
 	if (!tagName || typeof tagName !== "string") {
 		throw (`Error, Invalid value passed to createCustomElement(tagName). tagName >> ${tagName}`);
 	}
@@ -274,10 +266,10 @@ function clean_up() {
 	window.box_on = false;
 
 	// remove the link boxes
-	for (let i = 0; i < window.links.length; i++) {
-		if (window.links[i].box !== null) {
-			(window.linkclump).removeChild(window.links[i].box);
-			window.links[i].box = null;
+	for (const link of window.links) {
+		if (link.box !== null) {
+			(window.linkclump).removeChild(link.box);
+			link.box = null;
 		}
 	}
 	window.links = [];
@@ -415,39 +407,43 @@ function getXY(element: HTMLElement): { x: number, y: number } {
 	let matrix;
 
 	do {
-		const style = window.getComputedStyle(parent);
-		const transform = style?.transform;
+		if (parent instanceof HTMLElement) {
+			const style = window.getComputedStyle(parent);
+			const transform = style?.transform;
 
-		if (transform && transform !== "none") {
-			try {
-				matrix = new DOMMatrix(transform);
-			} catch {
-				// Fallback, older browsers supported (Google Chrome 60 and earlier)
-				if ("WebKitCSSMatrix" in window) {
-					matrix = new WebKitCSSMatrix(style.webkitTransform);
-				} else {
-					matrix = { m41: 0, m42: 0 };
+			if (transform && transform !== "none") {
+				try {
+					matrix = new DOMMatrix(transform);
+				} catch {
+					// Fallback, older browsers supported (Google Chrome 60 and earlier)
+					if ("WebKitCSSMatrix" in window) {
+						matrix = new WebKitCSSMatrix(style.webkitTransform);
+					} else {
+						matrix = { m41: 0, m42: 0 };
+					}
 				}
+			} else {
+				matrix = { m41: 0, m42: 0 };
 			}
+
+			x += parent.offsetLeft + matrix.m41;
+			y += parent.offsetTop + matrix.m42;
+
+			parent = parent.offsetParent;
 		} else {
-			 matrix = { m41: 0, m42: 0 };
+			break;
 		}
-
-		x += parent.offsetLeft + matrix.m41;
-		y += parent.offsetTop + matrix.m42;
-
-		parent = parent.offsetParent;
 	} while (parent);
 
-	parent = element;
-	while (parent && parent !== document.body) {
-		if (parent.scrollLeft) {
-			x -= parent.scrollLeft;
+	let scrollParent: Element | null = element;
+	while (scrollParent && scrollParent !== document.body) {
+		if (scrollParent.scrollLeft) {
+			x -= scrollParent.scrollLeft;
 		}
-		if (parent.scrollTop) {
-			y -= parent.scrollTop;
+		if (scrollParent.scrollTop) {
+			y -= scrollParent.scrollTop;
 		}
-		parent = parent.parentNode;
+		scrollParent = scrollParent.parentElement;
 	}
 
 	return {
@@ -456,7 +452,7 @@ function getXY(element: HTMLElement): { x: number, y: number } {
 	};
 }
 
-function start() {
+function start(): void {
 	const selectedAction = window.settings[window.setting];
 
 	if (selectedAction === undefined) {
@@ -477,64 +473,74 @@ function start() {
 
 	// create RegExp once
 	const re1 = /^javascript:/i;
-	const re2 = new RegExp(selectedAction.options.ignore.slice(1).join("|"), "i");
+	const ignoreList = selectedAction.options?.ignore ?? [];
+	const re2 = new RegExp(ignoreList.slice(1).join("|"), "i");
 	const re3 = /^H\d$/i;
 
 	for (let i = 0; i < page_links.length; i++) {
+		const rawLink = page_links[i];
+		if (!rawLink) {
+			continue;
+		}
+
 		// reject javascript: links
-		if (re1.test(page_links[i].href)) {
+		if (re1.test(rawLink.href)) {
 			continue;
 		}
 
 		// reject href="" or href="#"
-		if (!page_links[i].getAttribute("href") || page_links[i].getAttribute("href") === "#") {
+		if (!rawLink.getAttribute("href") || rawLink.getAttribute("href") === "#") {
 			continue;
 		}
 
 		// include/exclude links
-		if (selectedAction.options.ignore.length > 1) {
-			if (re2.test(page_links[i].href) || re2.test(page_links[i].innerHTML)) {
-				if (Number(selectedAction.options.ignore[0]) === EXCLUDE_LINKS) {
+		if (ignoreList.length > 1) {
+			if (re2.test(rawLink.href) || re2.test(rawLink.innerHTML)) {
+				if (Number(ignoreList[0]) === EXCLUDE_LINKS) {
 					continue;
 				}
-			} else if (Number(selectedAction.options.ignore[0]) === INCLUDE_LINKS) {
+			} else if (Number(ignoreList[0]) === INCLUDE_LINKS) {
 				continue;
 			}
 		}
 
 		// attempt to ignore invisible links (can't ignore overflow)
-		const comp = window.getComputedStyle(page_links[i], null);
+		const comp = window.getComputedStyle(rawLink, null);
 		if (comp.visibility === "hidden" || comp.display === "none") {
 			continue;
 		}
 
-		const pos = getXY(page_links[i]);
-		let width = page_links[i].offsetWidth;
-		let height = page_links[i].offsetHeight;
+		const pos = getXY(rawLink);
+		let width = rawLink.offsetWidth;
+		let height = rawLink.offsetHeight;
 
 		// attempt to get the actual size of the link
-		for (let k = 0; k < page_links[i].childNodes.length; k++) {
-			if (page_links[i].childNodes[k].nodeName === "IMG") {
-				const pos2 = getXY(page_links[i].childNodes[k]);
+		for (let k = 0; k < rawLink.childNodes.length; k++) {
+			const child = rawLink.childNodes[k];
+			if (child instanceof HTMLElement && child.nodeName === "IMG") {
+				const pos2 = getXY(child);
 				if (pos.y >= pos2.y) {
 					pos.y = pos2.y;
 
-					width = Math.max(width, page_links[i].childNodes[k].offsetWidth);
-					height = Math.max(height, page_links[i].childNodes[k].offsetHeight);
+					width = Math.max(width, child.offsetWidth);
+					height = Math.max(height, child.offsetHeight);
 				}
 			}
 		}
 
-		page_links[i].x1 = pos.x;
-		page_links[i].y1 = pos.y;
-		page_links[i].x2 = pos.x + width;
-		page_links[i].y2 = pos.y + height;
-		page_links[i].height = height;
-		page_links[i].width = width;
-		page_links[i].box = null;
-		page_links[i].important = Number(selectedAction.options.smart) === 0 && page_links[i].parentNode !== null && re3.test(page_links[i].parentNode.nodeName);
+		// DOM要素にLinkclump独自の座標・ボックス管理プロパティを付与
+		// lib.dom.d.ts の標準型定義の限界（独自プロパティ未定義）に起因するため、専用型 LinkItem へのアサーションを行う
+		const link = rawLink as LinkItem;
+		link.x1 = pos.x;
+		link.y1 = pos.y;
+		link.x2 = pos.x + width;
+		link.y2 = pos.y + height;
+		link.height = height;
+		link.width = width;
+		link.box = null;
+		link.important = Number(selectedAction.options?.smart) === 0 && rawLink.parentNode !== null && re3.test(rawLink.parentNode.nodeName);
 
-		window.links.push(page_links[i]);
+		window.links.push(link);
 	}
 
 	window.box_on = true;
@@ -629,57 +635,57 @@ function detect(x: number, y: number, open: boolean) {
 	let count = 0;
 	const count_tabs = new Set;
 	const open_tabs = [];
-	for (let i = 0; i < window.links.length; i++) {
+	for (const link of window.links) {
 		if (
-			(!window.smart_select || window.links[i].important)
+			(!window.smart_select || link.important)
 			&& !(
-				window.links[i].x1 > window.box.x2
-				|| window.links[i].x2 < window.box.x1
-				|| window.links[i].y1 > window.box.y2
-				|| window.links[i].y2 < window.box.y1
+				link.x1 > window.box.x2
+				|| link.x2 < window.box.x1
+				|| link.y1 > window.box.y2
+				|| link.y2 < window.box.y1
 			)
 		) {
 			if (open) {
 				open_tabs.push({
-					"url": window.links[i].href,
-					"title": window.links[i].innerText
+					"url": link.href,
+					"title": link.innerText
 				});
 			}
 
 			// check if important links have been selected and possibly redo
 			if (!window.smart_select) {
-				if (window.links[i].important) {
+				if (link.important) {
 					window.smart_select = true;
 					return false;
 				}
 			} else {
-				if (window.links[i].important) {
+				if (link.important) {
 					count++;
 				}
 			}
 
-			if (window.links[i].box === null) {
+			if (link.box === null) {
 				const link_box = document.createElement("span");
 				link_box.className = "linkclump-link";
 				link_box.style.margin = "0px auto";
 				link_box.style.border = "1px solid red";
 				link_box.style.position = "absolute";
-				link_box.style.width = window.links[i].width + "px";
-				link_box.style.height = window.links[i].height + "px";
-				link_box.style.top = window.links[i].y1 + "px";
-				link_box.style.left = window.links[i].x1 + "px";
+				link_box.style.width = link.width + "px";
+				link_box.style.height = link.height + "px";
+				link_box.style.top = link.y1 + "px";
+				link_box.style.left = link.x1 + "px";
 				link_box.style.zIndex = (parseFloat(Z_INDEX) - 1).toString();
 
 				(window.linkclump).appendChild(link_box);
-				window.links[i].box = link_box;
+				link.box = link_box;
 			} else {
-				window.links[i].box.style.visibility = "visible";
+				link.box.style.visibility = "visible";
 			}
 
-			count_tabs.add(window.links[i].href);
+			count_tabs.add(link.href);
 		} else {
-			if (window.links[i].box !== null) {
-				window.links[i].box.style.visibility = "hidden";
+			if (link.box !== null) {
+				link.box.style.visibility = "hidden";
 			}
 		}
 	}
@@ -754,12 +760,15 @@ function remove_key() {
 	window.key_pressed = 0;
 }
 
-function allow_selection() {
+function allow_selection(): boolean {
 	for (const i in window.settings) {
 		const setting = window.settings[i];
+		if (!setting) {
+			continue;
+		}
 
 		// need to check if key is 0 as key_pressed might not be accurate
-		if (Number(setting?.mouse) === window.mouse_button && Number(setting?.key) === window.key_pressed) {
+		if (Number(setting.mouse) === window.mouse_button && Number(setting.key) === window.key_pressed) {
 			window.setting = Number.parseInt(i, 10);
 
 			if (window.box !== null) {
