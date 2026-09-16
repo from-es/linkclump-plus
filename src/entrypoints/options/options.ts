@@ -1,7 +1,11 @@
+// WXT provided cross-browser compatible API.
+import { browser } from "wxt/browser";
+
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import { isSettings } from "@/assets/js/types/Settings";
-import type { ActionSetting, Settings } from "@/assets/js/types/Settings";
+
 import type { OptionsSchema } from "@/assets/js/types/Options";
+import type { ActionSetting, Settings } from "@/assets/js/types/Settings";
 
 // jQuery
 import $ from "jquery";
@@ -9,6 +13,8 @@ import "@/assets/js/lib/colorpicker/jquery.colorpicker.js";
 import "@/assets/js/lib/colorpicker/jquery.colorpicker.css";
 
 import "./style.css";
+
+
 
 const config: OptionsSchema = {
 	"triggers":
@@ -143,32 +149,38 @@ function initEvent() {
 
 	setup_form();
 
-	chrome.runtime.sendMessage(
+	browser.runtime.sendMessage(
 		{
 			message: "init",
 			debug: true
-		},
-		function (response: Settings) {
-			currentSettings = response;
-
-			for (const i in currentSettings.actions) {
-				const action = currentSettings.actions[i];
-				if (!action) {
-					continue;
-				}
-				$("#settings").append(setup_action(action, i));
-			}
-			setup_text(keys);
-
-			$("#form_block").val(currentSettings.blocked.join("\n"));
-
-			if (isFirstTime) {
-				tour1();
-			} else {
-				tour2();
-			}
 		}
-	);
+	).then((response: Settings) => {
+		currentSettings = response;
+
+		if (!currentSettings) {
+			console.error("Failed to load settings: response is null or undefined.");
+			return;
+		}
+
+		for (const i in currentSettings.actions) {
+			const action = currentSettings.actions[i];
+			if (!action) {
+				continue;
+			}
+			$("#settings").append(setup_action(action, i));
+		}
+		setup_text(keys);
+
+		$("#form_block").val((currentSettings.blocked || []).join("\n"));
+
+		if (isFirstTime) {
+			tour1();
+		} else {
+			tour2();
+		}
+	}).catch((error) => {
+		console.error("Failed to initialize settings in options page:", error);
+	});
 }
 
 
@@ -192,7 +204,7 @@ function tour2() {
 }
 
 function tour3() {
-	chrome.tabs.create({ url: "https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm/reviews", active: true });
+	browser.tabs.create({ url: "https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm/reviews", active: true });
 }
 
 /**
@@ -722,7 +734,7 @@ function save_settings() {
 		return;
 	}
 
-	chrome.runtime.sendMessage({
+	browser.runtime.sendMessage({
 		message: "update",
 		settings: currentSettings
 	});

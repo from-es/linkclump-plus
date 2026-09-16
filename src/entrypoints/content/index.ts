@@ -1,6 +1,13 @@
+// WXT provided cross-browser compatible API.
+import { browser } from "wxt/browser";
+
 import type { LinkItem } from "@/assets/js/types/Content";
-import type { ActivateMessage, InitMessage, InitResponse } from "@/assets/js/types/Messages";
 import type { ActionSetting } from "@/assets/js/types/Settings";
+import type {
+	ActivateMessage,
+	InitMessage,
+	InitResponse
+} from "@/assets/js/types/Messages";
 
 
 
@@ -71,55 +78,54 @@ export default defineContentScript(
 );
 
 function main() {
-	chrome.runtime.sendMessage(
+	browser.runtime.sendMessage(
 		{
 			message: "init"
-		} as InitMessage,
-		function (response: InitResponse | null) {
-			if (response === null) {
-				console.error("Unable to load linkclump due to null response");
-			} else {
-				if (Object.hasOwn(response, "error")) {
-					console.error("Unable to properly load linkclump, returning to default settings: " + JSON.stringify(response));
+		} as InitMessage
+	).then((response: InitResponse | null) => {
+		if (response === null) {
+			console.error("Unable to load linkclump due to null response");
+		} else {
+			if (Object.hasOwn(response, "error")) {
+				console.error("Unable to properly load linkclump, returning to default settings: " + JSON.stringify(response));
+			}
+
+			window.settings = response.actions;
+
+			let allowed = true;
+			for (const blocked of response.blocked) {
+				if (!blocked || !blocked.match(/\S/g)) {
+					continue;
 				}
+				const re = new RegExp(blocked, "i");
 
-				window.settings = response.actions;
-
-				let allowed = true;
-				for (const blocked of response.blocked) {
-					if (!blocked || !blocked.match(/\S/g)) {
-						continue;
-					}
-					const re = new RegExp(blocked, "i");
-
-					if (re.test(window.location.href)) {
-						allowed = false;
-						console.error("Linkclump is blocked on this site: " + blocked + "~" + window.location.href);
-					}
-				}
-
-				if (allowed) {
-					// setting up the box and count label
-					window.linkclump = createCustomElement(CUSTOM_TAG_LINKCLUMP);
-					window.box = create_box();
-					window.count_label = create_count_label();
-
-					(window.linkclump).appendChild(window.box);
-					(window.linkclump).appendChild(window.count_label);
-					(document.body).appendChild(window.linkclump);
-
-					// add event listeners
-					window.addEventListener("mousedown", mousedown, true);
-					window.addEventListener("keydown", keydown, true);
-					window.addEventListener("keyup", keyup, true);
-					window.addEventListener("blur", blur, true);
-					window.addEventListener("contextmenu", contextmenu, true);
+				if (re.test(window.location.href)) {
+					allowed = false;
+					console.error("Linkclump is blocked on this site: " + blocked + "~" + window.location.href);
 				}
 			}
-		}
-	);
 
-	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+			if (allowed) {
+				// setting up the box and count label
+				window.linkclump = createCustomElement(CUSTOM_TAG_LINKCLUMP);
+				window.box = create_box();
+				window.count_label = create_count_label();
+
+				(window.linkclump).appendChild(window.box);
+				(window.linkclump).appendChild(window.count_label);
+				(document.body).appendChild(window.linkclump);
+
+				// add event listeners
+				window.addEventListener("mousedown", mousedown, true);
+				window.addEventListener("keydown", keydown, true);
+				window.addEventListener("keyup", keyup, true);
+				window.addEventListener("blur", blur, true);
+				window.addEventListener("contextmenu", contextmenu, true);
+			}
+		}
+	});
+
+	browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		if (request.message === "update") {
 			window.settings = request.settings.actions;
 
@@ -699,7 +705,7 @@ function detect(x: number, y: number, open: boolean) {
 	window.count_label.innerText = count_tabs.size.toString();
 
 	if (open_tabs.length > 0) {
-		chrome.runtime.sendMessage({
+		browser.runtime.sendMessage({
 			message: "activate",
 			urls: open_tabs,
 			setting: window.settings[window.setting]

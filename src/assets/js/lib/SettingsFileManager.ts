@@ -1,3 +1,16 @@
+/**
+ * Utilities for importing and exporting extension settings as JSON files.
+ *
+ * Provides browser file-picker based import, download-based export, OS-safe
+ * filename sanitization, and manifest-aware default naming for generated files.
+ *
+ * @requires {@link https://wxt.dev/|wxt}
+ * @requires {@link https://day.js.org/|Day.js}
+ */
+
+// WXT provided cross-browser compatible API.
+import { browser } from "wxt/browser";
+
 import dayjs from "dayjs";
 
 
@@ -229,8 +242,7 @@ function downloadFile<T>(data: T, filename: string, mimetype: string): boolean {
  * Returns a shallow copy of the fallback so callers cannot mutate the shared module-level constant.
  *
  * @param {ManifestIdentityInfo} [manifest] - Optional manifest identity info for dependency injection.
- * @param {ManifestIdentityInfo} [fallback=FALLBACK_APPLICATION_INFO] - Fallback manifest identity
- *   info if runtime manifest is inaccessible.
+ * @param {ManifestIdentityInfo} [fallback=FALLBACK_APPLICATION_INFO] - Fallback manifest identity info if runtime manifest is inaccessible.
  * @returns {ManifestIdentityInfo} Resolved manifest identity information.
  */
 function getManifestIdentityInfo(
@@ -241,9 +253,11 @@ function getManifestIdentityInfo(
 		return manifest;
 	}
 
+	// In certain execution contexts (e.g., unit test environments like Vitest/Node.js or when the extension context is invalidated),
+	// runtime.getManifest may be unavailable; return the default application info as a fallback.
 	try {
-		if (typeof chrome !== "undefined" && chrome.runtime?.getManifest) {
-			return chrome.runtime.getManifest();
+		if (browser?.runtime?.getManifest) {
+			return browser.runtime.getManifest();
 		}
 	} catch (error) {
 		console.warn("Failed to retrieve extension manifest, falling back to default application info.", error);

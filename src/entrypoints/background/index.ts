@@ -1,4 +1,9 @@
+// WXT provided cross-browser compatible API and Types.
+import { browser, type Browser } from "wxt/browser";
+
 import { CopyFormat } from "@/assets/js/types/Messages";
+import { isSettings } from "@/assets/js/types/Settings";
+
 import type {
 	ActivateMessage,
 	ActivateMessage_bm,
@@ -8,8 +13,9 @@ import type {
 	Messages,
 	UpdateMessage
 } from "@/assets/js/types/Messages";
-import { isSettings } from "@/assets/js/types/Settings";
 import type { Settings } from "@/assets/js/types/Settings";
+
+
 
 // Format version
 const CURRENT_VERSION = "5";
@@ -30,36 +36,36 @@ const AS_MARKDOWN = 6;
 class SettingsManager {
 
 	async load(): Promise<Settings> {
-		const result = await chrome.storage.sync.get(linkclumpSettingsKey);
+		const result = await browser.storage.sync.get(linkclumpSettingsKey);
 		const settings = result[linkclumpSettingsKey];
 
 		if (isSettings(settings)) {
 			return settings;
 		}
 
-		return this.init();
+		return await this.init();
 	};
 
-	save(settings: Settings & { error?: string }) {
+	async save(settings: Settings & { error?: string }) {
 		// remove any error messages from object (shouldn't be there)
 		if (settings.error !== undefined) {
 			delete settings.error;
 		}
 
-		chrome.storage.sync.set({ [linkclumpSettingsKey]: settings });
+		await browser.storage.sync.set({ [linkclumpSettingsKey]: settings });
 	};
 
 	async isInit() {
-		const { [linkclumpVersionKey]: version } = await chrome.storage.sync.get(linkclumpVersionKey);
+		const { [linkclumpVersionKey]: version } = await browser.storage.sync.get(linkclumpVersionKey);
 		return version !== undefined;
 	};
 
 	async isLatest() {
-		const { [linkclumpVersionKey]: version } = await chrome.storage.sync.get(linkclumpVersionKey);
+		const { [linkclumpVersionKey]: version } = await browser.storage.sync.get(linkclumpVersionKey);
 		return version === CURRENT_VERSION;
 	};
 
-	init() {
+	async init() {
 		// create default settings for first time user
 		const settings: Settings = {
 			"actions": {
@@ -86,8 +92,8 @@ class SettingsManager {
 		};
 
 		// save settings to store
-		chrome.storage.sync.set({ [linkclumpSettingsKey]: settings });
-		chrome.storage.sync.set({ [linkclumpVersionKey]: CURRENT_VERSION });
+		await browser.storage.sync.set({ [linkclumpSettingsKey]: settings });
+		await browser.storage.sync.set({ [linkclumpVersionKey]: CURRENT_VERSION });
 
 		return settings;
 	};
@@ -95,7 +101,7 @@ class SettingsManager {
 
 	async update() {
 		if (!(await this.isInit())) {
-			this.init();
+			await this.init();
 		}
 	};
 }
@@ -111,55 +117,69 @@ export default defineBackground(
 
 
 function main() {
-	chrome.runtime.onMessage.addListener(handleRequests);
+	browser.runtime.onMessage.addListener(handleRequests);
 
-	chrome.action.onClicked.addListener(() => {
-		chrome.runtime.openOptionsPage();
+	browser.action.onClicked.addListener(() => {
+		browser.runtime.openOptionsPage();
 	});
 
-	if (!settingsManager.isInit()) {
+	initBackground();
+}
+
+async function initBackground() {
+	if (!(await settingsManager.isInit())) {
 		// initialize settings manager with defaults and to stop this appearing again
-		settingsManager.init();
+		await settingsManager.init();
 
 		// inject Linkclump into windows currently open to make it just work
-		chrome.windows.getAll(
-			{ populate: true },
-			function (windows) {
-				for (let i = 0; i < windows.length; ++i) {
-					const win = windows[i];
-					if (!win) {
-						continue;
-					}
-					const numberOfTabs = win.tabs?.length;
-					if (numberOfTabs === undefined) {
-						continue;
-					}
-					for (let j = 0; j < numberOfTabs; ++j) {
-						const tab = win.tabs?.[j];
-						const url = tab?.url;
-						const id = tab?.id;
-						if (!url || !id) {
-							continue;
-						}
-						if (!/^https?:\/\//.test(url)) {
-							continue;
-						}
-						chrome.tabs.executeScript(id, { file: "/content-scripts/content.js" });
-					}
-				}
+		const windows = await browser.windows.getAll({ populate: true });
+		for (let i = 0; i < windows.length; ++i) {
+			const win = windows[i];
+			if (!win) {
+				continue;
 			}
-		);
+			const numberOfTabs = win.tabs?.length;
+			if (numberOfTabs === undefined) {
+				continue;
+			}
+			for (let j = 0; j < numberOfTabs; ++j) {
+				const tab = win.tabs?.[j];
+				const url = tab?.url;
+				const id = tab?.id;
+				if (!url || !id) {
+					continue;
+				}
+				if (!/^https?:\/\//.test(url)) {
+					continue;
+				}
+				browser.scripting.executeScript({
+					target: { tabId: id },
+					files: [ "/content-scripts/content.js" ]
+				}).catch((error) => {
+					console.warn("Could not inject content script into tab", { id, url, error });
+				});
+			}
+		}
 
 		// pop up window to show tour and options page
-		chrome.windows.create({
-			url: document.location.protocol + "//" + document.location.host + "/options.html?init=true",
+		const windowOptions: {
+			url: string;
+			width: number;
+			height: number;
+			left?: number;
+			top?: number;
+		} = {
+			url: browser.runtime.getURL("/options.html?init=true"),
 			width: 800,
-			height: 850,
-			left: screen.width / 2 - 800 / 2,
-			top: screen.height / 2 - 700 / 2
-		});
-	} else if (!settingsManager.isLatest()) {
-		settingsManager.update();
+			height: 850
+		};
+		if (typeof screen !== "undefined" && screen.width && screen.height) {
+			windowOptions.left = Math.round(screen.width / 2 - 800 / 2);
+			windowOptions.top = Math.round(screen.height / 2 - 700 / 2);
+		}
+		browser.windows.create(windowOptions);
+	} else if (!(await settingsManager.isLatest())) {
+		await settingsManager.update();
 	}
 }
 
@@ -204,7 +224,7 @@ function openTab(
 		windowId,
 		url: url,
 		active: false
-	} as chrome.tabs.CreateProperties;
+	} as Browser.tabs.CreateProperties;
 
 	// only add tab ID if delay feature is not being used as if tab with openerTabId is closed, the links stop opening
 	if (!delay) {
@@ -216,18 +236,15 @@ function openTab(
 		tabIndex++;
 	}
 
-	chrome.tabs.create(
-		obj,
-		function (tab) {
-			if (closeTime && closeTime > 0) {
-				setTimeout(function () {
-					if (tab.id) {
-						chrome.tabs.remove(tab.id);
-					}
-				}, closeTime * 1000);
-			}
+	browser.tabs.create(obj).then((tab) => {
+		if (closeTime && closeTime > 0) {
+			setTimeout(function () {
+				if (tab.id) {
+					browser.tabs.remove(tab.id);
+				}
+			}, closeTime * 1000);
 		}
-	);
+	});
 }
 
 /**
@@ -235,10 +252,10 @@ function openTab(
  * @param {string} text - Text to copy to clipboard
  */
 function copyToClipboard(text: string): void {
-	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+	browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
 		const tab = tabs[0];
 		if (tab?.id) {
-			chrome.tabs.sendMessage(tab.id, { message: "copyToClipboard", text: text });
+			browser.tabs.sendMessage(tab.id, { message: "copyToClipboard", text: text });
 		}
 	});
 }
@@ -262,13 +279,6 @@ function timeConverter(a: Date): string {
 	const time = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
 	return time;
 }
-
-async function sendInit(callback: (response?: Settings) => void): Promise<void> {
-	const settings = await settingsManager.load();
-	callback(settings);
-}
-
-
 
 function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: CopyFormat): string {
 	switch (Number(copyFormat)) {
@@ -308,145 +318,132 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
 	copyToClipboard(text);
 }
 
-function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
-	chrome.bookmarks.getTree(
-		function (bookmarkTreeNodes) {
-			const selectBookmarks = (bookmarks: undefined | string | number): number => {
-				const regex = /^([0-9]+)$/;
-				const defaultValue = 1; // Other Bookmarks: bookmarkTreeNodes[0].children.[1];
-				let index: number;
+async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
+	const bookmarkTreeNodes = await browser.bookmarks.getTree();
+	const selectBookmarks = (bookmarks: undefined | string | number): number => {
+		const regex = /^([0-9]+)$/;
+		const defaultValue = 1; // Other Bookmarks: bookmarkTreeNodes[0].children.[1];
+		let index: number;
 
-				if (!bookmarks) {
-					/*
-						Applies if the configuration has not been saved in Version 2.13 or later.
-						This maintains compatibility with the behavior of adding to "Other Bookmarks" until version 2.12.4.2 or earlier.
-					*/
-					index = defaultValue;
-				} else if (typeof bookmarks === "number" && Number.isSafeInteger(bookmarks)) {
-					index = bookmarks;
-				} else if (typeof bookmarks === "string" && regex.test(bookmarks)) {
-					index = Number.parseInt(bookmarks, 10);
-				} else {
-					console.warn("Invalid value passed to getBookmarksIndex()", { typeof: bookmarks, value: bookmarks });
-
-					index = defaultValue;
-				}
-
-				if (!(index === 0 || index === 1)) {
-					index = defaultValue;
-				}
-
-				return index;
-			};
-
+		if (!bookmarks) {
 			/*
-				request.setting.options.bookmarks
-					undefined : This key does not exist until 2.12.4.2 or earlier
-					0 or "0"  : main   bookmarks
-					1 or "1"  : other  bookmarks >> Default designation until 2.12.4.2 or earlier
-					2 or "2"  : synced bookmarks
+				Applies if the configuration has not been saved in Version 2.13 or later.
+				This maintains compatibility with the behavior of adding to "Other Bookmarks" until version 2.12.4.2 or earlier.
 			*/
-			const bookmarksIndex: number = selectBookmarks(request.setting.options?.bookmarks);
-			const rootNode = bookmarkTreeNodes[0];
-			const folderID = rootNode?.children?.[bookmarksIndex]?.id;
+			index = defaultValue;
+		} else if (typeof bookmarks === "number" && Number.isSafeInteger(bookmarks)) {
+			index = bookmarks;
+		} else if (typeof bookmarks === "string" && regex.test(bookmarks)) {
+			index = Number.parseInt(bookmarks, 10);
+		} else {
+			console.warn("Invalid value passed to getBookmarksIndex()", { typeof: bookmarks, value: bookmarks });
 
-			if (!folderID) {
-				console.error("Folder ID is undefined");
-				return;
-			}
-
-			// make assumption that bookmarkTreeNodes[0].children[1] refers to the "other bookmarks" folder
-			// as different languages will not use the english name to refer to the folder
-			chrome.bookmarks.create(
-				{
-					"parentId": folderID,
-					"title": "Linkclump " + timeConverter(new Date())
-				},
-				function (newFolder) {
-					for (let j = 0; j < request.urls.length; j++) {
-						const urlItem = request.urls[j];
-						if (!urlItem) {
-							continue;
-						}
-						chrome.bookmarks.create({
-							"parentId": newFolder.id,
-							"title": urlItem.title,
-							"url": urlItem.url
-						});
-					}
-				}
-			);
+			index = defaultValue;
 		}
-	);
+
+		if (!(index === 0 || index === 1)) {
+			index = defaultValue;
+		}
+
+		return index;
+	};
+
+	/*
+		request.setting.options.bookmarks
+			undefined : This key does not exist until 2.12.4.2 or earlier
+			0 or "0"  : main   bookmarks
+			1 or "1"  : other  bookmarks >> Default designation until 2.12.4.2 or earlier
+			2 or "2"  : synced bookmarks
+	*/
+	const bookmarksIndex: number = selectBookmarks(request.setting.options?.bookmarks);
+	const rootNode = bookmarkTreeNodes[0];
+	const folderID = rootNode?.children?.[bookmarksIndex]?.id;
+
+	if (!folderID) {
+		console.error("Folder ID is undefined");
+		return;
+	}
+
+	// make assumption that bookmarkTreeNodes[0].children[1] refers to the "other bookmarks" folder
+	// as different languages will not use the english name to refer to the folder
+	const newFolder = await browser.bookmarks.create({
+		"parentId": folderID,
+		"title": "Linkclump " + timeConverter(new Date())
+	});
+
+	for (let j = 0; j < request.urls.length; j++) {
+		const urlItem = request.urls[j];
+		if (!urlItem) {
+			continue;
+		}
+		await browser.bookmarks.create({
+			"parentId": newFolder.id,
+			"title": urlItem.title,
+			"url": urlItem.url
+		});
+	}
 }
 
-function handleWin(request: ActivateMessage<ActivateMessage_win>) {
-	chrome.windows.getCurrent(
-		function (currentWindow) {
-			const url = request.urls.shift()?.url;
+async function handleWin(request: ActivateMessage<ActivateMessage_win>) {
+	const currentWindow = await browser.windows.getCurrent();
+	const url = request.urls.shift()?.url;
 
-			if (!url) {
-				return;
-			}
+	if (!url) {
+		return;
+	}
 
-			chrome.windows.create(
-				{
-					url: url,
-					"focused": !request.setting.options.unfocus
-				},
-				function (window) {
-					const windowId = window ? window.id : currentWindow.id;
+	const window = await browser.windows.create({
+		url: url,
+		"focused": !request.setting.options.unfocus
+	});
 
-					if (request.urls.length > 0) {
-						openTab(
-							request.urls,
-							request.setting.options.delay,
-							windowId,
-							undefined,
-							undefined,
-							0
-						);
-					}
-				});
+	const windowId = window ? window.id : currentWindow.id;
 
-			if (currentWindow.id && request.setting.options.unfocus) {
-				chrome.windows.update(
-					currentWindow.id,
-					{ "focused": true }
-				);
-			}
-		}
-	);
+	if (request.urls.length > 0) {
+		openTab(
+			request.urls,
+			request.setting.options.delay,
+			windowId,
+			undefined,
+			undefined,
+			0
+		);
+	}
+
+	if (currentWindow.id && request.setting.options.unfocus) {
+		await browser.windows.update(
+			currentWindow.id,
+			{ "focused": true }
+		);
+	}
 }
 
-function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: chrome.runtime.MessageSender) {
+async function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: Browser.runtime.MessageSender) {
 	if (sender.tab === undefined || sender.tab.id === undefined) {
 		return;
 	}
 
-	chrome.tabs.get(sender.tab.id, function (tab) {
-		chrome.windows.getCurrent(function (currentWindow) {
-			let tab_index = null;
+	const tab = await browser.tabs.get(sender.tab.id);
+	const currentWindow = await browser.windows.getCurrent();
+	let tab_index = null;
 
-			if (!request.setting.options.end) {
-				tab_index = tab.index + 1;
-			}
+	if (!request.setting.options.end) {
+		tab_index = tab.index + 1;
+	}
 
-			const windowId = currentWindow ? currentWindow.id : undefined;
+	const windowId = currentWindow ? currentWindow.id : undefined;
 
-			openTab(
-				request.urls,
-				request.setting.options.delay,
-				windowId,
-				tab.id,
-				tab_index,
-				request.setting.options.close
-			);
-		});
-	});
+	openTab(
+		request.urls,
+		request.setting.options.delay,
+		windowId,
+		tab.id,
+		tab_index,
+		request.setting.options.close
+	);
 }
 
-function handleRequests(request: Messages, sender: chrome.runtime.MessageSender, callback: (response?: Settings) => void) {
+function handleRequests(request: Messages, sender: Browser.runtime.MessageSender): Promise<Settings> | void {
 	switch (request.message) {
 		case "activate": {
 			if (request.setting.options.block) {
@@ -486,21 +483,20 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 		}
 
 		case "init": {
-			sendInit(callback);
-			return true;
+			return settingsManager.load();
 		}
 		case "update": {
-			settingsManager.save(request.settings);
-
-			chrome.windows.getAll({
-				populate: true
-			}, function (windowList) {
+			settingsManager.save(request.settings).then(async () => {
+				const windowList = await browser.windows.getAll({
+					populate: true
+				});
+				const currentSettings = await settingsManager.load();
 				windowList.forEach(function (window) {
 					if (!window.tabs) {
 						return;
 					}
 
-					window.tabs.forEach(async function (tab) {
+					window.tabs.forEach(function (tab) {
 						if (!(tab?.id && tab?.url)) {
 							return;
 						}
@@ -510,11 +506,11 @@ function handleRequests(request: Messages, sender: chrome.runtime.MessageSender,
 							return;
 						}
 
-						const sendMessageToTab = chrome.tabs.sendMessage(
+						const sendMessageToTab = browser.tabs.sendMessage(
 							tab.id,
 							{
 								message: "update",
-								settings: await settingsManager.load()
+								settings: currentSettings
 							} as UpdateMessage
 						);
 

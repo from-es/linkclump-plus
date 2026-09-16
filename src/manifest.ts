@@ -31,11 +31,17 @@ export const manifest: UserManifest = {
 		"tabs",
 		"bookmarks",
 		"storage",
-		"clipboardWrite"
+		"clipboardWrite",
+		"scripting"
 	],
 	"host_permissions": [
 		"*://*/*"
 	],
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "{bfa63657-ac46-47eb-acfd-27f8e374bc0e}"
+		}
+	},
 	"background": {
 		"service_worker": "/background.js",
 		"type": "module"
