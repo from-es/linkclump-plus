@@ -5,7 +5,7 @@ import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import { isSettings } from "@/assets/js/types/Settings";
 
 import type { OptionsSchema } from "@/assets/js/types/Options";
-import type { ActionSetting, Settings } from "@/assets/js/types/Settings";
+import type { ActionOptionValue, ActionSetting, Settings } from "@/assets/js/types/Settings";
 
 // jQuery
 import $ from "jquery";
@@ -16,14 +16,49 @@ import "./style.css";
 
 
 
-const config: OptionsSchema = {
+/**
+ * Static UI definition schema for the options page.
+ *
+ * Defines the structure of the options UI — available triggers, action types,
+ * and option fields (labels, types, defaults, and descriptions).
+ * This is a compile-time constant embedded in the source code and is
+ * **not** a user settings value.
+ *
+ * @see {@link OptionsSchema}
+ * @see {@link currentSettings} for the mutable user settings loaded from storage.
+ */
+const optionsSchema: OptionsSchema = {
 	"triggers":
-		[ { "name": "Left" }, { "name": "Middle" }, { "name": "Right" } ],
+		[
+			{ "name": "Left" },
+			{ "name": "Middle" },
+			{ "name": "Right" }
+		],
 	"actions": {
-		"win": { "name": "Opened in a New Window", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "block", "reverse", "unfocus" ] },
-		"tabs": { "name": "Opened as New Tabs", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "delay", "close", "block", "reverse", "end" ] },
-		"bm": { "name": "Bookmarked", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "bookmarks", "block", "reverse" ] },
-		"copy": { "name": "Copied to clipboard", "options": [ "fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "copy", "block", "reverse" ] }
+		"win": {
+			"name": "Opened in a New Window",
+			"options": [
+				"fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse", "delay", "unfocus"
+			]
+		},
+		"tabs": {
+			"name": "Opened as New Tabs",
+			"options": [
+				"fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse", "delay", "close", "end"
+			]
+		},
+		"bm": {
+			"name": "Bookmarked",
+			"options": [
+				"fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse", "bookmarks"
+			]
+		},
+		"copy": {
+			"name": "Copied to clipboard",
+			"options": [
+				"fontsizeofcounter", "fontweightofcounter", "samebgcolorasbox", "smart", "ignore", "block", "reverse", "copy"
+			]
+		}
 	},
 	"options": {
 		"fontsizeofcounter": {
@@ -237,7 +272,7 @@ function load_action(id: string | null) {  // into form
 		displayOptions(actionSetting.action);
 
 		for (const i in actionSetting.options) {
-			const optDef = config.options[i];
+			const optDef = optionsSchema.options[i];
 			if (!optDef) {
 				continue;
 			}
@@ -331,11 +366,11 @@ function delete_action(id: string, div: JQuery) {
 function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 	const setting = $("<div class='setting' id='action_" + id + "'>");
 
-	const actionDef = config.actions[actionSetting.action];
+	const actionDef = optionsSchema.actions[actionSetting.action];
 	const actionName = actionDef ? actionDef.name : actionSetting.action;
 	const h3 = "<h3>" + actionName + "</h3>";
 	const activateKey = (actionSetting.key > 0 && keys[actionSetting.key]) ? "\"<b>" + keys[actionSetting.key] + "</b>\" key and " : "";
-	const triggerDef = config.triggers[actionSetting.mouse];
+	const triggerDef = optionsSchema.triggers[actionSetting.mouse];
 	const triggerName = triggerDef ? triggerDef.name : String(actionSetting.mouse);
 	const activateMouse = "\"<b>" + triggerName + "</b>\" mouse button";
 	const activate = "<p>Activate by " + activateKey + activateMouse + ".</p>";
@@ -344,7 +379,7 @@ function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 
 	const list = $("<ul>");
 	for (const j in actionSetting.options) {
-		const op = config.options[j];
+		const op = optionsSchema.options[j];
 		if (!op) {
 			continue;
 		}
@@ -420,8 +455,8 @@ function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 
 function setup_form() {
 	const mouse = $("#form_mouse");
-	for (let i = 0; i < config.triggers.length; i++) {
-		const trg = config.triggers[i];
+	for (let i = 0; i < optionsSchema.triggers.length; i++) {
+		const trg = optionsSchema.triggers[i];
 		if (trg) {
 			mouse.append('<option value="' + i + '">' + trg.name + '</option>');
 		}
@@ -445,8 +480,8 @@ function setup_form() {
 
 
 	const action = $("#form_action");
-	for (const i in config.actions) {
-		const actDef = config.actions[i];
+	for (const i in optionsSchema.actions) {
+		const actDef = optionsSchema.actions[i];
 		if (!actDef) {
 			continue;
 		}
@@ -475,8 +510,8 @@ function setup_text(keys: Record<number, string>) {
 	if (actionSetting === undefined) {
 		return;
 	}
-	const trigger = config.triggers[actionSetting.mouse];
-	const actionDef = config.actions[actionSetting.action];
+	const trigger = optionsSchema.triggers[actionSetting.mouse];
+	const actionDef = optionsSchema.actions[actionSetting.action];
 	if (trigger) {
 		$("#mouse_name").text(trigger.name);
 	}
@@ -537,13 +572,13 @@ function displayOptions(action: string) {
 	const options = $("#form_options");
 	options.empty();
 
-	const actionDef = config.actions[action];
+	const actionDef = optionsSchema.actions[action];
 	if (!actionDef) {
 		return;
 	}
 
 	for (const optKey of actionDef.options) {
-		const op = config.options[optKey];
+		const op = optionsSchema.options[optKey];
 		if (!op) {
 			continue;
 		}
@@ -658,23 +693,24 @@ function save_action(event: Event | JQuery.TriggeredEvent) {
 	const colorVal = $(".colorpicker-trigger").css("background-color") || "";
 	const actionVal = String($("input[name=action]:radio:checked").val() ?? "tabs");
 
+	const actionOptions: Record<string, ActionOptionValue | undefined> = {};
 	const actionSetting: ActionSetting = {
 		mouse: mouseVal,
 		key: keyVal,
 		color: colorVal,
 		action: actionVal,
-		options: {}
+		options: actionOptions
 	};
 
-	const actionDef = config.actions[actionSetting.action];
+	const actionDef = optionsSchema.actions[actionSetting.action];
 	if (actionDef) {
 		for (const name of actionDef.options) {
-			const op = config.options[name];
+			const op = optionsSchema.options[name];
 			if (!op) {
 				continue;
 			}
 			if (op.type === "checkbox") {
-				actionSetting.options[name] = $("#form_option_" + name).is(":checked");
+				actionOptions[name] = $("#form_option_" + name).is(":checked");
 			} else if (name === "ignore") {
 				const rawText = String($("#form_option_text_" + name).val() ?? "");
 				const ignore: (number | string)[] = rawText.replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",");
@@ -685,15 +721,15 @@ function save_action(event: Event | JQuery.TriggeredEvent) {
 				const selVal = Number($("#form_option_selection_" + name).val() ?? 0);
 				ignore.unshift(selVal);
 
-				actionSetting.options[name] = ignore;
+				actionOptions[name] = ignore;
 			} else if (name === "delay" || name === "close" || name === "copy") {
 				let value = parseFloat(String($("#form_option_" + name).val() ?? "0"));
 				if (isNaN(value)) {
 					value = 0;
 				}
 
-				actionSetting.options[name] = value;
-			} else if (name === "fontsizeofcounter" || name === "fontweightofcounter") {
+				actionOptions[name] = value;
+			} else if (op.type === "number") {
 				let value = parseFloat(String($("#form_option_" + name).val() ?? "0"));
 				const def = op.data ? Number(op.data[0]) : 0;
 				const min = op.data ? Number(op.data[1]) : 0;
@@ -706,9 +742,9 @@ function save_action(event: Event | JQuery.TriggeredEvent) {
 					value = def;
 				}
 
-				actionSetting.options[name] = value;
+				actionOptions[name] = value;
 			} else {
-				actionSetting.options[name] = String($("#form_option_" + name).val() ?? "");
+				actionOptions[name] = String($("#form_option_" + name).val() ?? "");
 			}
 		}
 	}
