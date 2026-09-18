@@ -326,10 +326,8 @@ async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 		let index: number;
 
 		if (!bookmarks) {
-			/*
-				Applies if the configuration has not been saved in Version 2.13 or later.
-				This maintains compatibility with the behavior of adding to "Other Bookmarks" until version 2.12.4.2 or earlier.
-			*/
+			// Applies if the setting has not been saved in Version 2.13 or later.
+			// This maintains compatibility with the behavior of adding to "Other Bookmarks" until version 2.12.4.2 or earlier.
 			index = defaultValue;
 		} else if (typeof bookmarks === "number" && Number.isSafeInteger(bookmarks)) {
 			index = bookmarks;
@@ -348,13 +346,11 @@ async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 		return index;
 	};
 
-	/*
-		request.setting.options.bookmarks
-			undefined : This key does not exist until 2.12.4.2 or earlier
-			0 or "0"  : main   bookmarks
-			1 or "1"  : other  bookmarks >> Default designation until 2.12.4.2 or earlier
-			2 or "2"  : synced bookmarks
-	*/
+	// request.setting.options.bookmarks
+	//   undefined : This key does not exist until 2.12.4.2 or earlier
+	//     0 or "0"  : main   bookmarks
+	//     1 or "1"  : other  bookmarks >> Default designation until 2.12.4.2 or earlier
+	//     2 or "2"  : synced bookmarks
 	const bookmarksIndex: number = selectBookmarks(request.setting.options?.bookmarks);
 	const rootNode = bookmarkTreeNodes[0];
 	const folderID = rootNode?.children?.[bookmarksIndex]?.id;

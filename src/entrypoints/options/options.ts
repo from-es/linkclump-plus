@@ -178,7 +178,7 @@ function initEvent() {
 	document.getElementById("cancel")?.addEventListener("click", close_form);
 	document.getElementById("save")?.addEventListener("click", save_action);
 
-	// ToDo : 要、動作検証@2024/12/17
+	// TODO: Verification needed @2024/12/17
 	document.getElementById("import-setting")?.addEventListener("click", import_setting);
 	document.getElementById("export-setting")?.addEventListener("click", export_setting);
 
@@ -397,7 +397,7 @@ function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 				break;
 			}
 			case "textbox": {
-				// TODO not sure if actionSetting.options[j] returns a string or int
+				// TODO: not sure if actionSetting.options[j] returns a string or int
 				if (optVal === "" || String(optVal) === "0") {
 					continue;
 				}

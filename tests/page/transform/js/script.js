@@ -10,7 +10,7 @@ function main() {
 }
 
 function setTableOfContents() {
-	// Tocbot API(https://tscanlin.github.io/tocbot/#api)
+	// Tocbot API (https://tscanlin.github.io/tocbot/#api)
 	const options = {
 		tocSelector    : ".js-toc",
 		contentSelector: ".js-toc-content",
@@ -20,7 +20,7 @@ function setTableOfContents() {
 	};
 	tocbot.init(options);
 
-	// 動的生成されたリスト要素の前にテキスト(<p>Table of Contents</p>)を追加
+	// Add text (<p>Table of Contents</p>) before dynamically generated list elements
 	const elm  = document.querySelector(options.tocSelector);
 	const str  = "Table of Contents";
 	const text = document.createElement("p");

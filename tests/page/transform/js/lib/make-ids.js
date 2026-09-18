@@ -1,8 +1,6 @@
 /* eslint no-var: off */
 
-/*
-	make-ids.js(https://github.com/tscanlin/tocbot/blob/master/src/utils/make-ids.js)
-*/
+// make-ids.js (https://github.com/tscanlin/tocbot/blob/master/src/utils/make-ids.js)
 function makeIds() {
   // eslint-disable-line
   var content = document.querySelector(".js-toc-content")

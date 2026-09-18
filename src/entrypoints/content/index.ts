@@ -54,22 +54,18 @@ const CUSTOM_TAG_LINKCLUMP = "linkclump-plus";
 
 
 
-// Content Scripts(https://wxt.dev/guide/essentials/entrypoints.html#content-scripts)
+// Content Scripts (https://wxt.dev/guide/essentials/entrypoints.html#content-scripts)
 export default defineContentScript(
 	{
-		/*
-			Notes: content scripts (content.js) are called twice
-
-			When building with WXT,
-			specifying "run_at": "document_end" in the "content_scripts" of the manifest causes the content scripts to be called twice.
-		*/
-
-		/*
-			Notes: Error during build if ‘matches: [’<all_urls>‘]’ is not specified within defineContentScript() in content.js
-
-			ERROR  Entrypoint validation failed: 1 error, 0 warnings
-			src\entrypoints\content.js	- ERROR matches is required (recieved: undefined)
-		*/
+		// Notes: content scripts (content.js) are called twice
+		//
+		// When building with WXT,
+		// specifying "run_at": "document_end" in the "content_scripts" of the manifest causes the content scripts to be called twice.
+		//
+		// Notes: Error during build if ‘matches: [’<all_urls>‘]’ is not specified within defineContentScript() in content.js
+		//
+		// ERROR  Entrypoint validation failed: 1 error, 0 warnings
+		// src\entrypoints\content.js	- ERROR matches is required (recieved: undefined)
 		matches: [ "<all_urls>" ],
 
 		// Executed when content script is loaded, can be async
@@ -462,7 +458,7 @@ function start(): void {
 	const selectedAction = window.settings[window.setting];
 
 	if (selectedAction === undefined) {
-		console.error("Selected action configuration was not found.");
+		console.error("Selected action setting was not found.");
 		return;
 	}
 
@@ -534,8 +530,8 @@ function start(): void {
 			}
 		}
 
-		// DOM要素にLinkclump独自の座標・ボックス管理プロパティを付与
-		// lib.dom.d.ts の標準型定義の限界（独自プロパティ未定義）に起因するため、専用型 LinkItem へのアサーションを行う
+		// Attach Linkclump's custom coordinate and box management properties to the DOM element
+		// Assert to the dedicated LinkItem type due to standard lib.dom.d.ts type limitations (custom properties undefined)
 		const link = rawLink as LinkItem;
 		link.x1 = pos.x;
 		link.y1 = pos.y;
