@@ -156,7 +156,7 @@ async function initBackground() {
 					target: { tabId: id },
 					files: [ "/content-scripts/content.js" ]
 				}).catch((error) => {
-					console.warn("Could not inject content script into tab", { id, url, error });
+					console.warn("Failed to inject content script into tab:", { id, url, error });
 				});
 			}
 		}
@@ -336,7 +336,7 @@ async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 		} else if (typeof bookmarks === "string" && regex.test(bookmarks)) {
 			index = Number.parseInt(bookmarks, 10);
 		} else {
-			console.warn("Invalid value passed to getBookmarksIndex()", { typeof: bookmarks, value: bookmarks });
+			console.warn("Invalid bookmarks option value:", { typeof: bookmarks, value: bookmarks });
 
 			index = defaultValue;
 		}
@@ -360,7 +360,7 @@ async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 	const folderID = rootNode?.children?.[bookmarksIndex]?.id;
 
 	if (!folderID) {
-		console.error("Folder ID is undefined");
+		console.error("Target bookmark folder ID is undefined.");
 		return;
 	}
 
@@ -517,17 +517,14 @@ function handleRequests(request: Messages, sender: Browser.runtime.MessageSender
 						sendMessageToTab
 							.then(
 								() => {
-									// debug
-									// console.log('Debug, send an "update" message to the tab. Received a response from Tab. response from content.js >>', { tab, response });
+									// console.debug("Successfully sent update message to tab:", { tab, response });
 								}
 							)
 							.catch(
 								(error) => {
 									// When sending a message to a tab other than "http or https or file",
 									// "Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist." occurs in "background.js".
-
-									// debug
-									console.log('Debug, send an "update" message to the tab. Received a response from Tab. error >>', { tab, error });
+									console.debug("Failed to send update message to tab:", { tab, error });
 								}
 							);
 					});

@@ -819,7 +819,7 @@ async function import_setting() {
 
 		save_settings();
 	} else {
-		console.error("Error, can't import setting. result >>", result);
+		console.error("Failed to import settings:", result);
 	}
 }
 

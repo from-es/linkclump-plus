@@ -84,10 +84,10 @@ function main() {
 		} as InitMessage
 	).then((response: InitResponse | null) => {
 		if (response === null) {
-			console.error("Unable to load linkclump due to null response");
+			console.error("Failed to initialize: received null response from background.");
 		} else {
 			if (Object.hasOwn(response, "error")) {
-				console.error("Unable to properly load linkclump, returning to default settings: " + JSON.stringify(response));
+				console.warn("Failed to load settings, falling back to default settings:", response);
 			}
 
 			window.settings = response.actions;
@@ -101,7 +101,7 @@ function main() {
 
 				if (re.test(window.location.href)) {
 					allowed = false;
-					console.error("Linkclump is blocked on this site: " + blocked + "~" + window.location.href);
+					console.info("Blocked on this site by matching pattern:", { pattern: blocked, url: window.location.href });
 				}
 			}
 
@@ -462,7 +462,7 @@ function start(): void {
 	const selectedAction = window.settings[window.setting];
 
 	if (selectedAction === undefined) {
-		console.error("No setting selected");
+		console.error("Selected action configuration was not found.");
 		return;
 	}
 
@@ -804,16 +804,14 @@ function allow_selection(): boolean {
 					window.count_label.style.borderWidth = `${base * 0.25}px`;
 					window.count_label.style.borderRadius = `${base * 0.50}px`;
 				} else {
-					// debug
-					console.error("Error, setting.options.fontsizeofcounter is not of type number. value >>", setting.options.fontsizeofcounter);
+					console.warn("Invalid fontsizeofcounter value (expected number between 9 and 25):", setting.options.fontsizeofcounter);
 				}
 				if (setting?.options?.fontweightofcounter && (typeof setting.options.fontweightofcounter === "number") && (1 <= setting.options.fontweightofcounter && setting.options.fontweightofcounter <= 1000)) {
 					const weight = setting.options.fontweightofcounter;
 
 					window.count_label.style.fontWeight = weight.toString();
 				} else {
-					// debug
-					console.error("Error, setting.options.fontweightofcounter is not of type number. value >>", setting.options.fontweightofcounter);
+					console.warn("Invalid fontweightofcounter value (expected number between 1 and 1000):", setting.options.fontweightofcounter);
 				}
 			}
 

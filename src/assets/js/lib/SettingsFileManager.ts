@@ -100,7 +100,7 @@ async function importFile<T = unknown>(): Promise<T | null> {
 
 		return result;
 	} catch (error) {
-		console.error("Error, can't read Import File.", error);
+		console.error("Failed to read settings file:", error);
 
 		return null;
 	}
@@ -230,7 +230,7 @@ function downloadFile<T>(data: T, filename: string, mimetype: string): boolean {
 
 		return true;
 	} catch (error) {
-		console.error("Error, can't export file.", error);
+		console.error("Failed to export settings file:", error);
 
 		return false;
 	}
@@ -260,7 +260,7 @@ function getManifestIdentityInfo(
 			return browser.runtime.getManifest();
 		}
 	} catch (error) {
-		console.warn("Failed to retrieve extension manifest, falling back to default application info.", error);
+		console.warn("Failed to retrieve extension manifest, falling back to default application info:", error);
 	}
 
 	return { ...fallback };
