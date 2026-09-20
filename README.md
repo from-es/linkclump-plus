@@ -11,6 +11,8 @@ The [Linkclump](https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnf
 
 Thanks to [benblack86](https://github.com/benblack86 "https://github.com/benblack86") for creating this amazing extension and [wvanderp](https://github.com/wvanderp "https://github.com/wvanderp") for updating it to manifest v3.
 
+It supports both Google Chrome / Chromium-based browsers and Mozilla Firefox.
+
 ## Support
 
 Please note that as this is a free extension the developer is unable to offer individual support.
@@ -19,7 +21,9 @@ If you have any issues or feature requests, please report them at GitHub (https:
 
 ## Installation
 
-Install it by visiting the [Linkclump Plus - Chrome Web Store](https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm "Linkclump Plus - Chrome Web Store").
+Install it from your browser's official extension store:
+- [Linkclump Plus - Chrome Web Store](https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm "Linkclump Plus - Chrome Web Store")
+- [Linkclump Plus - Firefox Add-ons](https://addons.mozilla.org/firefox/addon/linkclump-plus/ "Linkclump Plus - Firefox Add-ons")
 
 ## Build
 
@@ -30,10 +34,16 @@ Assuming that [Node.js](https://nodejs.org/ "https://nodejs.org/") is installed.
 3. move it to the directory where **package.json** is located.
 4. run `npm ci` to install the dependencies required for development.
 5. build the extension into the **.output** directory.
-	- `npm run dev:chrome`: build the extension in **Development** mode (with auto-reload).
-	- `npm run build:chrome:prod`: build the extension in **Production** mode.
-	- `npm run build:chrome:prod:sourcemap`: build the extension in **Production** mode (with **source maps**).
-	- `npm run zip:chrome`: package the extension into a zip file.
+	- Chrome:
+		- `npm run dev:chrome`: build the extension in **Development** mode (with auto-reload).
+		- `npm run build:chrome:prod`: build the extension in **Production** mode.
+		- `npm run build:chrome:prod:sourcemap`: build the extension in **Production** mode (with **source maps**).
+		- `npm run zip:chrome`: package the extension into a zip file.
+	- Firefox:
+		- `npm run dev:firefox`: build the extension in **Development** mode (with auto-reload).
+		- `npm run build:firefox:prod`: build the extension in **Production** mode.
+		- `npm run build:firefox:prod:sourcemap`: build the extension in **Production** mode (with **source maps**).
+		- `npm run zip:firefox`: package the extension into a zip file.
 	- `npm run typecheck`: run TypeScript type checking without emitting files.
 	- `npm run eslint`: run ESLint linting check.
 
@@ -77,7 +87,7 @@ header, nav, main, footer {
 
 ### "Linkclump Plus" Opened Links not marking as "Visited"
 
-If opened links are not marked as “visited”, then that is a Google Chrome specification; the behavioural specification changed in an update in early 2025/03. For more information on this change, see the following article.
+If opened links are not marked as “visited”, then that is a **Google Chrome** specification; the behavioural specification changed in an update in early 2025/03. For more information on this change, see the following article.
 
 Partitioning :visited links history - Chrome Platform Status  
 https://chromestatus.com/feature/5101991698628608
@@ -103,9 +113,10 @@ https://www.reddit.com/r/Enhancement/comments/1kecupw/fix_for_visited_links_not_
 
 - Linkclump
 	- [Linkclump - Chrome Web Store](https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj "https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfef")
-	- [benblack86/linkclump - Github](https://github.com/benblack86/linkclump "https://github.com/benblack86/linkclump")
+	- [benblack86/linkclump - GitHub](https://github.com/benblack86/linkclump "https://github.com/benblack86/linkclump")
 - Linkclump-ng
-	- [wvanderp/linkclump - Github](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump")
+	- [wvanderp/linkclump - GitHub](https://github.com/wvanderp/linkclump "https://github.com/wvanderp/linkclump")
 - Linkclump Plus
 	- [Linkclump Plus - Chrome Web Store](https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm "Linkclump Plus - Chrome Web Store")
-	- [from-es/linkclump-plus - Github](https://github.com/from-es/linkclump-plus "https://github.com/from-es/linkclump-plus")
+	- [Linkclump Plus - Firefox Add-ons](https://addons.mozilla.org/firefox/addon/linkclump-plus/ "Linkclump Plus - Firefox Add-ons")
+	- [from-es/linkclump-plus - GitHub](https://github.com/from-es/linkclump-plus "https://github.com/from-es/linkclump-plus")

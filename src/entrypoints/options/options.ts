@@ -3,6 +3,7 @@ import { browser } from "wxt/browser";
 
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import { isSettings } from "@/assets/js/types/Settings";
+import { Information } from "@/assets/js/constants/app";
 
 import type { OptionsSchema } from "@/assets/js/types/Options";
 import type { ActionOptionValue, ActionSetting, Settings } from "@/assets/js/types/Settings";
@@ -169,6 +170,18 @@ function initEvent() {
 		return;
 	}
 
+	// until migrate to the Svelte UI, we need to update the store link for Firefox users.
+	// This is because the link to the Browser Extension Store (Google Chrome / Firefox) is hardcoded in the HTML, and we want to ensure that it points to the correct store based on the user's browser.
+	if (!isChrome()) {
+		const storeLink = document.getElementById("faq-store-link");
+		if (storeLink) {
+			const { url } = Information.stores.firefox;
+
+			storeLink.setAttribute("href", url);
+			storeLink.setAttribute("title", url);
+		}
+	}
+
 	document.getElementById("guide3")?.addEventListener("click", tour3);
 	document.getElementById("guide2")?.addEventListener("click", tour2);
 	document.getElementById("guide1")?.addEventListener("click", tour1);
@@ -238,8 +251,21 @@ function tour2() {
 	$("#page2").fadeIn();
 }
 
+/**
+ * Determines whether the current browser is Google Chrome or Chromium-based.
+ *
+ * @returns {boolean} True if running on Chrome / Chromium-based browser, false otherwise.
+ */
+function isChrome(): boolean {
+	return navigator.userAgent.includes("Chrome");
+}
+
 function tour3() {
-	browser.tabs.create({ url: "https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm/reviews", active: true });
+	const store = isChrome()
+		? Information.stores.chrome
+		: Information.stores.firefox;
+
+	browser.tabs.create({ url: store.reviews, active: true });
 }
 
 /**

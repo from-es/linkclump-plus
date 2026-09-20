@@ -1,6 +1,6 @@
 {
   "name": "linkclump-plus",
-  "description": "Lets you open, copy or bookmark multiple links at the same time.",
+  "description": "Lets you open, copy or bookmark multiple links at the same time. Cross-browser extension supporting both Chrome and Firefox.",
   "version": "2.15.4",
   "license": "MIT",
   "repository": {
@@ -38,8 +38,5 @@
     "@types/jquery": "^4.0.1",
     "dayjs": "^1.11.23",
     "jquery": "^4.0.0"
-  },
-  "_comment": {
-    "scripts": "Note: The script for Firefox was created with future cross-browser development in mind. It is not intended for use in the current environment."
   }
 }

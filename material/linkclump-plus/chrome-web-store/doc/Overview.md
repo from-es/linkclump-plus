@@ -23,7 +23,7 @@ This "Linkclump Plus" is a fork of linkclump-ng with some fixes and additional f
 
 ## System Requirements
 
-Works with Google Chrome & Chromium-based browsers.
+- Works with Google Chrome & Chromium-based browsers (version 125 or later).
 
 ## Known Issues
 
@@ -60,10 +60,11 @@ If you have any issues or feature requests, please report them at GitHub (https:
 ## Related Links
 
 - Linkclump
-	- https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj
 	- https://github.com/benblack86/linkclump
+	- https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj
 - Linkclump-ng
 	- https://github.com/wvanderp/linkclump
 - Linkclump Plus
-	- https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm
 	- https://github.com/from-es/linkclump-plus
+	- https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm
+	- https://addons.mozilla.org/firefox/addon/linkclump-plus/
