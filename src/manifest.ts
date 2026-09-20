@@ -31,11 +31,60 @@ export const manifest: UserManifest = {
 		"tabs",
 		"bookmarks",
 		"storage",
-		"clipboardWrite"
+		"clipboardWrite",
+		"scripting"
 	],
 	"host_permissions": [
 		"*://*/*"
 	],
+	/*
+		CSS
+			:has() (https://developer.mozilla.org/en-US/docs/Web/CSS/:has)
+				- Chrome : 105 & later
+				- Firefox: 121 & later
+			CSS Nesting (https://caniuse.com/css-nesting)
+				- Chrome : 120 & later
+				- Firefox: 117 & later
+			field-sizing (https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/field-sizing)
+				- Chrome : 123 & later
+				- Firefox: 152 & later
+		JavaScript
+			Popover API (https://developer.mozilla.org/en-US/docs/Web/API/Popover_API)
+				- Chrome : 114 & later
+				- Firefox: 125 & later
+			URL.canParse() (https://developer.mozilla.org/en-US/docs/Web/API/URL/canParse_static)
+				- Chrome : 120 & later
+				- Firefox: 115 & later
+			Error: cause (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)
+				- Chrome : 125 & later
+				- Firefox:  91 & later
+			Clipboard API: ClipboardItem (https://developer.mozilla.org/en-US/docs/Web/API/ClipboardItem)
+				- Chrome :  76 & later
+				- Firefox: 127 & later
+		Firefox Add-ons Store
+			data_collection_permissions (https://extensionworkshop.com/documentation/develop/best-practices-for-collecting-user-data-consents/)
+				- Firefox (Desktop): 140 & later
+				- Firefox (Android): 142 & later
+	*/
+	// for Google Chrome or Chromium-based browsers
+	"minimum_chrome_version": "125",
+
+	// for Mozilla Firefox or Firefox-based browsers
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "{bfa63657-ac46-47eb-acfd-27f8e374bc0e}",
+			"strict_min_version": "152.0",
+
+			/**
+			 * Data collection permissions for Firefox
+			 *
+			 * @see {@link https://extensionworkshop.com/documentation/develop/best-practices-for-collecting-user-data-consents/|Data Collection Permissions - Extension Workshop}
+			 */
+			"data_collection_permissions": {
+				"required": [ "none" ]
+			}
+		}
+	},
 	"background": {
 		"service_worker": "/background.js",
 		"type": "module"

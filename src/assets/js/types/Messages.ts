@@ -1,4 +1,4 @@
-import type { Settings } from './Settings';
+import type { Settings } from "./Settings";
 
 export type Messages = ActivateMessage | InitMessage | UpdateMessage;
 

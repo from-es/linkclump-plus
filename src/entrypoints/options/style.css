@@ -17,7 +17,6 @@
 
 	dt : 14.0 px
 	dl : 14.0 px
-
 */
 
 :root {
@@ -241,8 +240,7 @@ button:hover.button {
 	display: inline-block;
 
 	width: 2rem;
-	height: 1.0em;
-	/* ここだけ親要素基準に指定 */
+	height: 1.0em; /* Specified relative to parent font size only here */
 
 	border: calc(1rem / 16) solid #000;
 }

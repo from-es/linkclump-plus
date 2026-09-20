@@ -9,7 +9,8 @@
 	--radius   : 256;
 }
 
-*:not(img) { /* 画像(img)要素は対象外とする */
+/* Exclude image (img) elements */
+*:not(img) {
 	box-sizing: border-box;
 }
 
@@ -68,7 +69,7 @@ nav {
 .toc a:hover   { color: #8000ff; }
 .toc a:active  { color: #0068ff; }
 
-/* 目次 > 参考：Table of Contents@WordPress Plugin */
+/* Table of Contents > Ref: Table of Contents @ WordPress Plugin */
 .toc {
 	margin-top: 1rem;
 	margin-bottom : 1rem;
