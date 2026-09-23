@@ -459,7 +459,7 @@ function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 
 	setting.append(list);
 
-	const edit = $("<button class='button edit'>Edit</button>").click({ 'i': id },
+	const edit = $("<button class='button edit'>Edit</button>").click({ "i": id },
 		function (event) {
 			load_action(event.data.i);
 			return false;
@@ -484,7 +484,7 @@ function setup_form() {
 	for (let i = 0; i < optionsSchema.triggers.length; i++) {
 		const trg = optionsSchema.triggers[i];
 		if (trg) {
-			mouse.append('<option value="' + i + '">' + trg.name + '</option>');
+			mouse.append('<option value="' + i + '">' + trg.name + "</option>");
 		}
 	}
 
@@ -511,7 +511,7 @@ function setup_form() {
 		if (!actDef) {
 			continue;
 		}
-		const act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + actDef.name + '<br/>');
+		const act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + actDef.name + "<br/>");
 
 		act.click(function (event) {
 			const target = event.currentTarget as HTMLInputElement;
@@ -557,7 +557,7 @@ function check_selection() {
 	const id = $("#form_id").val();
 
 
-	const keyWarning = $('#key_warning');
+	const keyWarning = $("#key_warning");
 	keyWarning.empty();
 	if (k === "0") {
 		keyWarning.append("WARNING: Not using a key could cause unexpected behavior on some websites");
@@ -625,7 +625,7 @@ function displayOptions(action: string) {
 				const selector = $("<select id='form_option_" + optKey + "'>");
 				if (op.data) {
 					for (const j in op.data) {
-						selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
+						selector.append('<option value="' + j + '">' + op.data[j] + "</option>");
 					}
 				}
 				p.append(selector);
@@ -643,11 +643,11 @@ function displayOptions(action: string) {
 				const selector = $("<select id='form_option_selection_" + optKey + "'>");
 				if (op.data) {
 					for (const j in op.data) {
-						selector.append('<option value="' + j + '">' + op.data[j] + '</option>');
+						selector.append('<option value="' + j + '">' + op.data[j] + "</option>");
 					}
 				}
 				p.append(selector);
-				p.append('</p><label></label><p>');
+				p.append("</p><label></label><p>");
 				p.append('<input type="text" name="' + op.name + '" id="form_option_text_' + optKey + '"/>');
 				break;
 			}
@@ -685,7 +685,7 @@ function displayKeys(mouseButton: number): Record<number, string> {
 	// NOTE mouseButton is sometimes a string, sometimes an int
 	const mb = (typeof mouseButton === "string") ? Number.parseInt(mouseButton, 10) : mouseButton;
 	if (mb !== 2 || os === OS_WIN) {
-		keys[0] = '';
+		keys[0] = "";
 	}
 
 	// add on alpha characters
@@ -694,7 +694,7 @@ function displayKeys(mouseButton: number): Record<number, string> {
 	}
 
 	for (const i in keys) {
-		key.append('<option value="' + i + '">' + keys[i] + '</option>');
+		key.append('<option value="' + i + '">' + keys[i] + "</option>");
 	}
 
 	// set selected value to z
