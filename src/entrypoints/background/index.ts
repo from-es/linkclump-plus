@@ -276,28 +276,28 @@ function timeConverter(a: Date): string {
 	const hour = pad(a.getHours(), 2);
 	const min = pad(a.getMinutes(), 2);
 	const sec = pad(a.getSeconds(), 2);
-	const time = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
+	const time = `${year}-${month}-${day} ${hour}:${min}:${sec}`;
 	return time;
 }
 
 function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: CopyFormat): string {
 	switch (Number(copyFormat)) {
 		case URLS_WITH_TITLES:
-			return title + "\t" + url + "\n";
+			return `${title}\t${url}\n`;
 		case URLS_ONLY:
-			return url + "\n";
+			return `${url}\n`;
 		case URLS_ONLY_SPACE_SEPARATED:
-			return url + " ";
+			return `${url} `;
 		case TITLES_ONLY:
-			return title + "\n";
+			return `${title}\n`;
 		case AS_LINK_HTML:
-			return '<a href="' + url + '">' + title + "</a>\n";
+			return `<a href="${url}">${title}</a>\n`;
 		case AS_LIST_LINK_HTML:
-			return '<li><a href="' + url + '">' + title + "</a></li>\n";
+			return `<li><a href="${url}">${title}</a></li>\n`;
 		case AS_MARKDOWN:
-			return "[" + title + "](" + url + ")\n";
+			return `[${title}](${url})\n`;
 		default:
-			throw new Error("Invalid copy format: " + copyFormat);
+			throw new Error(`Invalid copy format: ${copyFormat}`);
 	}
 }
 
@@ -312,7 +312,7 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
 	}
 
 	if (request.setting.options.copy === AS_LIST_LINK_HTML) {
-		text = "<ul>\n" + text + "</ul>\n";
+		text = `<ul>\n${text}</ul>\n`;
 	}
 
 	copyToClipboard(text);

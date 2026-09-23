@@ -279,7 +279,7 @@ function load_action(id: string | null) {  // into form
 		$("#form_id").val("");
 		$("#form_mouse").val(0);  // default to left mouse button
 		$("#form_key").val(90);   // and z key
-		$(".colorpicker-trigger").css("background-color", "#" + colors[Math.floor(Math.random() * colors.length)]);
+		$(".colorpicker-trigger").css("background-color", `#${colors[Math.floor(Math.random() * colors.length)]}`);
 	} else {
 		const actionSetting = currentSettings?.actions[id];
 		if (!actionSetting) {
@@ -293,7 +293,7 @@ function load_action(id: string | null) {  // into form
 
 		$(".colorpicker-trigger").css("background-color", actionSetting.color);
 
-		$("#form_" + actionSetting.action).attr("checked", "checked");
+		$(`#form_${actionSetting.action}`).attr("checked", "checked");
 
 		displayOptions(actionSetting.action);
 
@@ -307,11 +307,11 @@ function load_action(id: string | null) {  // into form
 				case "number":
 				case "selection":
 				case "textbox":
-					$("#form_option_" + i).val(String(optVal ?? ""));
+					$(`#form_option_${i}`).val(String(optVal ?? ""));
 					break;
 
 				case "checkbox":
-					$("#form_option_" + i).prop("checked", Boolean(optVal));
+					$(`#form_option_${i}`).prop("checked", Boolean(optVal));
 					break;
 
 				case "selection-textbox":
@@ -319,11 +319,11 @@ function load_action(id: string | null) {  // into form
 						const selection = optVal[0];
 						let text = "";
 						for (let k = 1; k < optVal.length; k++) {
-							text += optVal[k] + ",";
+							text += `${optVal[k]},`;
 						}
 
-						$("#form_option_selection_" + i).val(String(selection ?? ""));
-						$("#form_option_text_" + i).val(text);
+						$(`#form_option_selection_${i}`).val(String(selection ?? ""));
+						$(`#form_option_text_${i}`).val(text);
 					}
 
 					break;
@@ -390,16 +390,16 @@ function delete_action(id: string, div: JQuery) {
 }
 
 function setup_action(actionSetting: ActionSetting, id: string): JQuery {
-	const setting = $("<div class='setting' id='action_" + id + "'>");
+	const setting = $(`<div class='setting' id='action_${id}'>`);
 
 	const actionDef = optionsSchema.actions[actionSetting.action];
 	const actionName = actionDef ? actionDef.name : actionSetting.action;
-	const h3 = "<h3>" + actionName + "</h3>";
-	const activateKey = (actionSetting.key > 0 && keys[actionSetting.key]) ? "\"<b>" + keys[actionSetting.key] + "</b>\" key and " : "";
+	const h3 = `<h3>${actionName}</h3>`;
+	const activateKey = (actionSetting.key > 0 && keys[actionSetting.key]) ? `"<b>${keys[actionSetting.key]}</b>" key and ` : "";
 	const triggerDef = optionsSchema.triggers[actionSetting.mouse];
 	const triggerName = triggerDef ? triggerDef.name : String(actionSetting.mouse);
-	const activateMouse = "\"<b>" + triggerName + "</b>\" mouse button";
-	const activate = "<p>Activate by " + activateKey + activateMouse + ".</p>";
+	const activateMouse = `"<b>${triggerName}</b>" mouse button`;
+	const activate = `<p>Activate by ${activateKey}${activateMouse}.</p>`;
 	setting.append(h3);
 	setting.append(activate);
 
@@ -410,7 +410,7 @@ function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 			continue;
 		}
 		const optVal = actionSetting.options[j];
-		let text = op.name + ": ";
+		let text = `${op.name}: `;
 		switch (op.type) {
 			case "number": {
 				text += String(optVal ?? "");
@@ -448,14 +448,14 @@ function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 					}
 				}
 				const selText = op.data ? op.data[selection] : "";
-				text += (selText ?? "") + "; " + words;
+				text += `${selText ?? ""}; ${words}`;
 				break;
 			}
 		}
 
-		list.append("<li>" + text + "</li>");
+		list.append(`<li>${text}</li>`);
 	}
-	list.append("<li>selection box color: <span style='background-color: " + actionSetting.color + "' class='color'></span></li>");
+	list.append(`<li>selection box color: <span style='background-color: ${actionSetting.color}' class='color'></span></li>`);
 
 	setting.append(list);
 
@@ -484,7 +484,7 @@ function setup_form() {
 	for (let i = 0; i < optionsSchema.triggers.length; i++) {
 		const trg = optionsSchema.triggers[i];
 		if (trg) {
-			mouse.append('<option value="' + i + '">' + trg.name + "</option>");
+			mouse.append(`<option value="${i}">${trg.name}</option>`);
 		}
 	}
 
@@ -496,7 +496,7 @@ function setup_form() {
 
 	const color = $("#form_color");
 	for (const i in colors) {
-		color.append("<option value='" + colors[i] + "'>" + colors[i] + "</option>");
+		color.append(`<option value='${colors[i]}'>${colors[i]}</option>`);
 	}
 
 	color.colorpicker({
@@ -511,7 +511,7 @@ function setup_form() {
 		if (!actDef) {
 			continue;
 		}
-		const act = $('<input type="radio" name="action" value="' + i + '" id="form_' + i + '"/>' + actDef.name + "<br/>");
+		const act = $(`<input type="radio" name="action" value="${i}" id="form_${i}"/>${actDef.name}<br/>`);
 
 		act.click(function (event) {
 			const target = event.currentTarget as HTMLInputElement;
@@ -545,7 +545,7 @@ function setup_text(keys: Record<number, string>) {
 		$("#action_name").text(actionDef.name);
 	}
 	if (actionSetting.key > 0 && keys[actionSetting.key]) {
-		$("#key_name").html("the <b>" + keys[actionSetting.key] + "</b> key and");
+		$("#key_name").html(`the <b>${keys[actionSetting.key]}</b> key and`);
 	} else {
 		$("#key_name").html("");
 	}
@@ -608,7 +608,7 @@ function displayOptions(action: string) {
 		if (!op) {
 			continue;
 		}
-		const title = $("<label>" + op.name + "</label>");
+		const title = $(`<label>${op.name}</label>`);
 		const p = $("<p class=\"clearfix\"/>");
 		p.append(title);
 
@@ -622,33 +622,33 @@ function displayOptions(action: string) {
 				break;
 			}
 			case "selection": {
-				const selector = $("<select id='form_option_" + optKey + "'>");
+				const selector = $(`<select id='form_option_${optKey}'>`);
 				if (op.data) {
 					for (const j in op.data) {
-						selector.append('<option value="' + j + '">' + op.data[j] + "</option>");
+						selector.append(`<option value="${j}">${op.data[j]}</option>`);
 					}
 				}
 				p.append(selector);
 				break;
 			}
 			case "textbox": {
-				p.append('<input type="text" name="' + op.name + '" id="form_option_' + optKey + '"/>');
+				p.append(`<input type="text" name="${op.name}" id="form_option_${optKey}"/>`);
 				break;
 			}
 			case "checkbox": {
-				p.append('<input type="checkbox" name="' + op.name + '" id="form_option_' + optKey + '"/>');
+				p.append(`<input type="checkbox" name="${op.name}" id="form_option_${optKey}"/>`);
 				break;
 			}
 			case "selection-textbox": {
-				const selector = $("<select id='form_option_selection_" + optKey + "'>");
+				const selector = $(`<select id='form_option_selection_${optKey}'>`);
 				if (op.data) {
 					for (const j in op.data) {
-						selector.append('<option value="' + j + '">' + op.data[j] + "</option>");
+						selector.append(`<option value="${j}">${op.data[j]}</option>`);
 					}
 				}
 				p.append(selector);
 				p.append("</p><label></label><p>");
-				p.append('<input type="text" name="' + op.name + '" id="form_option_text_' + optKey + '"/>');
+				p.append(`<input type="text" name="${op.name}" id="form_option_text_${optKey}"/>`);
 				break;
 			}
 		}
@@ -694,7 +694,7 @@ function displayKeys(mouseButton: number): Record<number, string> {
 	}
 
 	for (const i in keys) {
-		key.append('<option value="' + i + '">' + keys[i] + "</option>");
+		key.append(`<option value="${i}">${keys[i]}</option>`);
 	}
 
 	// set selected value to z
@@ -736,27 +736,27 @@ function save_action(event: Event | JQuery.TriggeredEvent) {
 				continue;
 			}
 			if (op.type === "checkbox") {
-				actionOptions[name] = $("#form_option_" + name).is(":checked");
+				actionOptions[name] = $(`#form_option_${name}`).is(":checked");
 			} else if (name === "ignore") {
-				const rawText = String($("#form_option_text_" + name).val() ?? "");
+				const rawText = String($(`#form_option_text_${name}`).val() ?? "");
 				const ignore: (number | string)[] = rawText.replace(/^ */, "").replace(/, */g, ",").toLowerCase().split(",");
 				// if the last entry is empty then just remove from array
 				if (ignore.length > 0 && ignore[ignore.length - 1] === "") {
 					ignore.pop();
 				}
-				const selVal = Number($("#form_option_selection_" + name).val() ?? 0);
+				const selVal = Number($(`#form_option_selection_${name}`).val() ?? 0);
 				ignore.unshift(selVal);
 
 				actionOptions[name] = ignore;
 			} else if (name === "delay" || name === "close" || name === "copy") {
-				let value = parseFloat(String($("#form_option_" + name).val() ?? "0"));
+				let value = parseFloat(String($(`#form_option_${name}`).val() ?? "0"));
 				if (isNaN(value)) {
 					value = 0;
 				}
 
 				actionOptions[name] = value;
 			} else if (op.type === "number") {
-				let value = parseFloat(String($("#form_option_" + name).val() ?? "0"));
+				let value = parseFloat(String($(`#form_option_${name}`).val() ?? "0"));
 				const def = op.data ? Number(op.data[0]) : 0;
 				const min = op.data ? Number(op.data[1]) : 0;
 				const max = op.data ? Number(op.data[2]) : 100;
@@ -770,7 +770,7 @@ function save_action(event: Event | JQuery.TriggeredEvent) {
 
 				actionOptions[name] = value;
 			} else {
-				actionOptions[name] = String($("#form_option_" + name).val() ?? "");
+				actionOptions[name] = String($(`#form_option_${name}`).val() ?? "");
 			}
 		}
 	}
@@ -784,7 +784,7 @@ function save_action(event: Event | JQuery.TriggeredEvent) {
 	} else {
 		currentSettings.actions[id] = actionSetting;
 		const update = setup_action(actionSetting, id);
-		$("#action_" + id).replaceWith(update);
+		$(`#action_${id}`).replaceWith(update);
 	}
 
 	save_settings();
