@@ -1,10 +1,10 @@
-## About
+**##** About
 
 This "Linkclump Plus" is a fork of linkclump-ng with some fixes and additional features. linkclump-ng is a fork from Linkclump and has been updated to Manifest V3.
 
 "Linkclump Plus" gives you the ability to drag a selection box around links using your mouse to quickly open as new tabs, open in new window, save as bookmarks, or copy to clipboard. Similar to Snap Links or Multi Links.
 
-## Features
+**##** Features
 
 1. Action
 	choose to open links as new tabs, into a new window, copy to clipboard or saved to your bookmarks. You can setup multiple actions.
@@ -21,17 +21,17 @@ This "Linkclump Plus" is a fork of linkclump-ng with some fixes and additional f
 7. Display number of selected links
 	displays a counter with the number of selected links. The font size and color of the counter can be changed in the settings.
 
-## System Requirements
+**##** System Requirements
 
-- Works with Mozilla Firefox & Firefox-based browsers (version 152 or later).
+Works with Mozilla Firefox & Firefox-based browsers (version 152 or later).
 
-## Support
+**##** Support
 
 Please note that as this is a free extension the developer is unable to offer individual support.
 
 If you have any issues or feature requests, please report them at GitHub (https://github.com/from-es/linkclump-plus/issues).
 
-## Related Links
+**##** Related Links
 
 - Linkclump
 	- https://github.com/benblack86/linkclump

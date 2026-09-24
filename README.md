@@ -19,6 +19,19 @@ Please note that as this is a free extension the developer is unable to offer in
 
 If you have any issues or feature requests, please report them at GitHub (https://github.com/from-es/linkclump-plus/issues).
 
+## Permissions
+
+This extension requires the following browser permissions to function:
+
+| Permission | Purpose |
+|---|---|
+| `tabs` | Open selected links in new tabs or a new window. |
+| `bookmarks` | Save selected links as bookmarks. |
+| `storage` | Save and load your settings. |
+| `clipboardWrite` | Copy selected links to the clipboard. |
+| `scripting` | Bring already-open tabs up to date with the content script immediately after first installation, without requiring a manual page reload. |
+| Host permission (`*://*/*`) | Inject the content script into web pages so links can be detected and selected on any site. |
+
 ## Installation
 
 Install it from your browser's official extension store:

@@ -29,12 +29,38 @@ const targetFiles = {
 const MULTIPLE_EMPTY_LINES_MAX = 3;
 
 /**
- * Common rules regarding line endings and line breaks
+ * Rules provided by ESLint core.
+ *
+ * Only rules related to code correctness and safety belong here.
+ * Formatting and appearance rules belong in stylisticRules.
  *
  * @type {import('eslint').Linter.RulesRecord}
  */
-const lineBreakRules = {
-	// Require newline at end of files
+const eslintCoreRules = {
+	// variable declaration and assignment
+	"no-unused-vars": "warn",
+	"prefer-const": "warn",
+
+	// stricter comparison operators
+	"eqeqeq": "error",
+
+	// console logging: allow semantic log levels only, prohibit console.log
+	"no-console": [ "error", { "allow": [ "warn", "error", "info", "debug", "trace" ] } ],
+
+	// Enforce consistent brace style for all control statements
+	"curly": "error"
+};
+
+/**
+ * Rules provided by @stylistic/eslint-plugin.
+ *
+ * Formatting and appearance rules belong here.
+ * All rules in this object must use the "@stylistic/" prefix.
+ *
+ * @type {import('eslint').Linter.RulesRecord}
+ */
+const stylisticRules = {
+	// line endings / blank lines
 	"@stylistic/eol-last": [ "error", "always" ],
 
 	// Disallow empty lines at EOF (0), allow up to max (3) elsewhere
@@ -46,74 +72,32 @@ const lineBreakRules = {
 	],
 
 	// Enforce Unix linebreaks (LF)
-	"@stylistic/linebreak-style": [ "error", "unix" ]
+	"@stylistic/linebreak-style": [ "error", "unix" ],
+
+	// Stylistic Issues
+	"@stylistic/quotes": [ "error", "double", { "avoidEscape": true, "allowTemplateLiterals": "always" } ],
+
+	// code style
+	"@stylistic/comma-style": [ "error", "last" ],
+	"@stylistic/semi": [ "error", "always" ],
+
+	// indent style
+	"@stylistic/indent": [ "error", "tab", { "SwitchCase": 1 } ],
+
+	// space
+	"@stylistic/array-bracket-spacing": [ "error", "always" ],
+	"@stylistic/block-spacing": [ "error", "always" ],
+	"@stylistic/function-call-spacing": [ "error", "never" ],
+	"@stylistic/no-trailing-spaces": "error",
+	"@stylistic/space-before-blocks": [ "error", "always" ],
+	"@stylistic/spaced-comment": [ "error", "always" ],
+
+	// disables line length check
+	"@stylistic/max-len": "off",
+
+	// Allow inline comments after code
+	"@stylistic/no-inline-comments": "off"
 };
-
-/**
- * Rules related to line breaks and empty lines
- *
- * @type {import('eslint').Linter.Config[]}
- */
-const customRulesLineBreakRules = [
-	{
-		files: [
-			...targetFiles.javascript,
-			...targetFiles.typescript
-		],
-		plugins: {
-			"@stylistic": stylistic,
-		},
-		rules: {
-			...lineBreakRules
-		}
-	}
-];
-
-/**
- * Common Rules for js/mjs/ts files
- *
- * @type {import('eslint').Linter.Config[]}
- */
-const customRules = [
-	{
-		files: [
-			...targetFiles.javascript,
-			...targetFiles.typescript
-		],
-		rules: {
-			// variable declaration and assignment
-			"no-unused-vars": "warn",
-			"prefer-const": "warn",
-
-			// stricter comparison operators
-			"eqeqeq": "error",
-
-			// code style
-			"comma-style": [ "error", "last" ],
-			"semi": [ "error", "always" ],
-
-			// indent style
-			"indent": [ "error", "tab", { "SwitchCase": 1 } ],
-
-			// space
-			"array-bracket-spacing": [ "error", "always" ],
-			"block-spacing": [ "error", "always" ],
-			"func-call-spacing": [ "error", "never" ],
-			"no-trailing-spaces": "error",
-			"space-before-blocks": [ "error", "always" ],
-			"spaced-comment": [ "error", "always" ],
-
-			// disables line length check
-			"max-len": "off",
-
-			// Enforce consistent brace style for all control statements
-			"curly": "error",
-
-			// Allow inline comments after code
-			"no-inline-comments": "off"
-		}
-	}
-];
 
 
 
@@ -158,9 +142,20 @@ export default defineConfig([
 		extends: [ tseslint.configs.recommended ]
 	},
 
-	// Custom Rules
-	...customRules,
-	...customRulesLineBreakRules,
+	// Custom rules: ESLint core rules + @stylistic rules, clearly separated by source.
+	{
+		files: [
+			...targetFiles.javascript,
+			...targetFiles.typescript
+		],
+		plugins: {
+			"@stylistic": stylistic
+		},
+		rules: {
+			...eslintCoreRules,
+			...stylisticRules
+		}
+	},
 
 	// Override or add specific rules for TypeScript after recommended configs
 	{
@@ -168,9 +163,9 @@ export default defineConfig([
 			...targetFiles.typescript
 		],
 		rules: {
-			"no-unused-vars": "off",                       // Disable core rule in TypeScript files in favor of @typescript-eslint/no-unused-vars
-			"@typescript-eslint/no-unused-vars": "warn",   // Warn on unused variables
-			"@typescript-eslint/no-explicit-any": "warn"   // Warn on explicit any usage
+			"no-unused-vars": "off",                      // Disable core rule in TypeScript files in favor of @typescript-eslint/no-unused-vars
+			"@typescript-eslint/no-unused-vars": "warn",  // Warn on unused variables
+			"@typescript-eslint/no-explicit-any": "warn"  // Warn on explicit any usage
 		}
 	}
 ]);
