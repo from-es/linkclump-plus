@@ -1,8 +1,8 @@
 // WXT provided cross-browser compatible API and Types.
 import { browser, type Browser } from "wxt/browser";
 
-import { CopyFormat } from "@/assets/js/types/Messages";
-import { isSettings } from "@/assets/js/types/Settings";
+import { CopyFormatType } from "@/assets/js/constants/CopyFormat";
+import { isSettings } from "@/assets/js/lib/SettingsGuard";
 
 import type {
 	ActivateMessage,
@@ -13,7 +13,7 @@ import type {
 	Messages,
 	UpdateMessage
 } from "@/assets/js/types/Messages";
-import type { Settings } from "@/assets/js/types/Settings";
+import type { CopyFormat, Settings } from "@/assets/js/types/Settings";
 
 
 
@@ -23,15 +23,6 @@ const CURRENT_VERSION = "5";
 // key name for Stroage
 const linkclumpSettingsKey = "linkclumpSettings";
 const linkclumpVersionKey = "linkclumpVersion";
-
-// Link copy formats
-const URLS_WITH_TITLES = 0;
-const URLS_ONLY = 1;
-const URLS_ONLY_SPACE_SEPARATED = 2;
-const TITLES_ONLY = 3;
-const AS_LINK_HTML = 4;
-const AS_LIST_LINK_HTML = 5;
-const AS_MARKDOWN = 6;
 
 class SettingsManager {
 
@@ -282,19 +273,19 @@ function timeConverter(a: Date): string {
 
 function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: CopyFormat): string {
 	switch (Number(copyFormat)) {
-		case URLS_WITH_TITLES:
+		case CopyFormatType.URLS_WITH_TITLES:
 			return `${title}\t${url}\n`;
-		case URLS_ONLY:
+		case CopyFormatType.URLS_ONLY:
 			return `${url}\n`;
-		case URLS_ONLY_SPACE_SEPARATED:
+		case CopyFormatType.URLS_ONLY_SPACE_SEPARATED:
 			return `${url} `;
-		case TITLES_ONLY:
+		case CopyFormatType.TITLES_ONLY:
 			return `${title}\n`;
-		case AS_LINK_HTML:
+		case CopyFormatType.AS_LINK_HTML:
 			return `<a href="${url}">${title}</a>\n`;
-		case AS_LIST_LINK_HTML:
+		case CopyFormatType.AS_LIST_LINK_HTML:
 			return `<li><a href="${url}">${title}</a></li>\n`;
-		case AS_MARKDOWN:
+		case CopyFormatType.AS_MARKDOWN:
 			return `[${title}](${url})\n`;
 		default:
 			throw new Error(`Invalid copy format: ${copyFormat}`);
@@ -311,7 +302,7 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
 		text += formatLink(urlItem, request.setting.options.copy);
 	}
 
-	if (request.setting.options.copy === AS_LIST_LINK_HTML) {
+	if (request.setting.options.copy === CopyFormatType.AS_LIST_LINK_HTML) {
 		text = `<ul>\n${text}</ul>\n`;
 	}
 

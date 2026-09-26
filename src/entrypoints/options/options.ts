@@ -2,7 +2,7 @@
 import { browser } from "wxt/browser";
 
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
-import { isSettings } from "@/assets/js/types/Settings";
+import { isSettings } from "@/assets/js/lib/SettingsGuard";
 import { Information } from "@/assets/js/constants/app";
 
 import type { OptionsSchema } from "@/assets/js/types/Options";

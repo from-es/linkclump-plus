@@ -1,16 +1,4 @@
-import type { Settings } from "./Settings";
-
-export type Messages = ActivateMessage | InitMessage | UpdateMessage;
-
-export enum CopyFormat {
-	URLS_WITH_TITLES = 0,
-	URLS_ONLY = 1,
-	URLS_ONLY_SPACE_SEPARATED = 2,
-	TITLES_ONLY = 3,
-	AS_LINK_HTML = 4,
-	AS_LIST_LINK_HTML = 5,
-	AS_MARKDOWN = 6,
-}
+import type { CopyFormat, Settings } from "./Settings";
 
 export type ActivateMessage_copy = {
 	"action": "copy",
@@ -67,5 +55,7 @@ export type UpdateMessage = {
 export type InitMessage = {
 	"message": "init",
 };
+
+export type Messages = ActivateMessage | InitMessage | UpdateMessage;
 
 export type InitResponse = Settings & { error?: string };
