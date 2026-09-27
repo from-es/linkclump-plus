@@ -1,7 +1,24 @@
-// WXT provided cross-browser compatible API and Types.
 import { browser, type Browser } from "wxt/browser";
 
 import { CopyFormatType } from "@/assets/js/constants/CopyFormat";
+import { MOUSE_BUTTON_LEFT } from "@/assets/js/constants/mouseButton";
+import { KEY_CODE_DEFAULT_Z } from "@/assets/js/constants/keyboard";
+import {
+	SMART_SELECT_ON,
+	FILTER_EXCLUDE_LINKS,
+	BOOKMARK_OTHER_DEFAULT_INDEX
+} from "@/assets/js/constants/action";
+import {
+	COUNTER_FONT_SIZE_DEFAULT,
+	COUNTER_FONT_WEIGHT_DEFAULT
+} from "@/assets/js/constants/ui";
+import {
+	OPTIONS_WINDOW_DEFAULT_WIDTH,
+	OPTIONS_WINDOW_DEFAULT_HEIGHT,
+	OPTIONS_WINDOW_CENTER_OFFSET_X,
+	OPTIONS_WINDOW_CENTER_OFFSET_Y
+} from "@/assets/js/constants/window";
+import { SECONDS_TO_MS } from "@/assets/js/constants/timing";
 import { isSettings } from "@/assets/js/lib/SettingsGuard";
 
 import type {
@@ -61,20 +78,20 @@ class SettingsManager {
 		const settings: Settings = {
 			"actions": {
 				"101": {
-					"mouse": 0,  // left mouse button
-					"key": 90,   // z key
+					"mouse": MOUSE_BUTTON_LEFT,  // left mouse button
+					"key": KEY_CODE_DEFAULT_Z,   // z key
 					"action": "tabs",
 					"color": "#FFA500",
 					"options": {
-						"smart": 0,
-						"ignore": [ 0 ],
+						"smart": SMART_SELECT_ON,
+						"ignore": [ FILTER_EXCLUDE_LINKS ],
 						"delay": 0,
 						"close": 0,
 						"block": true,
 						"reverse": false,
 						"end": false,
-						"fontsizeofcounter": 16,
-						"fontweightofcounter": 400,
+						"fontsizeofcounter": COUNTER_FONT_SIZE_DEFAULT,
+						"fontweightofcounter": COUNTER_FONT_WEIGHT_DEFAULT,
 						"samebgcolorasbox": true // If you want to set the color of counter to the same as the box color, specify a value of true
 					}
 				}
@@ -161,12 +178,12 @@ async function initBackground() {
 			top?: number;
 		} = {
 			url: browser.runtime.getURL("/options.html?init=true"),
-			width: 800,
-			height: 850
+			width: OPTIONS_WINDOW_DEFAULT_WIDTH,
+			height: OPTIONS_WINDOW_DEFAULT_HEIGHT
 		};
 		if (typeof screen !== "undefined" && screen.width && screen.height) {
-			windowOptions.left = Math.round(screen.width / 2 - 800 / 2);
-			windowOptions.top = Math.round(screen.height / 2 - 700 / 2);
+			windowOptions.left = Math.round(screen.width / 2 - OPTIONS_WINDOW_CENTER_OFFSET_X / 2);
+			windowOptions.top = Math.round(screen.height / 2 - OPTIONS_WINDOW_CENTER_OFFSET_Y / 2);
 		}
 		browser.windows.create(windowOptions);
 	} else if (!(await settingsManager.isLatest())) {
@@ -207,7 +224,7 @@ function openTab(
 			function () {
 				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime);
 			},
-			delay * 1000
+			delay * SECONDS_TO_MS
 		);
 	}
 
@@ -233,7 +250,7 @@ function openTab(
 				if (tab.id) {
 					browser.tabs.remove(tab.id);
 				}
-			}, closeTime * 1000);
+			}, closeTime * SECONDS_TO_MS);
 		}
 	});
 }
@@ -302,7 +319,7 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
 		text += formatLink(urlItem, request.setting.options.copy);
 	}
 
-	if (request.setting.options.copy === CopyFormatType.AS_LIST_LINK_HTML) {
+	if (Number(request.setting.options.copy) === CopyFormatType.AS_LIST_LINK_HTML) {
 		text = `<ul>\n${text}</ul>\n`;
 	}
 
@@ -313,7 +330,7 @@ async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 	const bookmarkTreeNodes = await browser.bookmarks.getTree();
 	const selectBookmarks = (bookmarks: undefined | string | number): number => {
 		const regex = /^([0-9]+)$/;
-		const defaultValue = 1; // Other Bookmarks: bookmarkTreeNodes[0].children.[1];
+		const defaultValue = BOOKMARK_OTHER_DEFAULT_INDEX; // Other Bookmarks: bookmarkTreeNodes[0].children.[1];
 		let index: number;
 
 		if (!bookmarks) {

@@ -1,6 +1,39 @@
 // WXT provided cross-browser compatible API.
 import { browser } from "wxt/browser";
 
+import {
+	OS_WIN,
+	OS_LINUX
+} from "@/assets/js/constants/os";
+import {
+	MOUSE_BUTTON_LEFT,
+	MOUSE_BUTTON_NONE
+} from "@/assets/js/constants/mouseButton";
+import {
+	KEY_CODE_END,
+	KEY_CODE_HOME
+} from "@/assets/js/constants/keyboard";
+import {
+	MOUSEUP_BOUNCE_TIMEOUT_MS,
+	SCROLL_DETECT_INTERVAL_MS
+} from "@/assets/js/constants/timing";
+import {
+	Z_INDEX_BASE,
+	COUNTER_FONT_SIZE_DEFAULT,
+	COUNTER_FONT_SIZE_MIN,
+	COUNTER_FONT_SIZE_MAX,
+	COUNTER_FONT_WEIGHT_DEFAULT,
+	COUNTER_FONT_WEIGHT_MIN,
+	COUNTER_FONT_WEIGHT_MAX,
+	CUSTOM_TAG_LINKCLUMP,
+	DRAG_THRESHOLD_MIN_PX
+} from "@/assets/js/constants/ui";
+import {
+	SMART_SELECT_ON,
+	FILTER_EXCLUDE_LINKS,
+	FILTER_INCLUDE_LINKS
+} from "@/assets/js/constants/action";
+
 import type { LinkItem } from "@/assets/js/types/Content";
 import type { ActionSetting } from "@/assets/js/types/Settings";
 import type {
@@ -8,6 +41,7 @@ import type {
 	InitMessage,
 	InitResponse
 } from "@/assets/js/types/Messages";
+import type { OsType } from "@/assets/js/types/OS";
 
 
 
@@ -34,23 +68,11 @@ declare global {
 		linkclump: HTMLElement;
 		overlay: HTMLElement | null;
 		scroll_bug_ignore: boolean;
-		os: 0 | 1;
+		os: OsType;
 
 		timer: number;
 	}
 }
-
-const END_CODE = "End";
-const HOME_CODE = "Home";
-const Z_INDEX = "2147483647";
-const COUNTER_FONT_SIZE = 16;
-const COUNTER_FONT_WEIGHT = 400;
-const OS_WIN = 1;
-const OS_LINUX = 0;
-const LEFT_BUTTON = 0;
-const EXCLUDE_LINKS = 0;
-const INCLUDE_LINKS = 1;
-const CUSTOM_TAG_LINKCLUMP = "linkclump-plus";
 
 
 
@@ -188,7 +210,7 @@ function create_box() {
 	window.box.style.margin = "0px auto";
 	window.box.style.border = "0px dotted " + (window.settings[window.setting]?.color ?? "red");
 	window.box.style.position = "absolute";
-	window.box.style.zIndex = (parseFloat(Z_INDEX) - 1).toString();
+	window.box.style.zIndex = (Z_INDEX_BASE - 1).toString();
 	window.box.style.visibility = "hidden";
 
 	// set the box properties
@@ -203,11 +225,11 @@ function create_box() {
 }
 
 function create_count_label() {
-	const base = COUNTER_FONT_SIZE;
+	const base = COUNTER_FONT_SIZE_DEFAULT;
 
 	window.count_label = document.createElement("span");
 
-	window.count_label.style.zIndex = Z_INDEX;
+	window.count_label.style.zIndex = Z_INDEX_BASE.toString();
 	window.count_label.style.display = "inline-block";
 	window.count_label.style.visibility = "hidden";
 
@@ -218,7 +240,7 @@ function create_count_label() {
 	window.count_label.style.lineHeight = `${base * 1}px`;
 	window.count_label.style.fontSize = `${base * 1}px`;
 	window.count_label.style.font = "Arial, sans-serif";
-	window.count_label.style.fontWeight = COUNTER_FONT_WEIGHT.toString();
+	window.count_label.style.fontWeight = COUNTER_FONT_WEIGHT_DEFAULT.toString();
 
 	window.count_label.style.color = "black";
 	window.count_label.style.backgroundColor = "transparent";
@@ -278,7 +300,7 @@ function clean_up() {
 
 	// wipe clean the smart select
 	window.smart_select = false;
-	window.mouse_button = -1;
+	window.mouse_button = MOUSE_BUTTON_NONE;
 	window.key_pressed = 0;
 }
 
@@ -297,7 +319,7 @@ function mousedown(event: MouseEvent) {
 	if (allow_selection()) {
 		// don't prevent for windows right click as it breaks spell checker
 		// do prevent for left as otherwise the page becomes highlighted
-		if (window.os === OS_LINUX || (window.os === OS_WIN && window.mouse_button === LEFT_BUTTON)) {
+		if (window.os === OS_LINUX || (window.os === OS_WIN && window.mouse_button === MOUSE_BUTTON_LEFT)) {
 			prevent_escalation(event);
 		}
 
@@ -393,7 +415,7 @@ function mouseup(event: MouseEvent) {
 
 				stop();
 				window.timer = 0;
-			}, 100);
+			}, MOUSEUP_BOUNCE_TIMEOUT_MS);
 		}
 	} else {
 		// false alarm
@@ -498,10 +520,10 @@ function start(): void {
 		// include/exclude links
 		if (ignoreList.length > 1) {
 			if (re2.test(rawLink.href) || re2.test(rawLink.innerHTML)) {
-				if (Number(ignoreList[0]) === EXCLUDE_LINKS) {
+				if (Number(ignoreList[0]) === FILTER_EXCLUDE_LINKS) {
 					continue;
 				}
-			} else if (Number(ignoreList[0]) === INCLUDE_LINKS) {
+			} else if (Number(ignoreList[0]) === FILTER_INCLUDE_LINKS) {
 				continue;
 			}
 		}
@@ -540,7 +562,7 @@ function start(): void {
 		link.height = height;
 		link.width = width;
 		link.box = null;
-		link.important = Number(selectedAction.options?.smart) === 0 && rawLink.parentNode !== null && re3.test(rawLink.parentNode.nodeName);
+		link.important = Number(selectedAction.options?.smart) === SMART_SELECT_ON && rawLink.parentNode !== null && re3.test(rawLink.parentNode.nodeName);
 
 		window.links.push(link);
 	}
@@ -622,7 +644,7 @@ function detect(x: number, y: number, open: boolean) {
 	window.mouse_y = y;
 
 	if (!window.box_on) {
-		if (window.box.x2 - window.box.x1 < 5 && window.box.y2 - window.box.y1 < 5) {
+		if (window.box.x2 - window.box.x1 < DRAG_THRESHOLD_MIN_PX && window.box.y2 - window.box.y1 < DRAG_THRESHOLD_MIN_PX) {
 			return true;
 		} else {
 			start();
@@ -631,7 +653,7 @@ function detect(x: number, y: number, open: boolean) {
 	}
 
 	if (!window.scroll_id) {
-		window.scroll_id = setInterval(scroll, 100);
+		window.scroll_id = setInterval(scroll, SCROLL_DETECT_INTERVAL_MS);
 	}
 
 	let count = 0;
@@ -676,7 +698,7 @@ function detect(x: number, y: number, open: boolean) {
 				link_box.style.height = link.height + "px";
 				link_box.style.top = link.y1 + "px";
 				link_box.style.left = link.x1 + "px";
-				link_box.style.zIndex = (parseFloat(Z_INDEX) - 1).toString();
+				link_box.style.zIndex = (Z_INDEX_BASE - 1).toString();
 
 				(window.linkclump).appendChild(link_box);
 				link.box = link_box;
@@ -725,7 +747,7 @@ function keydown(event: KeyboardEvent) {
 		return;
 	}
 
-	if (event.code !== END_CODE && event.code !== HOME_CODE) {
+	if (event.code !== KEY_CODE_END && event.code !== KEY_CODE_HOME) {
 		window.key_pressed = event.keyCode;
 		// turn menu off for linux
 		if (window.os === OS_LINUX && allow_key(window.key_pressed)) {
@@ -749,7 +771,7 @@ function keyup(event: KeyboardEvent) {
 		return;
 	}
 
-	if (event.code !== END_CODE && event.code !== HOME_CODE) {
+	if (event.code !== KEY_CODE_END && event.code !== KEY_CODE_HOME) {
 		remove_key();
 	}
 }
@@ -791,7 +813,7 @@ function allow_selection(): boolean {
 				}
 				if (setting?.options?.fontsizeofcounter && (typeof setting.options.fontsizeofcounter === "number")) {
 					const num = setting.options.fontsizeofcounter;
-					const base = num || COUNTER_FONT_SIZE;
+					const base = num || COUNTER_FONT_SIZE_DEFAULT;
 
 					window.count_label.style.fontSize = `${base * 1}px`;
 					window.count_label.style.lineHeight = `${base * 1}px`;
@@ -800,14 +822,14 @@ function allow_selection(): boolean {
 					window.count_label.style.borderWidth = `${base * 0.25}px`;
 					window.count_label.style.borderRadius = `${base * 0.50}px`;
 				} else {
-					console.warn("Invalid fontsizeofcounter value (expected number between 9 and 25):", setting.options.fontsizeofcounter);
+					console.warn(`Invalid fontsizeofcounter value (expected number between ${COUNTER_FONT_SIZE_MIN} and ${COUNTER_FONT_SIZE_MAX}):`, setting.options.fontsizeofcounter);
 				}
-				if (setting?.options?.fontweightofcounter && (typeof setting.options.fontweightofcounter === "number") && (1 <= setting.options.fontweightofcounter && setting.options.fontweightofcounter <= 1000)) {
+				if (setting?.options?.fontweightofcounter && (typeof setting.options.fontweightofcounter === "number") && (COUNTER_FONT_WEIGHT_MIN <= setting.options.fontweightofcounter && setting.options.fontweightofcounter <= COUNTER_FONT_WEIGHT_MAX)) {
 					const weight = setting.options.fontweightofcounter;
 
 					window.count_label.style.fontWeight = weight.toString();
 				} else {
-					console.warn("Invalid fontweightofcounter value (expected number between 1 and 1000):", setting.options.fontweightofcounter);
+					console.warn(`Invalid fontweightofcounter value (expected number between ${COUNTER_FONT_WEIGHT_MIN} and ${COUNTER_FONT_WEIGHT_MAX}):`, setting.options.fontweightofcounter);
 				}
 			}
 
