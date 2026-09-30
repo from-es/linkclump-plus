@@ -30,7 +30,10 @@ import type {
 	Messages,
 	UpdateMessage
 } from "@/assets/js/types/Messages";
-import type { CopyFormat, Settings } from "@/assets/js/types/Settings";
+import type {
+	CopyFormat,
+	Settings
+} from "@/assets/js/types/Settings";
 
 
 

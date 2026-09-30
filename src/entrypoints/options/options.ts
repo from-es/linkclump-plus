@@ -3,6 +3,8 @@ import { browser } from "wxt/browser";
 
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import { isSettings } from "@/assets/js/lib/SettingsGuard";
+import { detectOs } from "@/assets/js/lib/detectOs";
+
 import { Information } from "@/assets/js/constants/app";
 import {
 	OS_WIN,
@@ -10,7 +12,6 @@ import {
 	OS_MAC
 } from "@/assets/js/constants/os";
 
-import type { OsType } from "@/assets/js/types/OS";
 import {
 	MOUSE_BUTTON_LEFT,
 	MOUSE_BUTTON_RIGHT
@@ -20,6 +21,7 @@ import {
 	KEY_CODE_SHIFT,
 	KEY_CODE_CTRL,
 	KEY_CODE_ALT,
+	KEY_CODE_META,
 	KEY_CODE_DEFAULT_Z,
 	ALPHA_KEYCODE_START,
 	ALPHA_CHARCODE_LOWERCASE_START,
@@ -35,6 +37,7 @@ import {
 	OPTIONS_TOOLTIP_LEFT_OFFSET_PX
 } from "@/assets/js/constants/ui";
 
+import type { OsType } from "@/assets/js/types/OS";
 import type { OptionsSchema } from "@/assets/js/types/Options";
 import type { ActionOptionValue, ActionSetting, Settings } from "@/assets/js/types/Settings";
 
@@ -184,8 +187,8 @@ function main() {
 }
 
 function initValue() {
-	keys = displayKeys(0);
-	os = ((navigator.appVersion.indexOf("Win") === -1) ? ((navigator.appVersion.indexOf("Mac") === -1) ? OS_LINUX : OS_MAC) : OS_WIN);
+	os = detectOs();
+	keys = displayKeys(MOUSE_BUTTON_LEFT);
 }
 
 function initEvent() {
@@ -300,7 +303,7 @@ function tour3() {
  */
 function load_action(id: string | null) {  // into form
 	if (id === null) {
-		displayKeys(0);
+		displayKeys(MOUSE_BUTTON_LEFT);
 		displayOptions("tabs");
 		$("#form_id").val("");
 		$("#form_mouse").val(MOUSE_BUTTON_LEFT);  // default to left mouse button
@@ -705,6 +708,10 @@ function displayKeys(mouseButton: number): Record<number, string> {
 
 	if (os !== OS_LINUX) {
 		keys[KEY_CODE_ALT] = "alt";
+	}
+
+	if (os === OS_MAC) {
+		keys[KEY_CODE_META] = "cmd";
 	}
 
 	// if not left or windows then allow no key

@@ -2,20 +2,29 @@
 import { browser } from "wxt/browser";
 
 import {
-	OS_WIN,
-	OS_LINUX
+	OS_LINUX,
+	OS_MAC
 } from "@/assets/js/constants/os";
 import {
 	MOUSE_BUTTON_LEFT,
+	MOUSE_BUTTON_RIGHT,
 	MOUSE_BUTTON_NONE
 } from "@/assets/js/constants/mouseButton";
 import {
+	KEY_CODE_NONE,
+	KEY_CODE_SHIFT,
+	KEY_CODE_CTRL,
+	KEY_CODE_ALT,
+	KEY_CODE_META,
+	KEY_CODE_META_RIGHT,
+	KEY_CODE_META_FIREFOX_MAC,
 	KEY_CODE_END,
 	KEY_CODE_HOME
 } from "@/assets/js/constants/keyboard";
 import {
 	MOUSEUP_BOUNCE_TIMEOUT_MS,
-	SCROLL_DETECT_INTERVAL_MS
+	SCROLL_DETECT_INTERVAL_MS,
+	TOUCH_HOLD_TIMEOUT_MS
 } from "@/assets/js/constants/timing";
 import {
 	Z_INDEX_BASE,
@@ -33,17 +42,20 @@ import {
 	FILTER_EXCLUDE_LINKS,
 	FILTER_INCLUDE_LINKS
 } from "@/assets/js/constants/action";
+import { detectOs } from "@/assets/js/lib/detectOs";
 
 import type { LinkItem } from "@/assets/js/types/Content";
+import type { OsType } from "@/assets/js/types/OS";
 import type { ActionSetting } from "@/assets/js/types/Settings";
 import type {
 	ActivateMessage,
 	InitMessage,
 	InitResponse
 } from "@/assets/js/types/Messages";
-import type { OsType } from "@/assets/js/types/OS";
 
 
+// Cancels the touch hold that is currently pending (timer + temporary listeners), if any
+let cancelPendingTouchHold: (() => void) | null = null;
 
 // set all the properties of the window object
 // to avoid typescript errors
@@ -71,6 +83,9 @@ declare global {
 		os: OsType;
 
 		timer: number;
+		touch_timer: number;
+		touch_active: boolean;
+		pointer_type: string | null;
 	}
 }
 
@@ -126,6 +141,8 @@ function main() {
 			if (allowed) {
 				// setting up the box and count label
 				window.linkclump = createCustomElement(CUSTOM_TAG_LINKCLUMP);
+				window.linkclump.style.pointerEvents = "none";
+				window.linkclump.style.touchAction = "none";
 				window.box = create_box();
 				window.count_label = create_count_label();
 
@@ -134,11 +151,13 @@ function main() {
 				(document.body).appendChild(window.linkclump);
 
 				// add event listeners
-				window.addEventListener("mousedown", mousedown, true);
+				window.addEventListener("pointerdown", pointerdown, true);
 				window.addEventListener("keydown", keydown, true);
 				window.addEventListener("keyup", keyup, true);
 				window.addEventListener("blur", blur, true);
 				window.addEventListener("contextmenu", contextmenu, true);
+				// non-passive: required to cancel native panning once the touch hold is confirmed
+				window.addEventListener("touchmove", touchmove, { capture: true, passive: false });
 			}
 		}
 	});
@@ -182,11 +201,12 @@ function init() {
 	window.count_label = undefined;
 	window.overlay = null;
 	window.scroll_bug_ignore = false;
-	window.os = ((navigator.appVersion.indexOf("Win") === -1) ? OS_LINUX : OS_WIN);
+	window.os = detectOs();
 	window.timer = 0;
+	window.touch_timer = 0;
+	window.touch_active = false;
+	window.pointer_type = null;
 }
-
-
 
 /**
  *
@@ -212,6 +232,8 @@ function create_box() {
 	window.box.style.position = "absolute";
 	window.box.style.zIndex = (Z_INDEX_BASE - 1).toString();
 	window.box.style.visibility = "hidden";
+	window.box.style.pointerEvents = "none";
+	window.box.style.touchAction = "none";
 
 	// set the box properties
 	window.box.x = 0;
@@ -232,6 +254,9 @@ function create_count_label() {
 	window.count_label.style.zIndex = Z_INDEX_BASE.toString();
 	window.count_label.style.display = "inline-block";
 	window.count_label.style.visibility = "hidden";
+	window.count_label.style.pointerEvents = "none";
+	window.count_label.style.touchAction = "none";
+	window.count_label.style.userSelect = "none";
 
 	window.count_label.style.position = "absolute";
 	window.count_label.style.top = "0";
@@ -252,13 +277,13 @@ function create_count_label() {
 	return window.count_label;
 }
 
-function mousemove(event: MouseEvent) {
+function pointermove(event: PointerEvent) {
 	if (!isTrustedEvent(event)) {
 		return;
 	}
 
 	prevent_escalation(event);
-	if (allow_selection() || window.scroll_bug_ignore) {
+	if (allow_selection(event) || window.scroll_bug_ignore) {
 		window.scroll_bug_ignore = false;
 		update_box(event.pageX, event.pageY);
 
@@ -267,7 +292,7 @@ function mousemove(event: MouseEvent) {
 			// empty
 		}
 	} else {
-		// only stop if the mouseup timer is no longer set
+		// only stop if the pointerup timer is no longer set
 		if (window.timer === 0) {
 			stop();
 		}
@@ -302,24 +327,125 @@ function clean_up() {
 	window.smart_select = false;
 	window.mouse_button = MOUSE_BUTTON_NONE;
 	window.key_pressed = 0;
+	window.pointer_type = null;
+	window.touch_active = false;
+	if (window.touch_timer !== 0) {
+		clearTimeout(window.touch_timer);
+		window.touch_timer = 0;
+	}
 }
 
-function mousedown(event: MouseEvent) {
+function pointerdown(event: PointerEvent) {
 	if (!isTrustedEvent(event)) {
 		return;
 	}
 
+	window.pointer_type = event.pointerType;
 	window.mouse_button = event.button;
 
-	// turn on menu for windows
-	if (window.os === OS_WIN) {
+	// Sync modifier keys from pointer event
+	if (event.metaKey) {
+		window.key_pressed = KEY_CODE_META;
+	} else if (event.ctrlKey) {
+		window.key_pressed = KEY_CODE_CTRL;
+	} else if (event.shiftKey) {
+		window.key_pressed = KEY_CODE_SHIFT;
+	} else if (event.altKey) {
+		window.key_pressed = KEY_CODE_ALT;
+	}
+
+	// turn on menu for non-Linux OS (Windows, Mac)
+	if (window.os !== OS_LINUX) {
 		window.stop_menu = false;
 	}
 
-	if (allow_selection()) {
-		// don't prevent for windows right click as it breaks spell checker
+	// Handle pure touch input with no physical keyboard modifier held
+	if (event.pointerType === "touch" && window.key_pressed === 0) {
+		// discard a hold that is still pending (e.g. a second finger touched down)
+		cancelPendingTouchHold?.();
+
+		// extra fingers (pinch/zoom) never start a hold gesture nor disturb a running selection
+		if (!event.isPrimary) {
+			return;
+		}
+
+		window.touch_active = false;
+
+		// arm the hold only when a left-click action exists that touch could trigger
+		if (findTouchSettingId() === undefined) {
+			return;
+		}
+
+		const startX = event.pageX;
+		const startY = event.pageY;
+
+		const removeHoldListeners = () => {
+			window.removeEventListener("pointermove", cancelTouchOnMove, true);
+			window.removeEventListener("pointerup", cancelTouchOnEnd, true);
+			window.removeEventListener("pointercancel", cancelTouchOnEnd, true);
+			cancelPendingTouchHold = null;
+		};
+
+		const cancelTouchOnEnd = () => {
+			if (window.touch_timer !== 0) {
+				clearTimeout(window.touch_timer);
+				window.touch_timer = 0;
+			}
+			removeHoldListeners();
+		};
+
+		const cancelTouchOnMove = (moveEvent: PointerEvent) => {
+			const dx = Math.abs(moveEvent.pageX - startX);
+			const dy = Math.abs(moveEvent.pageY - startY);
+			if (dx > DRAG_THRESHOLD_MIN_PX || dy > DRAG_THRESHOLD_MIN_PX) {
+				cancelTouchOnEnd();
+			}
+		};
+
+		cancelPendingTouchHold = cancelTouchOnEnd;
+		window.addEventListener("pointermove", cancelTouchOnMove, true);
+		window.addEventListener("pointerup", cancelTouchOnEnd, true);
+		window.addEventListener("pointercancel", cancelTouchOnEnd, true);
+
+		window.touch_timer = setTimeout(
+			() => {
+				window.touch_timer = 0;
+				removeHoldListeners();
+
+				window.touch_active = true;
+				if (startSelection(event, startX, startY)) {
+					if (typeof navigator.vibrate === "function") {
+						navigator.vibrate(30);
+					}
+				} else {
+					// no action matched: hand the gesture back to the browser (scroll, native menu)
+					window.touch_active = false;
+				}
+			},
+			TOUCH_HOLD_TIMEOUT_MS
+		);
+
+		return;
+	}
+
+	startSelection(event, event.pageX, event.pageY);
+}
+
+function startSelection(event: PointerEvent, startX: number, startY: number): boolean {
+	if (allow_selection(event)) {
+		if (event.target instanceof Element && typeof event.target.setPointerCapture === "function") {
+			try {
+				event.target.setPointerCapture(event.pointerId);
+			} catch {
+				// Ignore
+			}
+		}
+
+		// don't prevent for right click on Windows/Mac as it breaks spell checker
 		// do prevent for left as otherwise the page becomes highlighted
-		if (window.os === OS_LINUX || (window.os === OS_WIN && window.mouse_button === MOUSE_BUTTON_LEFT)) {
+		// (skipped for the delayed touch path: the original pointerdown has already been dispatched,
+		// so preventDefault()/stopPropagation() would have no effect)
+		if (!window.touch_active && (window.os === OS_LINUX || window.mouse_button === MOUSE_BUTTON_LEFT)) {
 			prevent_escalation(event);
 		}
 
@@ -328,8 +454,8 @@ function mousedown(event: MouseEvent) {
 			clearTimeout(window.timer);
 			window.timer = 0;
 
-			// keep menu off for windows
-			if (window.os === OS_WIN) {
+			// keep menu off for non-Linux OS
+			if (window.os !== OS_LINUX) {
 				window.stop_menu = true;
 			}
 		} else {
@@ -339,17 +465,23 @@ function mousedown(event: MouseEvent) {
 			}
 
 			// update position
-			window.box.x = event.pageX;
-			window.box.y = event.pageY;
-			update_box(event.pageX, event.pageY);
+			window.box.x = startX;
+			window.box.y = startY;
+			update_box(startX, startY);
 
-			// setup mouse move and mouse up
-			window.addEventListener("mousemove", mousemove, true);
-			window.addEventListener("mouseup", mouseup, true);
-			window.addEventListener("mousewheel", mousewheel, true);
-			window.addEventListener("mouseout", mouseout, true);
+			// setup pointer move and pointer up
+			window.addEventListener("pointermove", pointermove, true);
+			window.addEventListener("pointerup", pointerup, true);
+			window.addEventListener("pointercancel", pointercancel, true);
+			window.addEventListener("wheel", wheel, { capture: true, passive: true });
+			window.addEventListener("mousewheel", wheel, true);
+			window.addEventListener("pointerout", pointerout, true);
 		}
+
+		return true;
 	}
+
+	return false;
 }
 
 function update_box(x: number, y: number) {
@@ -384,31 +516,49 @@ function update_box(x: number, y: number) {
 	window.count_label.style.left = (x - adjustPositionLeft) + "px";
 }
 
-function mousewheel() {
+function wheel() {
 	window.scroll_bug_ignore = true;
 }
 
-function mouseout(event: MouseEvent) {
-	mousemove(event);
-	// the mouse wheel event might also call this event
+function pointerout(event: PointerEvent) {
+	pointermove(event);
+
+	// the wheel event might also call this event
 	window.scroll_bug_ignore = true;
 }
 
-function prevent_escalation(event: MouseEvent) {
+function pointercancel(event: PointerEvent) {
+	if (!isTrustedEvent(event)) {
+		return;
+	}
+	stop();
+}
+
+function prevent_escalation(event: Event) {
 	event.stopPropagation();
 	event.preventDefault();
 }
 
-function mouseup(event: MouseEvent) {
+function pointerup(event: PointerEvent) {
 	if (!isTrustedEvent(event)) {
 		return;
+	}
+
+	if (event.target instanceof Element && typeof event.target.releasePointerCapture === "function") {
+		try {
+			if (event.target.hasPointerCapture(event.pointerId)) {
+				event.target.releasePointerCapture(event.pointerId);
+			}
+		} catch {
+			// Ignore
+		}
 	}
 
 	prevent_escalation(event);
 
 	if (window.box_on) {
-		// all the detection of the mouse to bounce
-		if (allow_selection() && window.timer === 0) {
+		// all the detection of the pointer to bounce
+		if (allow_selection(event) && window.timer === 0) {
 			window.timer = setTimeout(function () {
 				update_box(event.pageX, event.pageY);
 				detect(event.pageX, event.pageY, true);
@@ -416,6 +566,9 @@ function mouseup(event: MouseEvent) {
 				stop();
 				window.timer = 0;
 			}, MOUSEUP_BOUNCE_TIMEOUT_MS);
+		} else if (window.timer === 0) {
+			// selection is no longer allowed (e.g. modifier key released): cancel without opening links
+			stop();
 		}
 	} else {
 		// false alarm
@@ -569,8 +722,8 @@ function start(): void {
 
 	window.box_on = true;
 
-	// turn off menu for windows so mouse up doesn't trigger context menu
-	if (window.os === OS_WIN) {
+	// turn off menu for non-Linux OS so mouse up doesn't trigger context menu
+	if (window.os !== OS_LINUX) {
 		window.stop_menu = true;
 	}
 }
@@ -579,11 +732,30 @@ function stop() {
 	// allow user to select text/elements
 	document.body.style.userSelect = "";
 
-	// turn off mouse move and mouse up
-	window.removeEventListener("mousemove", mousemove, true);
-	window.removeEventListener("mouseup", mouseup, true);
-	window.removeEventListener("mousewheel", mousewheel, true);
-	window.removeEventListener("mouseout", mouseout, true);
+	// turn off pointer move and pointer up
+	window.removeEventListener("pointermove", pointermove, true);
+	window.removeEventListener("pointerup", pointerup, true);
+	window.removeEventListener("pointercancel", pointercancel, true);
+	window.removeEventListener("wheel", wheel, true);
+	window.removeEventListener("mousewheel", wheel, true);
+	window.removeEventListener("pointerout", pointerout, true);
+
+	cancelPendingTouchHold?.();
+	if (window.touch_timer !== 0) {
+		clearTimeout(window.touch_timer);
+		window.touch_timer = 0;
+	}
+	window.touch_active = false;
+
+	// a pending mouse-up bounce timer must not open links after the selection was cancelled
+	if (window.timer !== 0) {
+		clearTimeout(window.timer);
+		window.timer = 0;
+	}
+	if (window.scroll_id) {
+		clearInterval(window.scroll_id);
+		window.scroll_id = 0;
+	}
 
 	if (window.box_on) {
 		clean_up();
@@ -739,6 +911,7 @@ function allow_key(keyCode: number) {
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -748,7 +921,17 @@ function keydown(event: KeyboardEvent) {
 	}
 
 	if (event.code !== KEY_CODE_END && event.code !== KEY_CODE_HOME) {
-		window.key_pressed = event.keyCode;
+		let keyCode = event.keyCode;
+		if (
+			event.key === "Meta" ||
+			event.code === "MetaLeft" ||
+			event.code === "MetaRight" ||
+			keyCode === KEY_CODE_META_FIREFOX_MAC ||
+			keyCode === KEY_CODE_META_RIGHT
+		) {
+			keyCode = KEY_CODE_META;
+		}
+		window.key_pressed = keyCode;
 		// turn menu off for linux
 		if (window.os === OS_LINUX && allow_key(window.key_pressed)) {
 			window.stop_menu = true;
@@ -764,6 +947,11 @@ function blur(event: FocusEvent) {
 	}
 
 	remove_key();
+
+	// window lost focus (e.g. app switch) in the middle of a selection: cancel it
+	if (event.target === window && (window.box_on || window.touch_timer !== 0)) {
+		stop();
+	}
 }
 
 function keyup(event: KeyboardEvent) {
@@ -784,15 +972,77 @@ function remove_key() {
 	window.key_pressed = 0;
 }
 
-function allow_selection(): boolean {
+/**
+ * Picks the setting that a confirmed touch hold should trigger.
+ * Touch input cannot press modifier keys, so a "Left click" setting without a key
+ * (KEY_CODE_NONE) is preferred; otherwise the first left-click setting is used.
+ *
+ * @returns {string | undefined} The settings key, or undefined if no left-click setting exists.
+ */
+function findTouchSettingId(): string | undefined {
+	let fallbackId: string | undefined;
+
+	for (const i in window.settings) {
+		const setting = window.settings[i];
+		if (!setting || Number(setting.mouse) !== MOUSE_BUTTON_LEFT) {
+			continue;
+		}
+		if (Number(setting.key) === KEY_CODE_NONE) {
+			return i;
+		}
+		fallbackId ??= i;
+	}
+
+	return fallbackId;
+}
+
+function allow_selection(event?: PointerEvent): boolean {
+	if (event) {
+		if (event.metaKey && window.key_pressed === 0) {
+			window.key_pressed = KEY_CODE_META;
+		} else if (event.ctrlKey && window.key_pressed === 0) {
+			window.key_pressed = KEY_CODE_CTRL;
+		} else if (event.shiftKey && window.key_pressed === 0) {
+			window.key_pressed = KEY_CODE_SHIFT;
+		} else if (event.altKey && window.key_pressed === 0) {
+			window.key_pressed = KEY_CODE_ALT;
+		}
+	}
+
+	// Determine which setting a confirmed touch hold should trigger (once, before the loop)
+	const touchSettingId = (window.pointer_type === "touch" && window.touch_active)
+		? findTouchSettingId()
+		: undefined;
+
 	for (const i in window.settings) {
 		const setting = window.settings[i];
 		if (!setting) {
 			continue;
 		}
 
+		const settingMouse = Number(setting.mouse);
+		const settingKey = Number(setting.key);
+
+		// On macOS, Ctrl + Left Click is synthesized by the OS as button: 2 (Right Click) with ctrlKey: true.
+		// When the user configured Left Click + Ctrl, treat this simulated right click as a match.
+		const isMacCtrlLeftClickEmulated =
+			window.os === OS_MAC &&
+			window.mouse_button === MOUSE_BUTTON_RIGHT &&
+			window.key_pressed === KEY_CODE_CTRL &&
+			settingMouse === MOUSE_BUTTON_LEFT &&
+			settingKey === KEY_CODE_CTRL;
+
+		let isMouseMatch = settingMouse === window.mouse_button || isMacCtrlLeftClickEmulated;
+		let isKeyMatch = settingKey === window.key_pressed;
+
+		// When touch hold is active without physical keyboard, allow the preferred left-button action
+		if (touchSettingId !== undefined && i === touchSettingId) {
+			isMouseMatch = true;
+			isKeyMatch = true;
+		}
+
 		// need to check if key is 0 as key_pressed might not be accurate
-		if (Number(setting.mouse) === window.mouse_button && Number(setting.key) === window.key_pressed) {
+		if (isMouseMatch && isKeyMatch) {
 			window.setting = Number.parseInt(i, 10);
 
 			if (window.box !== null) {
@@ -844,7 +1094,22 @@ function contextmenu(event: MouseEvent) {
 		return;
 	}
 
-	if (window.stop_menu) {
+	// Suppress the native long-press menu (e.g. Android Chrome) while a touch hold is pending or active
+	const touchHoldInProgress = window.pointer_type === "touch" && (window.touch_timer !== 0 || window.touch_active);
+
+	if (window.stop_menu || touchHoldInProgress) {
+		event.preventDefault();
+	}
+}
+
+/**
+ * Cancels native touch panning after the touch hold gesture has been confirmed,
+ * so that the drag is handled as a link selection instead of a page scroll.
+ * NOTE: `touch-action` is fixed at the start of a touch sequence, so it cannot be
+ * switched to "none" after the 500ms hold. A non-passive `touchmove` listener is used instead.
+ */
+function touchmove(event: TouchEvent) {
+	if (window.touch_active && event.cancelable) {
 		event.preventDefault();
 	}
 }

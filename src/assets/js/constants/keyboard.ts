@@ -5,6 +5,9 @@ export const KEY_CODE_NONE = 0 as const;
 export const KEY_CODE_SHIFT = 16 as const;
 export const KEY_CODE_CTRL = 17 as const;
 export const KEY_CODE_ALT = 18 as const;
+export const KEY_CODE_META = 91 as const;
+export const KEY_CODE_META_RIGHT = 93 as const;
+export const KEY_CODE_META_FIREFOX_MAC = 224 as const;
 export const KEY_CODE_DEFAULT_Z = 90 as const;
 
 export const KEY_CODE_END = "End" as const;
