@@ -11,7 +11,7 @@
 // WXT provided cross-browser compatible API.
 import { browser } from "wxt/browser";
 
-import dayjs from "dayjs";
+import { dateFormatter } from "@/assets/js/lib/dateFormatter";
 
 
 
@@ -274,7 +274,7 @@ function getManifestIdentityInfo(
  */
 function generateDefaultFilename(manifest?: ManifestIdentityInfo): string {
 	const { name, version } = getManifestIdentityInfo(manifest);
-	const datestr = dayjs().format(DATE_FORMAT);
+	const datestr = dateFormatter(new Date(), DATE_FORMAT);
 	const sanitizedName = sanitizeFilenameToken(name, FALLBACK_APPLICATION_INFO.name);
 	const sanitizedVersion = sanitizeFilenameToken(version, FALLBACK_APPLICATION_INFO.version);
 	const fileName = `${sanitizedName}_v${sanitizedVersion}_${datestr}.${SETTING_FILE.extension}`;

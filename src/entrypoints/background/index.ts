@@ -20,6 +20,7 @@ import {
 } from "@/assets/js/constants/window";
 import { SECONDS_TO_MS } from "@/assets/js/constants/timing";
 import { isSettings } from "@/assets/js/lib/SettingsGuard";
+import { dateFormatter } from "@/assets/js/lib/dateFormatter";
 
 import type {
 	ActivateMessage,
@@ -271,26 +272,6 @@ function copyToClipboard(text: string): void {
 	});
 }
 
-function pad(number: number, length: number): string {
-	let str = "" + number;
-	while (str.length < length) {
-		str = "0" + str;
-	}
-
-	return str;
-}
-
-function timeConverter(a: Date): string {
-	const year = a.getFullYear();
-	const month = pad(a.getMonth() + 1, 2);
-	const day = pad(a.getDate(), 2);
-	const hour = pad(a.getHours(), 2);
-	const min = pad(a.getMinutes(), 2);
-	const sec = pad(a.getSeconds(), 2);
-	const time = `${year}-${month}-${day} ${hour}:${min}:${sec}`;
-	return time;
-}
-
 function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: CopyFormat): string {
 	switch (Number(copyFormat)) {
 		case CopyFormatType.URLS_WITH_TITLES:
@@ -373,9 +354,12 @@ async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
 
 	// make assumption that bookmarkTreeNodes[0].children[1] refers to the "other bookmarks" folder
 	// as different languages will not use the english name to refer to the folder
+	const dateFormat = "YYYY-MM-DD HH:mm:ss";
+	const dateString = dateFormatter(new Date(), dateFormat);
+	const dirName = `Linkclump ${dateString}`;
 	const newFolder = await browser.bookmarks.create({
 		"parentId": folderID,
-		"title": "Linkclump " + timeConverter(new Date())
+		"title": dirName
 	});
 
 	for (let j = 0; j < request.urls.length; j++) {
