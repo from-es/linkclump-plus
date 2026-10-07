@@ -5,9 +5,15 @@ import { MOUSE_BUTTON_LEFT } from "@/assets/js/constants/mouseButton";
 import { KEY_CODE_DEFAULT_Z } from "@/assets/js/constants/keyboard";
 import {
 	SMART_SELECT_ON,
-	FILTER_EXCLUDE_LINKS,
-	BOOKMARK_OTHER_DEFAULT_INDEX
+	FILTER_EXCLUDE_LINKS
 } from "@/assets/js/constants/action";
+import {
+	BROWSER_FIREFOX,
+	BOOKMARK_CHROME_BAR_ID,
+	BOOKMARK_CHROME_OTHER_ID,
+	BOOKMARK_FIREFOX_MENU_GUID,
+	BOOKMARK_FIREFOX_UNFILED_GUID
+} from "@/assets/js/constants/browser";
 import {
 	COUNTER_FONT_SIZE_DEFAULT,
 	COUNTER_FONT_WEIGHT_DEFAULT
@@ -21,6 +27,7 @@ import {
 import { SECONDS_TO_MS } from "@/assets/js/constants/timing";
 import { isSettings } from "@/assets/js/lib/SettingsGuard";
 import { dateFormatter } from "@/assets/js/lib/dateFormatter";
+import { detectBrowser } from "@/assets/js/lib/detectBrowser";
 
 import type {
 	ActivateMessage,
@@ -293,6 +300,52 @@ function formatLink({ url, title }: ActivateMessage["urls"][0], copyFormat: Copy
 	}
 }
 
+/**
+ * Resolves the target parent bookmark folder ID based on browser type and user configuration.
+ *
+ * @todo Add support for "toolbar" option in the next major version.
+ * Next major version type: `type BookmarkOption = "main" | "toolbar" | "other";`
+ *
+ * @param {Browser.bookmarks.BookmarkTreeNode | undefined} rootNode - Root bookmark tree node.
+ * @param {undefined | string | number} bookmarksOption - User-selected bookmark option value.
+ * @returns {string | undefined} Resolved parent folder ID or GUID.
+ */
+function resolveBookmarkFolderId(
+	rootNode: Browser.bookmarks.BookmarkTreeNode | undefined,
+	bookmarksOption: undefined | string | number
+): string | undefined {
+	const normalizeBookmarkOption = (option: undefined | string | number): "main" | "other" => {
+		switch (option) {
+			// Chrome: Bookmarks Bar / Firefox: Bookmarks Menu
+			case 0:
+			case "0":
+			case "main":
+				return "main";
+			// Chrome / Firefox: Other Bookmarks
+			case 1:
+			case "1":
+			case "other":
+				return "other";
+			default:
+				// For any other value, including undefined, default to "main"
+				return "main";
+		}
+	};
+
+	const target = normalizeBookmarkOption(bookmarksOption);
+
+	if (detectBrowser() === BROWSER_FIREFOX) {
+		const targetGuid = target === "main"
+			? BOOKMARK_FIREFOX_MENU_GUID
+			: BOOKMARK_FIREFOX_UNFILED_GUID;
+		return rootNode?.children?.find((node) => node.id === targetGuid)?.id ?? targetGuid;
+	}
+
+	const targetId = target === "main" ? BOOKMARK_CHROME_BAR_ID : BOOKMARK_CHROME_OTHER_ID;
+	const targetIndex = target === "main" ? 0 : 1;
+	return rootNode?.children?.find((node) => node.id === targetId)?.id ?? rootNode?.children?.[targetIndex]?.id ?? targetId;
+}
+
 function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
 	let text = "";
 	for (let i = 0; i < request.urls.length; i++) {
@@ -310,68 +363,51 @@ function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
 	copyToClipboard(text);
 }
 
-async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>) {
+async function handleBookmark(request: ActivateMessage<ActivateMessage_bm>): Promise<void> {
 	const bookmarkTreeNodes = await browser.bookmarks.getTree();
-	const selectBookmarks = (bookmarks: undefined | string | number): number => {
-		const regex = /^([0-9]+)$/;
-		const defaultValue = BOOKMARK_OTHER_DEFAULT_INDEX; // Other Bookmarks: bookmarkTreeNodes[0].children.[1];
-		let index: number;
-
-		if (!bookmarks) {
-			// Applies if the setting has not been saved in Version 2.13 or later.
-			// This maintains compatibility with the behavior of adding to "Other Bookmarks" until version 2.12.4.2 or earlier.
-			index = defaultValue;
-		} else if (typeof bookmarks === "number" && Number.isSafeInteger(bookmarks)) {
-			index = bookmarks;
-		} else if (typeof bookmarks === "string" && regex.test(bookmarks)) {
-			index = Number.parseInt(bookmarks, 10);
-		} else {
-			console.warn("Invalid bookmarks option value:", { typeof: bookmarks, value: bookmarks });
-
-			index = defaultValue;
-		}
-
-		if (!(index === 0 || index === 1)) {
-			index = defaultValue;
-		}
-
-		return index;
-	};
-
-	// request.setting.options.bookmarks
-	//   undefined : This key does not exist until 2.12.4.2 or earlier
-	//     0 or "0"  : main   bookmarks
-	//     1 or "1"  : other  bookmarks >> Default designation until 2.12.4.2 or earlier
-	//     2 or "2"  : synced bookmarks
-	const bookmarksIndex: number = selectBookmarks(request.setting.options?.bookmarks);
 	const rootNode = bookmarkTreeNodes[0];
-	const folderID = rootNode?.children?.[bookmarksIndex]?.id;
+	const folderID = resolveBookmarkFolderId(rootNode, request.setting.options?.bookmarks);
 
 	if (!folderID) {
 		console.error("Target bookmark folder ID is undefined.");
 		return;
 	}
 
-	// make assumption that bookmarkTreeNodes[0].children[1] refers to the "other bookmarks" folder
-	// as different languages will not use the english name to refer to the folder
 	const dateFormat = "YYYY-MM-DD HH:mm:ss";
 	const dateString = dateFormatter(new Date(), dateFormat);
 	const dirName = `Linkclump ${dateString}`;
-	const newFolder = await browser.bookmarks.create({
-		"parentId": folderID,
-		"title": dirName
-	});
+
+	let newFolder: Browser.bookmarks.BookmarkTreeNode;
+	try {
+		newFolder = await browser.bookmarks.create({
+			"parentId": folderID,
+			"title": dirName
+		});
+	} catch (error) {
+		console.error("Failed to create bookmark folder:", error);
+		return;
+	}
+
+	if (!newFolder?.id) {
+		console.error("Created bookmark folder ID is undefined:", newFolder);
+		return;
+	}
 
 	for (let j = 0; j < request.urls.length; j++) {
 		const urlItem = request.urls[j];
 		if (!urlItem) {
 			continue;
 		}
-		await browser.bookmarks.create({
-			"parentId": newFolder.id,
-			"title": urlItem.title,
-			"url": urlItem.url
-		});
+
+		try {
+			await browser.bookmarks.create({
+				"parentId": newFolder.id,
+				"title": urlItem.title,
+				"url": urlItem.url
+			});
+		} catch (error) {
+			console.error(`Failed to add bookmark: ${urlItem.url}`, error);
+		}
 	}
 }
 
