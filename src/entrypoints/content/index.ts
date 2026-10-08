@@ -1,58 +1,29 @@
 // WXT provided cross-browser compatible API.
 import { browser } from "wxt/browser";
 
-import type { LinkItem } from "@/assets/js/types/Content";
-import type { ActionSetting } from "@/assets/js/types/Settings";
+import { CUSTOM_TAG_LINKCLUMP } from "@/assets/js/constants/ui";
+import { detectOs } from "@/assets/js/lib/detectOs";
+
+import {
+	createBox,
+	createCountLabel,
+	createCustomElement
+} from "./dom/selectionBox";
+import {
+	blur,
+	keydown,
+	keyup
+} from "./keyboard/keyState";
+import {
+	contextmenu,
+	pointerdown,
+	touchmove
+} from "./pointer/pointerEvents";
+
 import type {
-	ActivateMessage,
 	InitMessage,
 	InitResponse
 } from "@/assets/js/types/Messages";
-
-
-
-// set all the properties of the window object
-// to avoid typescript errors
-declare global {
-	interface Window {
-		settings: Record<string, ActionSetting>;
-		setting: number;
-
-		key_pressed: number;
-		mouse_button: number | null;
-		stop_menu: boolean;
-		box_on: boolean;
-		smart_select: boolean;
-
-		mouse_x: number;
-		mouse_y: number;
-
-		scroll_id: number;
-		links: LinkItem[];
-		box: HTMLElement & { x: number, y: number, x1: number, x2: number, y1: number, y2: number };
-		count_label: HTMLElement;
-		linkclump: HTMLElement;
-		overlay: HTMLElement | null;
-		scroll_bug_ignore: boolean;
-		os: 0 | 1;
-
-		timer: number;
-	}
-}
-
-const END_CODE = "End";
-const HOME_CODE = "Home";
-const Z_INDEX = "2147483647";
-const COUNTER_FONT_SIZE = 16;
-const COUNTER_FONT_WEIGHT = 400;
-const OS_WIN = 1;
-const OS_LINUX = 0;
-const LEFT_BUTTON = 0;
-const EXCLUDE_LINKS = 0;
-const INCLUDE_LINKS = 1;
-const CUSTOM_TAG_LINKCLUMP = "linkclump-plus";
-
-
 
 // Content Scripts (https://wxt.dev/guide/essentials/entrypoints.html#content-scripts)
 export default defineContentScript(
@@ -73,7 +44,12 @@ export default defineContentScript(
 	}
 );
 
-function main() {
+/**
+ * The content script's entry point (passed to `defineContentScript`).
+ *
+ * @returns {void}
+ */
+function main(): void {
 	browser.runtime.sendMessage(
 		{
 			message: "init"
@@ -104,19 +80,23 @@ function main() {
 			if (allowed) {
 				// setting up the box and count label
 				window.linkclump = createCustomElement(CUSTOM_TAG_LINKCLUMP);
-				window.box = create_box();
-				window.count_label = create_count_label();
+				window.linkclump.style.pointerEvents = "none";
+				window.linkclump.style.touchAction = "none";
+				window.box = createBox();
+				window.count_label = createCountLabel();
 
 				(window.linkclump).appendChild(window.box);
 				(window.linkclump).appendChild(window.count_label);
 				(document.body).appendChild(window.linkclump);
 
 				// add event listeners
-				window.addEventListener("mousedown", mousedown, true);
+				window.addEventListener("pointerdown", pointerdown, true);
 				window.addEventListener("keydown", keydown, true);
 				window.addEventListener("keyup", keyup, true);
 				window.addEventListener("blur", blur, true);
 				window.addEventListener("contextmenu", contextmenu, true);
+				// non-passive: required to cancel native panning once the touch hold is confirmed
+				window.addEventListener("touchmove", touchmove, { capture: true, passive: false });
 			}
 		}
 	});
@@ -140,7 +120,15 @@ function main() {
 	init();
 }
 
-function init() {
+/**
+ * Resets all of this content script's per-page state on `window` to its initial values
+ * (no settings loaded yet, no active selection, no touch in progress) and re-detects the
+ * host OS. Called once from main() on page load; does not remove or re-add any event
+ * listeners.
+ *
+ * @returns {void}
+ */
+function init(): void {
 	window.settings = {};
 	window.setting = -1;
 	window.key_pressed = 0;
@@ -160,689 +148,8 @@ function init() {
 	window.count_label = undefined;
 	window.overlay = null;
 	window.scroll_bug_ignore = false;
-	window.os = ((navigator.appVersion.indexOf("Win") === -1) ? OS_LINUX : OS_WIN);
+	window.os = detectOs();
 	window.timer = 0;
-}
-
-
-
-/**
- *
- * @param {string} tagName
- * @param {ElementCreationOptions} options - { is: "Custom Element Tag Name" }
- * @returns {HTMLElement}
- */
-function createCustomElement(tagName: string, options?: ElementCreationOptions): HTMLElement {
-	if (!tagName || typeof tagName !== "string") {
-		throw (`Error, Invalid value passed to createCustomElement(tagName). tagName >> ${tagName}`);
-	}
-
-	const custom = document.createElement(tagName, options);
-
-	return custom;
-}
-
-function create_box() {
-	// @ts-expect-error -- all will be right at the end of the function
-	window.box = document.createElement("span");
-	window.box.style.margin = "0px auto";
-	window.box.style.border = "0px dotted " + (window.settings[window.setting]?.color ?? "red");
-	window.box.style.position = "absolute";
-	window.box.style.zIndex = (parseFloat(Z_INDEX) - 1).toString();
-	window.box.style.visibility = "hidden";
-
-	// set the box properties
-	window.box.x = 0;
-	window.box.y = 0;
-	window.box.x1 = 0;
-	window.box.x2 = 0;
-	window.box.y1 = 0;
-	window.box.y2 = 0;
-
-	return window.box;
-}
-
-function create_count_label() {
-	const base = COUNTER_FONT_SIZE;
-
-	window.count_label = document.createElement("span");
-
-	window.count_label.style.zIndex = Z_INDEX;
-	window.count_label.style.display = "inline-block";
-	window.count_label.style.visibility = "hidden";
-
-	window.count_label.style.position = "absolute";
-	window.count_label.style.top = "0";
-	window.count_label.style.left = "0";
-
-	window.count_label.style.lineHeight = `${base * 1}px`;
-	window.count_label.style.fontSize = `${base * 1}px`;
-	window.count_label.style.font = "Arial, sans-serif";
-	window.count_label.style.fontWeight = COUNTER_FONT_WEIGHT.toString();
-
-	window.count_label.style.color = "black";
-	window.count_label.style.backgroundColor = "transparent";
-
-	window.count_label.style.padding = `${base * 0.50}px`;
-	window.count_label.style.borderRadius = `${base * 0.50}px`;
-	window.count_label.style.border = `${base * 0.25}px double transparent`;
-
-	return window.count_label;
-}
-
-function mousemove(event: MouseEvent) {
-	if (!isTrustedEvent(event)) {
-		return;
-	}
-
-	prevent_escalation(event);
-	if (allow_selection() || window.scroll_bug_ignore) {
-		window.scroll_bug_ignore = false;
-		update_box(event.pageX, event.pageY);
-
-		// while detect keeps on calling false then recall the method
-		while (!detect(event.pageX, event.pageY, false)) {
-			// empty
-		}
-	} else {
-		// only stop if the mouseup timer is no longer set
-		if (window.timer === 0) {
-			stop();
-		}
-	}
-}
-
-function clean_up() {
-	// remove the box
-	if (window.box) {
-		window.box.style.borderWidth = "0px";
-		window.box.style.top = "";
-		window.box.style.left = "";
-		window.box.style.width = "";
-		window.box.style.height = "";
-		window.box.style.visibility = "hidden";
-	}
-	if (window.count_label) {
-		window.count_label.style.visibility = "hidden";
-	}
-	window.box_on = false;
-
-	// remove the link boxes
-	for (const link of window.links) {
-		if (link.box !== null) {
-			(window.linkclump).removeChild(link.box);
-			link.box = null;
-		}
-	}
-	window.links = [];
-
-	// wipe clean the smart select
-	window.smart_select = false;
-	window.mouse_button = -1;
-	window.key_pressed = 0;
-}
-
-function mousedown(event: MouseEvent) {
-	if (!isTrustedEvent(event)) {
-		return;
-	}
-
-	window.mouse_button = event.button;
-
-	// turn on menu for windows
-	if (window.os === OS_WIN) {
-		window.stop_menu = false;
-	}
-
-	if (allow_selection()) {
-		// don't prevent for windows right click as it breaks spell checker
-		// do prevent for left as otherwise the page becomes highlighted
-		if (window.os === OS_LINUX || (window.os === OS_WIN && window.mouse_button === LEFT_BUTTON)) {
-			prevent_escalation(event);
-		}
-
-		// if mouse up timer is set then clear it as it was just caused by bounce
-		if (window.timer !== 0) {
-			clearTimeout(window.timer);
-			window.timer = 0;
-
-			// keep menu off for windows
-			if (window.os === OS_WIN) {
-				window.stop_menu = true;
-			}
-		} else {
-			// clean up any mistakes
-			if (window.box_on) {
-				clean_up();
-			}
-
-			// update position
-			window.box.x = event.pageX;
-			window.box.y = event.pageY;
-			update_box(event.pageX, event.pageY);
-
-			// setup mouse move and mouse up
-			window.addEventListener("mousemove", mousemove, true);
-			window.addEventListener("mouseup", mouseup, true);
-			window.addEventListener("mousewheel", mousewheel, true);
-			window.addEventListener("mouseout", mouseout, true);
-		}
-	}
-}
-
-function update_box(x: number, y: number) {
-	const documentDimensions = updateDocumentDimensions();
-
-	x = Math.min(x, documentDimensions.width  - documentDimensions.scrollbarWidth);
-	y = Math.min(y, documentDimensions.height - documentDimensions.scrollbarWidth);
-
-	if (x > window.box.x) {
-		window.box.x1 = window.box.x;
-		window.box.x2 = x;
-	} else {
-		window.box.x1 = x;
-		window.box.x2 = window.box.x;
-	}
-	if (y > window.box.y) {
-		window.box.y1 = window.box.y;
-		window.box.y2 = y;
-	} else {
-		window.box.y1 = y;
-		window.box.y2 = window.box.y;
-	}
-
-	window.box.style.left = window.box.x1 + "px";
-	window.box.style.width = window.box.x2 - window.box.x1 + "px";
-	window.box.style.top = window.box.y1 + "px";
-	window.box.style.height = window.box.y2 - window.box.y1 + "px";
-
-	const adjustPositionTop = window.count_label.offsetHeight + window.count_label.offsetHeight * 0.25;
-	const adjustPositionLeft = window.count_label.offsetWidth + window.count_label.offsetHeight * 0.25;
-	window.count_label.style.top = (y - adjustPositionTop) + "px";
-	window.count_label.style.left = (x - adjustPositionLeft) + "px";
-}
-
-function mousewheel() {
-	window.scroll_bug_ignore = true;
-}
-
-function mouseout(event: MouseEvent) {
-	mousemove(event);
-	// the mouse wheel event might also call this event
-	window.scroll_bug_ignore = true;
-}
-
-function prevent_escalation(event: MouseEvent) {
-	event.stopPropagation();
-	event.preventDefault();
-}
-
-function mouseup(event: MouseEvent) {
-	if (!isTrustedEvent(event)) {
-		return;
-	}
-
-	prevent_escalation(event);
-
-	if (window.box_on) {
-		// all the detection of the mouse to bounce
-		if (allow_selection() && window.timer === 0) {
-			window.timer = setTimeout(function () {
-				update_box(event.pageX, event.pageY);
-				detect(event.pageX, event.pageY, true);
-
-				stop();
-				window.timer = 0;
-			}, 100);
-		}
-	} else {
-		// false alarm
-		stop();
-	}
-}
-
-function getXY(element: HTMLElement): { x: number, y: number } {
-	let x = 0;
-	let y = 0;
-
-	let parent: Element | null = element;
-	let matrix;
-
-	do {
-		if (parent instanceof HTMLElement) {
-			const style = window.getComputedStyle(parent);
-			const transform = style?.transform;
-
-			if (transform && transform !== "none") {
-				try {
-					matrix = new DOMMatrix(transform);
-				} catch {
-					// Fallback, older browsers supported (Google Chrome 60 and earlier)
-					if ("WebKitCSSMatrix" in window) {
-						matrix = new WebKitCSSMatrix(style.webkitTransform);
-					} else {
-						matrix = { m41: 0, m42: 0 };
-					}
-				}
-			} else {
-				matrix = { m41: 0, m42: 0 };
-			}
-
-			x += parent.offsetLeft + matrix.m41;
-			y += parent.offsetTop + matrix.m42;
-
-			parent = parent.offsetParent;
-		} else {
-			break;
-		}
-	} while (parent);
-
-	let scrollParent: Element | null = element;
-	while (scrollParent && scrollParent !== document.body) {
-		if (scrollParent.scrollLeft) {
-			x -= scrollParent.scrollLeft;
-		}
-		if (scrollParent.scrollTop) {
-			y -= scrollParent.scrollTop;
-		}
-		scrollParent = scrollParent.parentElement;
-	}
-
-	return {
-		x: x,
-		y: y
-	};
-}
-
-function start(): void {
-	const selectedAction = window.settings[window.setting];
-
-	if (selectedAction === undefined) {
-		console.error("Selected action setting was not found.");
-		return;
-	}
-
-	// stop user from selecting text/elements
-	document.body.style.userSelect = "none";
-
-	// turn on the box
-	window.box.style.visibility = "visible";
-	window.count_label.style.visibility = "visible";
-
-	// find all links (find them each time as they could have moved)
-	const page_links = document.links;
-
-
-	// create RegExp once
-	const re1 = /^javascript:/i;
-	const ignoreList = selectedAction.options?.ignore ?? [];
-	const re2 = new RegExp(ignoreList.slice(1).join("|"), "i");
-	const re3 = /^H\d$/i;
-
-	for (let i = 0; i < page_links.length; i++) {
-		const rawLink = page_links[i];
-		if (!rawLink) {
-			continue;
-		}
-
-		// reject javascript: links
-		if (re1.test(rawLink.href)) {
-			continue;
-		}
-
-		// reject href="" or href="#"
-		if (!rawLink.getAttribute("href") || rawLink.getAttribute("href") === "#") {
-			continue;
-		}
-
-		// include/exclude links
-		if (ignoreList.length > 1) {
-			if (re2.test(rawLink.href) || re2.test(rawLink.innerHTML)) {
-				if (Number(ignoreList[0]) === EXCLUDE_LINKS) {
-					continue;
-				}
-			} else if (Number(ignoreList[0]) === INCLUDE_LINKS) {
-				continue;
-			}
-		}
-
-		// attempt to ignore invisible links (can't ignore overflow)
-		const comp = window.getComputedStyle(rawLink, null);
-		if (comp.visibility === "hidden" || comp.display === "none") {
-			continue;
-		}
-
-		const pos = getXY(rawLink);
-		let width = rawLink.offsetWidth;
-		let height = rawLink.offsetHeight;
-
-		// attempt to get the actual size of the link
-		for (let k = 0; k < rawLink.childNodes.length; k++) {
-			const child = rawLink.childNodes[k];
-			if (child instanceof HTMLElement && child.nodeName === "IMG") {
-				const pos2 = getXY(child);
-				if (pos.y >= pos2.y) {
-					pos.y = pos2.y;
-
-					width = Math.max(width, child.offsetWidth);
-					height = Math.max(height, child.offsetHeight);
-				}
-			}
-		}
-
-		// Attach Linkclump's custom coordinate and box management properties to the DOM element
-		// Assert to the dedicated LinkItem type due to standard lib.dom.d.ts type limitations (custom properties undefined)
-		const link = rawLink as LinkItem;
-		link.x1 = pos.x;
-		link.y1 = pos.y;
-		link.x2 = pos.x + width;
-		link.y2 = pos.y + height;
-		link.height = height;
-		link.width = width;
-		link.box = null;
-		link.important = Number(selectedAction.options?.smart) === 0 && rawLink.parentNode !== null && re3.test(rawLink.parentNode.nodeName);
-
-		window.links.push(link);
-	}
-
-	window.box_on = true;
-
-	// turn off menu for windows so mouse up doesn't trigger context menu
-	if (window.os === OS_WIN) {
-		window.stop_menu = true;
-	}
-}
-
-function stop() {
-	// allow user to select text/elements
-	document.body.style.userSelect = "";
-
-	// turn off mouse move and mouse up
-	window.removeEventListener("mousemove", mousemove, true);
-	window.removeEventListener("mouseup", mouseup, true);
-	window.removeEventListener("mousewheel", mousewheel, true);
-	window.removeEventListener("mouseout", mouseout, true);
-
-	if (window.box_on) {
-		clean_up();
-	}
-
-	// turn on menu for linux
-	if (window.os === OS_LINUX && window.settings[window.setting]?.key !== window.key_pressed) {
-		window.stop_menu = false;
-	}
-}
-
-function scroll() {
-	if (allow_selection()) {
-		const y = window.mouse_y - window.scrollY;
-		const win_height = window.innerHeight;
-
-		if (y > win_height - 20) { // down
-			let speed = win_height - y;
-			if (speed < 2) {
-				speed = 60;
-			} else if (speed < 10) {
-				speed = 30;
-			} else {
-				speed = 10;
-			}
-			window.scrollBy(0, speed);
-			window.mouse_y += speed;
-			update_box(window.mouse_x, window.mouse_y);
-			detect(window.mouse_x, window.mouse_y, false);
-
-			window.scroll_bug_ignore = true;
-			return;
-		} else if (window.scrollY > 0 && y < 20) { // up
-			let speed = y;
-			if (speed < 2) {
-				speed = 60;
-			} else if (speed < 10) {
-				speed = 30;
-			} else {
-				speed = 10;
-			}
-			window.scrollBy(0, -speed);
-			window.mouse_y -= speed;
-			update_box(window.mouse_x, window.mouse_y);
-			detect(window.mouse_x, window.mouse_y, false);
-
-			window.scroll_bug_ignore = true;
-			return;
-		}
-	}
-
-	clearInterval(window.scroll_id);
-	window.scroll_id = 0;
-}
-
-function detect(x: number, y: number, open: boolean) {
-	window.mouse_x = x;
-	window.mouse_y = y;
-
-	if (!window.box_on) {
-		if (window.box.x2 - window.box.x1 < 5 && window.box.y2 - window.box.y1 < 5) {
-			return true;
-		} else {
-			start();
-		}
-
-	}
-
-	if (!window.scroll_id) {
-		window.scroll_id = setInterval(scroll, 100);
-	}
-
-	let count = 0;
-	const count_tabs = new Set;
-	const open_tabs = [];
-	for (const link of window.links) {
-		if (
-			(!window.smart_select || link.important)
-			&& !(
-				link.x1 > window.box.x2
-				|| link.x2 < window.box.x1
-				|| link.y1 > window.box.y2
-				|| link.y2 < window.box.y1
-			)
-		) {
-			if (open) {
-				open_tabs.push({
-					"url": link.href,
-					"title": link.innerText
-				});
-			}
-
-			// check if important links have been selected and possibly redo
-			if (!window.smart_select) {
-				if (link.important) {
-					window.smart_select = true;
-					return false;
-				}
-			} else {
-				if (link.important) {
-					count++;
-				}
-			}
-
-			if (link.box === null) {
-				const link_box = document.createElement("span");
-				link_box.className = "linkclump-link";
-				link_box.style.margin = "0px auto";
-				link_box.style.border = "1px solid red";
-				link_box.style.position = "absolute";
-				link_box.style.width = link.width + "px";
-				link_box.style.height = link.height + "px";
-				link_box.style.top = link.y1 + "px";
-				link_box.style.left = link.x1 + "px";
-				link_box.style.zIndex = (parseFloat(Z_INDEX) - 1).toString();
-
-				(window.linkclump).appendChild(link_box);
-				link.box = link_box;
-			} else {
-				link.box.style.visibility = "visible";
-			}
-
-			count_tabs.add(link.href);
-		} else {
-			if (link.box !== null) {
-				link.box.style.visibility = "hidden";
-			}
-		}
-	}
-
-	// important links were found, but not anymore so redo
-	if (window.smart_select && count === 0) {
-		window.smart_select = false;
-		return false;
-	}
-
-	window.count_label.innerText = count_tabs.size.toString();
-
-	if (open_tabs.length > 0) {
-		browser.runtime.sendMessage({
-			message: "activate",
-			urls: open_tabs,
-			setting: window.settings[window.setting]
-		} as ActivateMessage);
-	}
-
-	return true;
-}
-
-function allow_key(keyCode: number) {
-	for (const i in window.settings) {
-		if (Number(window.settings[i]?.key) === keyCode) {
-			return true;
-		}
-	}
-	return false;
-}
-
-function keydown(event: KeyboardEvent) {
-	if (!isTrustedEvent(event)) {
-		return;
-	}
-
-	if (event.code !== END_CODE && event.code !== HOME_CODE) {
-		window.key_pressed = event.keyCode;
-		// turn menu off for linux
-		if (window.os === OS_LINUX && allow_key(window.key_pressed)) {
-			window.stop_menu = true;
-		}
-	} else {
-		window.scroll_bug_ignore = true;
-	}
-}
-
-function blur(event: FocusEvent) {
-	if (!isTrustedEvent(event)) {
-		return;
-	}
-
-	remove_key();
-}
-
-function keyup(event: KeyboardEvent) {
-	if (!isTrustedEvent(event)) {
-		return;
-	}
-
-	if (event.code !== END_CODE && event.code !== HOME_CODE) {
-		remove_key();
-	}
-}
-
-function remove_key() {
-	// turn menu on for linux
-	if (window.os === OS_LINUX) {
-		window.stop_menu = false;
-	}
-	window.key_pressed = 0;
-}
-
-function allow_selection(): boolean {
-	for (const i in window.settings) {
-		const setting = window.settings[i];
-		if (!setting) {
-			continue;
-		}
-
-		// need to check if key is 0 as key_pressed might not be accurate
-		if (Number(setting.mouse) === window.mouse_button && Number(setting.key) === window.key_pressed) {
-			window.setting = Number.parseInt(i, 10);
-
-			if (window.box !== null) {
-				// box
-				window.box.style.border = "2px dotted " + (setting?.color ?? "red");
-
-				// counter
-				if ((setting?.color && typeof setting.color === "string") && (setting?.options && Object.hasOwn(setting.options, "samebgcolorasbox") && typeof setting.options.samebgcolorasbox === "boolean")) {
-					if (setting.options.samebgcolorasbox === true) {
-						window.count_label.style.color = "white";
-						window.count_label.style.borderColor = "white";
-						window.count_label.style.backgroundColor = setting.color.toString();
-					} else {
-						window.count_label.style.color = "black";
-						window.count_label.style.borderColor = "transparent";
-						window.count_label.style.backgroundColor = "transparent";
-					}
-				}
-				if (setting?.options?.fontsizeofcounter && (typeof setting.options.fontsizeofcounter === "number")) {
-					const num = setting.options.fontsizeofcounter;
-					const base = num || COUNTER_FONT_SIZE;
-
-					window.count_label.style.fontSize = `${base * 1}px`;
-					window.count_label.style.lineHeight = `${base * 1}px`;
-
-					window.count_label.style.padding = `${base * 0.50}px`;
-					window.count_label.style.borderWidth = `${base * 0.25}px`;
-					window.count_label.style.borderRadius = `${base * 0.50}px`;
-				} else {
-					console.warn("Invalid fontsizeofcounter value (expected number between 9 and 25):", setting.options.fontsizeofcounter);
-				}
-				if (setting?.options?.fontweightofcounter && (typeof setting.options.fontweightofcounter === "number") && (1 <= setting.options.fontweightofcounter && setting.options.fontweightofcounter <= 1000)) {
-					const weight = setting.options.fontweightofcounter;
-
-					window.count_label.style.fontWeight = weight.toString();
-				} else {
-					console.warn("Invalid fontweightofcounter value (expected number between 1 and 1000):", setting.options.fontweightofcounter);
-				}
-			}
-
-			return true;
-		}
-	}
-	return false;
-}
-
-function contextmenu(event: MouseEvent) {
-	if (!isTrustedEvent(event)) {
-		return;
-	}
-
-	if (window.stop_menu) {
-		event.preventDefault();
-	}
-}
-
-function updateDocumentDimensions() {
-	const width = Math.max(document.documentElement.clientWidth, document.body.scrollWidth, document.documentElement.scrollWidth, document.body.offsetWidth, document.documentElement.offsetWidth);
-	const height = Math.max(document.documentElement.clientHeight, document.body.scrollHeight, document.documentElement.scrollHeight, document.body.offsetHeight, document.documentElement.offsetHeight);
-	const scrollbarWidth = window.innerWidth - document.body.clientWidth;
-
-	return { width, height, scrollbarWidth };
-}
-
-/**
- * Validates if the event is a trusted user gesture originating from the browser.
- * This is a security measure to prevent Confused Deputy attacks where a malicious
- * webpage attempts to trigger privileged actions via synthesized DOM events.
- *
- * @param {Event} event - The DOM event to validate.
- * @returns {boolean} True if the event is trusted (user-initiated), false otherwise.
- */
-function isTrustedEvent(event: Event): boolean {
-	return event?.isTrusted ?? false;
+	window.touch_active = false;
+	window.pointer_type = null;
 }

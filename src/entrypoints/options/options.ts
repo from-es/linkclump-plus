@@ -2,9 +2,44 @@
 import { browser } from "wxt/browser";
 
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
-import { isSettings } from "@/assets/js/types/Settings";
-import { Information } from "@/assets/js/constants/app";
+import { isSettings } from "@/assets/js/lib/SettingsGuard";
+import { detectOs } from "@/assets/js/lib/detectOs";
+import { detectBrowser } from "@/assets/js/lib/detectBrowser";
 
+import { Information } from "@/assets/js/constants/app";
+import { BROWSER_CHROME } from "@/assets/js/constants/browser";
+import {
+	OS_WIN,
+	OS_LINUX,
+	OS_MAC
+} from "@/assets/js/constants/os";
+
+import {
+	MOUSE_BUTTON_LEFT,
+	MOUSE_BUTTON_RIGHT
+} from "@/assets/js/constants/mouseButton";
+import {
+	KEY_CODE_NONE,
+	KEY_CODE_SHIFT,
+	KEY_CODE_CTRL,
+	KEY_CODE_ALT,
+	KEY_CODE_META,
+	KEY_CODE_DEFAULT_Z,
+	ALPHA_KEYCODE_START,
+	ALPHA_CHARCODE_LOWERCASE_START,
+	ALPHA_KEY_COUNT
+} from "@/assets/js/constants/keyboard";
+import {
+	COUNTER_FONT_SIZE_DEFAULT,
+	COUNTER_FONT_SIZE_MIN,
+	COUNTER_FONT_SIZE_MAX,
+	COUNTER_FONT_WEIGHT_DEFAULT,
+	COUNTER_FONT_WEIGHT_MIN,
+	COUNTER_FONT_WEIGHT_MAX,
+	OPTIONS_TOOLTIP_LEFT_OFFSET_PX
+} from "@/assets/js/constants/ui";
+
+import type { OsType } from "@/assets/js/types/OS";
 import type { OptionsSchema } from "@/assets/js/types/Options";
 import type { ActionOptionValue, ActionSetting, Settings } from "@/assets/js/types/Settings";
 
@@ -65,14 +100,14 @@ const optionsSchema: OptionsSchema = {
 		"fontsizeofcounter": {
 			"name": "counter font size",
 			"type": "number",
-			"data": [ 16, 8, 64 ], // [ default, min , max ]
-			"extra": "font size of the counter (default: 16, range: 8-64)"
+			"data": [ COUNTER_FONT_SIZE_DEFAULT, COUNTER_FONT_SIZE_MIN, COUNTER_FONT_SIZE_MAX ], // [ default, min , max ]
+			"extra": `font size of the counter (default: ${COUNTER_FONT_SIZE_DEFAULT}, range: ${COUNTER_FONT_SIZE_MIN}-${COUNTER_FONT_SIZE_MAX})`
 		},
 		"fontweightofcounter": {
 			"name": "counter font weight",
 			"type": "number",
-			"data": [ 400, 1, 1000 ], // [ default, min , max ]
-			"extra": "font weight of the counter (default: 400, range: 1-1000, thin: 100, normal: 400, bold: 700)"
+			"data": [ COUNTER_FONT_WEIGHT_DEFAULT, COUNTER_FONT_WEIGHT_MIN, COUNTER_FONT_WEIGHT_MAX ], // [ default, min , max ]
+			"extra": `font weight of the counter (default: ${COUNTER_FONT_WEIGHT_DEFAULT}, range: ${COUNTER_FONT_WEIGHT_MIN}-${COUNTER_FONT_WEIGHT_MAX}, thin: 100, normal: 400, bold: 700)`
 		},
 		"samebgcolorasbox": {
 			"name": "bgcolor of the counter the same as the box",
@@ -136,16 +171,12 @@ const optionsSchema: OptionsSchema = {
 	}
 };
 
-const OS_WIN = 0;
-const OS_LINUX = 1;
-const OS_MAC = 2;
-
 const colors: string[] = [ "458B74", "838B8B", "CCCCCC", "0000FF", "8A2BE2", "D2691E", "6495ED", "DC143C", "006400", "9400D3", "1E90FF", "228B22", "00FF00", "ADFF2F", "FF69B4", "4B0082", "F0E68C", "8B814C", "87CEFA", "32CD32", "000080", "FFA500", "FF4500", "DA70D6", "8B475D", "8B668B", "FF0000", "2E8B57", "8E388E", "FFFF00" ];
 let currentSettings: Settings | null = null;
 const div_history: Record<string, JQuery> = {};
 
 let keys: Record<number, string>;
-let os: 0 | 1 | 2;
+let os: OsType;
 
 
 
@@ -158,8 +189,8 @@ function main() {
 }
 
 function initValue() {
-	keys = displayKeys(0);
-	os = ((navigator.appVersion.indexOf("Win") === -1) ? ((navigator.appVersion.indexOf("Mac") === -1) ? OS_LINUX : OS_MAC) : OS_WIN);
+	os = detectOs();
+	keys = displayKeys(MOUSE_BUTTON_LEFT);
 }
 
 function initEvent() {
@@ -172,7 +203,7 @@ function initEvent() {
 
 	// until migrate to the Svelte UI, we need to update the store link for Firefox users.
 	// This is because the link to the Browser Extension Store (Google Chrome / Firefox) is hardcoded in the HTML, and we want to ensure that it points to the correct store based on the user's browser.
-	if (!isChrome()) {
+	if (detectBrowser() !== BROWSER_CHROME) {
 		const storeLink = document.getElementById("faq-store-link");
 		if (storeLink) {
 			const { url } = Information.stores.firefox;
@@ -251,17 +282,8 @@ function tour2() {
 	$("#page2").fadeIn();
 }
 
-/**
- * Determines whether the current browser is Google Chrome or Chromium-based.
- *
- * @returns {boolean} True if running on Chrome / Chromium-based browser, false otherwise.
- */
-function isChrome(): boolean {
-	return navigator.userAgent.includes("Chrome");
-}
-
 function tour3() {
-	const store = isChrome()
+	const store = detectBrowser() === BROWSER_CHROME
 		? Information.stores.chrome
 		: Information.stores.firefox;
 
@@ -274,11 +296,11 @@ function tour3() {
  */
 function load_action(id: string | null) {  // into form
 	if (id === null) {
-		displayKeys(0);
+		displayKeys(MOUSE_BUTTON_LEFT);
 		displayOptions("tabs");
 		$("#form_id").val("");
-		$("#form_mouse").val(0);  // default to left mouse button
-		$("#form_key").val(90);   // and z key
+		$("#form_mouse").val(MOUSE_BUTTON_LEFT);  // default to left mouse button
+		$("#form_key").val(KEY_CODE_DEFAULT_Z);   // and z key
 		$(".colorpicker-trigger").css("background-color", `#${colors[Math.floor(Math.random() * colors.length)]}`);
 	} else {
 		const actionSetting = currentSettings?.actions[id];
@@ -658,7 +680,7 @@ function displayOptions(action: string) {
 			const extra = $("#form_extra");
 			extra.html(event.data.extra);
 			extra.css("top", $(this).position().top);
-			extra.css("left", $(this).position().left + 500);
+			extra.css("left", $(this).position().left + OPTIONS_TOOLTIP_LEFT_OFFSET_PX);
 			extra.show();
 		}).mouseout(function () {
 			$("#form_extra").hide();
@@ -674,23 +696,27 @@ function displayKeys(mouseButton: number): Record<number, string> {
 	key.empty();
 	const keys: Record<number, string> = [];
 
-	keys[16] = "shift";
-	keys[17] = "ctrl";
+	keys[KEY_CODE_SHIFT] = "shift";
+	keys[KEY_CODE_CTRL] = "ctrl";
 
 	if (os !== OS_LINUX) {
-		keys[18] = "alt";
+		keys[KEY_CODE_ALT] = "alt";
+	}
+
+	if (os === OS_MAC) {
+		keys[KEY_CODE_META] = "cmd";
 	}
 
 	// if not left or windows then allow no key
 	// NOTE mouseButton is sometimes a string, sometimes an int
 	const mb = (typeof mouseButton === "string") ? Number.parseInt(mouseButton, 10) : mouseButton;
-	if (mb !== 2 || os === OS_WIN) {
-		keys[0] = "";
+	if (mb !== MOUSE_BUTTON_RIGHT || os === OS_WIN) {
+		keys[KEY_CODE_NONE] = "";
 	}
 
 	// add on alpha characters
-	for (let i = 0; i < 26; i++) {
-		keys[65 + i] = String.fromCharCode(97 + i);
+	for (let i = 0; i < ALPHA_KEY_COUNT; i++) {
+		keys[ALPHA_KEYCODE_START + i] = String.fromCharCode(ALPHA_CHARCODE_LOWERCASE_START + i);
 	}
 
 	for (const i in keys) {
@@ -698,7 +724,7 @@ function displayKeys(mouseButton: number): Record<number, string> {
 	}
 
 	// set selected value to z
-	key.val(90);
+	key.val(KEY_CODE_DEFAULT_Z);
 
 	return keys;
 }
