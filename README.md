@@ -11,7 +11,7 @@ The [Linkclump](https://chromewebstore.google.com/detail/linkclump/lfpjkncokllnf
 
 Thanks to [benblack86](https://github.com/benblack86 "https://github.com/benblack86") for creating this amazing extension and [wvanderp](https://github.com/wvanderp "https://github.com/wvanderp") for updating it to manifest v3.
 
-It supports both Google Chrome / Chromium-based browsers and Mozilla Firefox.
+It supports Google Chrome and Chromium-based browsers, as well as Mozilla Firefox and Firefox-based browsers.
 
 ## Support
 
