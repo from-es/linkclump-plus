@@ -44,12 +44,12 @@ export function handleRequests(
 					populate: true
 				});
 				const currentSettings = await deps.settingsManager.load();
-				windowList.forEach(function (window) {
+				windowList.forEach((window) => {
 					if (!window.tabs) {
 						return;
 					}
 
-					window.tabs.forEach(function (tab) {
+					window.tabs.forEach((tab) => {
 						if (!(tab?.id && tab?.url)) {
 							return;
 						}

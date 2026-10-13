@@ -24,7 +24,7 @@ export function openTab(
 
 	if (!url || urls.length > 0) {
 		setTimeout(
-			function () {
+			() => {
 				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime);
 			},
 			delay
@@ -49,11 +49,14 @@ export function openTab(
 
 	browser.tabs.create(obj).then((tab) => {
 		if (closeTime && closeTime > 0) {
-			setTimeout(function () {
-				if (tab.id) {
-					browser.tabs.remove(tab.id);
-				}
-			}, closeTime);
+			setTimeout(
+				() => {
+					if (tab.id) {
+						browser.tabs.remove(tab.id);
+					}
+				},
+				closeTime
+			);
 		}
 	});
 }
