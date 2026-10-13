@@ -1,20 +1,15 @@
-// WXT provided cross-browser compatible API
-import { browser } from "wxt/browser";
-
-import { SECONDS_TO_MS } from "@/assets/js/constants/timing";
-
-// WXT provided cross-browser Types
-import type { Browser } from "wxt/browser";
+// WXT provided cross-browser compatible API and Types
+import { browser, type Browser } from "wxt/browser";
 
 /**
  * Recursively opens tabs with an optional delay and automatic closing timer.
  *
  * @param {{ url: string, title: string }[]} urls - Array of link objects to open.
- * @param {number} delay - Delay in seconds between opening tabs.
+ * @param {number} delay - Delay in milliseconds between opening tabs.
  * @param {number} [windowId] - ID of the target window.
  * @param {number} [openerTabId] - ID of the opener tab.
  * @param {number | null} [tabIndex] - Target tab index within the window.
- * @param {number} [closeTime] - Auto-close duration in seconds.
+ * @param {number} [closeTime] - Auto-close duration in milliseconds.
  * @returns {void}
  */
 export function openTab(
@@ -32,7 +27,7 @@ export function openTab(
 			function () {
 				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime);
 			},
-			delay * SECONDS_TO_MS
+			delay
 		);
 	}
 
@@ -58,7 +53,7 @@ export function openTab(
 				if (tab.id) {
 					browser.tabs.remove(tab.id);
 				}
-			}, closeTime * SECONDS_TO_MS);
+			}, closeTime);
 		}
 	});
 }

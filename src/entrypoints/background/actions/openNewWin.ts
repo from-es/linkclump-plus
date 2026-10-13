@@ -1,6 +1,8 @@
 // WXT provided cross-browser compatible API
 import { browser } from "wxt/browser";
 
+import { SECONDS_TO_MS } from "@/assets/js/constants/timing";
+
 import { openTab } from "../utils/openTab";
 
 import type {
@@ -29,11 +31,12 @@ export async function handleOpenNewWin(request: ActivateMessage<ActivateMessage_
 	});
 
 	const windowId = window ? window.id : currentWindow.id;
+	const delay = (request.setting.options.delay ?? 0) * SECONDS_TO_MS;
 
 	if (request.urls.length > 0) {
 		openTab(
 			request.urls,
-			request.setting.options.delay,
+			delay,
 			windowId,
 			undefined,
 			undefined,

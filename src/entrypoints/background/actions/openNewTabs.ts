@@ -3,6 +3,9 @@ import { browser, type Browser } from "wxt/browser";
 
 import { openTab } from "../utils/openTab";
 
+import { SECONDS_TO_MS } from "@/assets/js/constants/timing";
+
+
 import type {
 	ActivateMessage,
 	ActivateMessage_tabs
@@ -29,13 +32,15 @@ export async function handleOpenNewTabs(request: ActivateMessage<ActivateMessage
 	}
 
 	const windowId = currentWindow ? currentWindow.id : undefined;
+	const delay = (request.setting.options.delay ?? 0) * SECONDS_TO_MS;
+	const closeTime = (request.setting.options.close ?? 0) * SECONDS_TO_MS;
 
 	openTab(
 		request.urls,
-		request.setting.options.delay,
+		delay,
 		windowId,
 		tab.id,
 		tabIndex,
-		request.setting.options.close
+		closeTime
 	);
 }

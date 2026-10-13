@@ -17,6 +17,10 @@ import {
 
 import { settingsManager } from "../settings/SettingsManager";
 
+const CONTENT_SCRIPT_PATH = "/content-scripts/content.js" as const;
+const OPTIONS_INIT_PATH = "/options.html?init=true" as const;
+const CENTER_DIVISOR = 2 as const;
+
 /**
  * Handles extension first-run initialization and configuration updates.
  * Injects content scripts into active tabs and opens the options page on first run.
@@ -55,7 +59,7 @@ export async function initBackground(): Promise<void> {
 
 				browser.scripting.executeScript({
 					target: { tabId: id },
-					files: [ "/content-scripts/content.js" ]
+					files: [ CONTENT_SCRIPT_PATH ]
 				}).catch((error) => {
 					console.warn("Failed to inject content script into tab:", { id, url, error });
 				});
@@ -70,13 +74,13 @@ export async function initBackground(): Promise<void> {
 			left?: number;
 			top?: number;
 		} = {
-			url: browser.runtime.getURL("/options.html?init=true"),
+			url: browser.runtime.getURL(OPTIONS_INIT_PATH),
 			width: OPTIONS_WINDOW_DEFAULT_WIDTH,
 			height: OPTIONS_WINDOW_DEFAULT_HEIGHT
 		};
 		if (typeof screen !== "undefined" && screen.width && screen.height) {
-			windowOptions.left = Math.round(screen.width / 2 - OPTIONS_WINDOW_CENTER_OFFSET_X / 2);
-			windowOptions.top = Math.round(screen.height / 2 - OPTIONS_WINDOW_CENTER_OFFSET_Y / 2);
+			windowOptions.left = Math.round(screen.width / CENTER_DIVISOR - OPTIONS_WINDOW_CENTER_OFFSET_X / CENTER_DIVISOR);
+			windowOptions.top = Math.round(screen.height / CENTER_DIVISOR - OPTIONS_WINDOW_CENTER_OFFSET_Y / CENTER_DIVISOR);
 		}
 		browser.windows.create(windowOptions);
 	} else if (!(await settingsManager.isLatest())) {
