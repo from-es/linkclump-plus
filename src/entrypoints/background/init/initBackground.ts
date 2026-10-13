@@ -15,7 +15,7 @@ import {
 	OPTIONS_WINDOW_DEFAULT_WIDTH
 } from "@/assets/js/constants/window";
 
-import { settingsManager } from "../settings/SettingsManager";
+import type { Deps } from "../deps";
 
 const CONTENT_SCRIPT_PATH = "/content-scripts/content.js" as const;
 const OPTIONS_INIT_PATH = "/options.html?init=true" as const;
@@ -25,12 +25,13 @@ const CENTER_DIVISOR = 2 as const;
  * Handles extension first-run initialization and configuration updates.
  * Injects content scripts into active tabs and opens the options page on first run.
  *
+ * @param {Deps} deps - Dependencies created in index.ts.
  * @returns {Promise<void>} Promise resolving when initialization completes.
  */
-export async function initBackground(): Promise<void> {
-	if (!(await settingsManager.isInit())) {
+export async function initBackground(deps: Deps): Promise<void> {
+	if (!(await deps.settingsManager.isInit())) {
 		// initialize settings manager with defaults and to stop this appearing again.
-		await settingsManager.init();
+		await deps.settingsManager.init();
 
 		// inject Linkclump into windows currently open to make it just work
 		const windows = await browser.windows.getAll({ populate: true });
@@ -83,7 +84,7 @@ export async function initBackground(): Promise<void> {
 			windowOptions.top = Math.round(screen.height / CENTER_DIVISOR - OPTIONS_WINDOW_CENTER_OFFSET_Y / CENTER_DIVISOR);
 		}
 		browser.windows.create(windowOptions);
-	} else if (!(await settingsManager.isLatest())) {
-		await settingsManager.update();
+	} else if (!(await deps.settingsManager.isLatest())) {
+		await deps.settingsManager.update();
 	}
 }

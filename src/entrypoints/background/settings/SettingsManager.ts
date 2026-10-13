@@ -96,6 +96,3 @@ export class SettingsManager {
 		}
 	}
 }
-
-// Export as a singleton instance for use throughout the application
-export const settingsManager = new SettingsManager();
