@@ -4,14 +4,14 @@
  * (copying to clipboard, bookmarking, opening in new tabs, or opening in a new window) based on
  */
 
-import { handleBookmark } from "../actions/bookmark";
-import { handleCopy } from "../actions/copyToClipboard";
-import { handleTab } from "../actions/openNewTabs";
-import { handleWin } from "../actions/openNewWin";
-import { uniqueUrl } from "../utils/uniqueUrl";
-
 // WXT provided cross-browser Types
-import type { Browser } from "wxt/browser";
+import { type Browser } from "wxt/browser";
+
+import { handleBookmark } from "../actions/bookmark";
+import { handleCopyToClipboard } from "../actions/copyToClipboard";
+import { handleOpenNewTabs } from "../actions/openNewTabs";
+import { handleOpenNewWin } from "../actions/openNewWin";
+import { uniqueUrl } from "../utils/uniqueUrl";
 
 import type {
 	ActivateMessage,
@@ -43,7 +43,7 @@ export function handleActivate(request: ActivateMessage, sender: Browser.runtime
 
 	switch (request.setting.action) {
 		case "copy": {
-			handleCopy(request as ActivateMessage<ActivateMessage_copy>);
+			handleCopyToClipboard(request as ActivateMessage<ActivateMessage_copy>);
 			break;
 		}
 		case "bm": {
@@ -51,11 +51,11 @@ export function handleActivate(request: ActivateMessage, sender: Browser.runtime
 			break;
 		}
 		case "win": {
-			handleWin(request as ActivateMessage<ActivateMessage_win>);
+			handleOpenNewWin(request as ActivateMessage<ActivateMessage_win>);
 			break;
 		}
 		case "tabs": {
-			handleTab(request as ActivateMessage<ActivateMessage_tabs>, sender);
+			handleOpenNewTabs(request as ActivateMessage<ActivateMessage_tabs>, sender);
 			break;
 		}
 	}

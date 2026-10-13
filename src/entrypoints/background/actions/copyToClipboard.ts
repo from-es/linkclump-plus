@@ -1,5 +1,5 @@
-// WXT provided cross-browser compatible API
-import { browser } from "wxt/browser";
+// WXT provided cross-browser compatible API and Types
+import { browser, type Browser } from "wxt/browser";
 
 import { CopyFormatType } from "@/assets/js/constants/CopyFormat";
 
@@ -63,7 +63,7 @@ export function formatLink({ url, title }: ActivateMessage["urls"][0], copyForma
  * @param {ActivateMessage<ActivateMessage_copy>} request - Activate message for copy action.
  * @returns {void}
  */
-export function handleCopy(request: ActivateMessage<ActivateMessage_copy>): void {
+export function handleCopyToClipboard(request: ActivateMessage<ActivateMessage_copy>): void {
 	let text = "";
 	for (let i = 0; i < request.urls.length; i++) {
 		const urlItem = request.urls[i];

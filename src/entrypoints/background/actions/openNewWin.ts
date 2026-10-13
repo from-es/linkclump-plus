@@ -15,7 +15,7 @@ import type {
  * @param {ActivateMessage<ActivateMessage_win>} request - Activate message for win action.
  * @returns {Promise<void>} Promise resolving when window creation logic completes.
  */
-export async function handleWin(request: ActivateMessage<ActivateMessage_win>): Promise<void> {
+export async function handleOpenNewWin(request: ActivateMessage<ActivateMessage_win>): Promise<void> {
 	const currentWindow = await browser.windows.getCurrent();
 	const url = request.urls.shift()?.url;
 

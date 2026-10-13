@@ -1,10 +1,7 @@
-// WXT provided cross-browser compatible API
-import { browser } from "wxt/browser";
+// WXT provided cross-browser compatible API and Types
+import { browser, type Browser } from "wxt/browser";
 
 import { openTab } from "../utils/openTab";
-
-// WXT provided cross-browser Types
-import type { Browser } from "wxt/browser";
 
 import type {
 	ActivateMessage,
@@ -18,7 +15,7 @@ import type {
  * @param {Browser.runtime.MessageSender} sender - Sender of the message containing tab information.
  * @returns {Promise<void>} Promise resolving when opening tabs has been initiated.
  */
-export async function handleTab(request: ActivateMessage<ActivateMessage_tabs>, sender: Browser.runtime.MessageSender): Promise<void> {
+export async function handleOpenNewTabs(request: ActivateMessage<ActivateMessage_tabs>, sender: Browser.runtime.MessageSender): Promise<void> {
 	if (sender.tab === undefined || sender.tab.id === undefined) {
 		return;
 	}
