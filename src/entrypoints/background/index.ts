@@ -3,15 +3,21 @@ import { browser } from "wxt/browser";
 
 import { initBackground } from "./init/initBackground";
 import { handleRequests } from "./messaging/handleRequests";
+import { ContentScriptManager } from "./scripts/ContentScriptManager";
 import { SettingsManager } from "./settings/SettingsManager";
+import { StorageManager } from "./settings/StorageManager";
 
 import type { Deps } from "./deps";
 import type { Messages } from "@/assets/js/types/Messages";
 
 // Instances are created here and passed to the handlers
-const settingsManager = new SettingsManager();
+const storageManager = new StorageManager();
+const settingsManager = new SettingsManager(storageManager);
+const contentScriptManager = new ContentScriptManager(settingsManager);
+
 const deps: Deps = {
-	settingsManager
+	settingsManager,
+	contentScriptManager
 };
 
 /**

@@ -17,7 +17,6 @@ import {
 
 import type { Deps } from "../deps";
 
-const CONTENT_SCRIPT_PATH = "/content-scripts/content.js" as const;
 const OPTIONS_INIT_PATH = "/options.html?init=true" as const;
 const CENTER_DIVISOR = 2 as const;
 
@@ -29,43 +28,14 @@ const CENTER_DIVISOR = 2 as const;
  * @returns {Promise<void>} Promise resolving when initialization completes.
  */
 export async function initBackground(deps: Deps): Promise<void> {
-	if (!(await deps.settingsManager.isInit())) {
+	const installState = await deps.settingsManager.getInstallState();
+
+	if (installState === "first") {
 		// initialize settings manager with defaults and to stop this appearing again.
-		await deps.settingsManager.init();
+		await deps.settingsManager.initialize();
 
 		// inject Linkclump into windows currently open to make it just work
-		const windows = await browser.windows.getAll({ populate: true });
-		for (let i = 0; i < windows.length; i++) {
-			const win = windows[i];
-			if (!win) {
-				continue;
-			}
-
-			const numberOfTabs = win.tabs?.length;
-			if (numberOfTabs === undefined) {
-				continue;
-			}
-
-			for (let j = 0; j < numberOfTabs; j++) {
-				const tab = win.tabs?.[j];
-				const url = tab?.url;
-				const id = tab?.id;
-				if (!url || !id) {
-					continue;
-				}
-
-				if (!/^https?:\/\//.test(url)) {
-					continue;
-				}
-
-				browser.scripting.executeScript({
-					target: { tabId: id },
-					files: [ CONTENT_SCRIPT_PATH ]
-				}).catch((error) => {
-					console.warn("Failed to inject content script into tab:", { id, url, error });
-				});
-			}
-		}
+		await deps.contentScriptManager.injectIntoExistingTabs();
 
 		// pop up window to show tour and options page
 		const windowOptions: {
@@ -83,8 +53,8 @@ export async function initBackground(deps: Deps): Promise<void> {
 			windowOptions.left = Math.round(screen.width / CENTER_DIVISOR - OPTIONS_WINDOW_CENTER_OFFSET_X / CENTER_DIVISOR);
 			windowOptions.top = Math.round(screen.height / CENTER_DIVISOR - OPTIONS_WINDOW_CENTER_OFFSET_Y / CENTER_DIVISOR);
 		}
-		browser.windows.create(windowOptions);
-	} else if (!(await deps.settingsManager.isLatest())) {
-		await deps.settingsManager.update();
+		await browser.windows.create(windowOptions);
+	} else if (installState === "outdated") {
+		// TODO: implement version migration here when needed
 	}
 }

@@ -5,14 +5,13 @@
  */
 
 // WXT provided cross-browser compatible API and Types
-import { browser, type Browser } from "wxt/browser";
+import type { Browser } from "wxt/browser";
 
 import { handleActivate } from "./handleActivate";
 
 import type {
 	ActivateMessage,
-	Messages,
-	UpdateMessage
+	Messages
 } from "@/assets/js/types/Messages";
 import type { Settings } from "@/assets/js/types/Settings";
 import type { Deps } from "../deps";
@@ -39,51 +38,7 @@ export function handleRequests(
 			return deps.settingsManager.load();
 		}
 		case "update": {
-			deps.settingsManager.save(request.settings).then(async () => {
-				const windowList = await browser.windows.getAll({
-					populate: true
-				});
-				const currentSettings = await deps.settingsManager.load();
-				windowList.forEach((window) => {
-					if (!window.tabs) {
-						return;
-					}
-
-					window.tabs.forEach((tab) => {
-						if (!(tab?.id && tab?.url)) {
-							return;
-						}
-
-						const regex = /^(file|https?):\/\//i;
-						if (!regex.test(tab.url)) {
-							return;
-						}
-
-						const sendMessageToTab = browser.tabs.sendMessage(
-							tab.id,
-							{
-								message: "update",
-								settings: currentSettings
-							} as UpdateMessage
-						);
-
-						sendMessageToTab
-							.then(
-								() => {
-									// console.debug("Successfully sent update message to tab:", { tab, response });
-								}
-							)
-							.catch(
-								(error) => {
-									// When sending a message to a tab other than "http or https or file",
-									// "Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist." occurs in "background.js".
-									console.debug("Failed to send update message to tab:", { tab, error });
-								}
-							);
-					});
-				});
-			});
-
+			deps.settingsManager.save(request.settings).then(() => deps.contentScriptManager.broadcastSettingsUpdate());
 			return;
 		}
 	}
