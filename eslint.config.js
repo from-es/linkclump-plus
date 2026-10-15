@@ -162,10 +162,17 @@ export default defineConfig([
 		files: [
 			...targetFiles.typescript
 		],
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: import.meta.dirname
+			}
+		},
 		rules: {
-			"no-unused-vars": "off",                      // Disable core rule in TypeScript files in favor of @typescript-eslint/no-unused-vars
-			"@typescript-eslint/no-unused-vars": "warn",  // Warn on unused variables
-			"@typescript-eslint/no-explicit-any": "warn"  // Warn on explicit any usage
+			"no-unused-vars": "off",                           // Disable core rule in TypeScript files in favor of @typescript-eslint/no-unused-vars
+			"@typescript-eslint/no-unused-vars": "warn",       // Warn on unused variables
+			"@typescript-eslint/no-explicit-any": "warn",      // Warn on explicit any usage
+			"@typescript-eslint/no-floating-promises": "warn"  // Warn on unhandled promises
 		}
 	}
 ]);
