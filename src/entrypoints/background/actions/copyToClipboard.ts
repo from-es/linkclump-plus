@@ -13,20 +13,18 @@ import type { CopyFormat } from "@/assets/js/types/Settings";
  * Sends a message to the active tab to copy the specified text to clipboard.
  *
  * @param {string} text - Text to copy to clipboard.
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function copyToClipboard(text: string): void {
+export async function copyToClipboard(text: string): Promise<void> {
 	const queryInfo: Browser.tabs.QueryInfo = {
 		active: true,
 		currentWindow: true
 	};
-	browser.tabs.query(queryInfo)
-		.then((tabs) => {
-			const tab = tabs[0];
-			if (tab?.id) {
-				browser.tabs.sendMessage(tab.id, { message: "copyToClipboard", text: text });
-			}
-		});
+	const tabs = await browser.tabs.query(queryInfo);
+	const tab = tabs[0];
+	if (tab?.id) {
+		await browser.tabs.sendMessage(tab.id, { message: "copyToClipboard", text: text });
+	}
 }
 
 /**
@@ -61,9 +59,9 @@ export function formatLink({ url, title }: ActivateMessage["urls"][0], copyForma
  * Handles the copy action by formatting links and sending them to the clipboard.
  *
  * @param {ActivateMessage<ActivateMessage_copy>} request - Activate message for copy action.
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function handleCopyToClipboard(request: ActivateMessage<ActivateMessage_copy>): void {
+export async function handleCopyToClipboard(request: ActivateMessage<ActivateMessage_copy>): Promise<void> {
 	let text = "";
 	for (let i = 0; i < request.urls.length; i++) {
 		const urlItem = request.urls[i];
@@ -78,5 +76,5 @@ export function handleCopyToClipboard(request: ActivateMessage<ActivateMessage_c
 		text = `<ul>\n${text}</ul>\n`;
 	}
 
-	copyToClipboard(text);
+	await copyToClipboard(text);
 }

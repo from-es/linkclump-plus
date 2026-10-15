@@ -1,6 +1,8 @@
 // WXT provided cross-browser compatible API and Types
 import { browser, type Browser } from "wxt/browser";
 
+import { safeAsync } from "@/assets/js/lib/safeAsync";
+
 /**
  * Recursively opens tabs with an optional delay and automatic closing timer.
  *
@@ -47,16 +49,24 @@ export function openTab(
 		tabIndex++;
 	}
 
-	browser.tabs.create(obj).then((tab) => {
-		if (closeTime && closeTime > 0) {
-			setTimeout(
-				() => {
-					if (tab.id) {
-						browser.tabs.remove(tab.id);
-					}
-				},
-				closeTime
-			);
-		}
-	});
+	safeAsync(
+		"openTab",
+		async () => {
+			const tab = await browser.tabs.create(obj);
+
+			if (closeTime && closeTime > 0) {
+				setTimeout(
+					() => {
+						if (tab.id) {
+							browser.tabs.remove(tab.id).catch((error: unknown) => {
+								console.debug("Failed to remove auto-closing tab:", { tabId: tab.id, error });
+							});
+						}
+					},
+					closeTime
+				);
+			}
+		},
+		"background"
+	);
 }

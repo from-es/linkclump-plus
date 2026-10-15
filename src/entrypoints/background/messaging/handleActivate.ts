@@ -7,6 +7,7 @@
 // WXT provided cross-browser Types
 import { type Browser } from "wxt/browser";
 
+import { safeAsync } from "@/assets/js/lib/safeAsync";
 import { handleBookmark } from "../actions/bookmark";
 import { handleCopyToClipboard } from "../actions/copyToClipboard";
 import { handleOpenNewTabs } from "../actions/openNewTabs";
@@ -43,19 +44,19 @@ export function handleActivate(request: ActivateMessage, sender: Browser.runtime
 
 	switch (request.setting.action) {
 		case "copy": {
-			handleCopyToClipboard(request as ActivateMessage<ActivateMessage_copy>);
+			safeAsync("handleCopyToClipboard", () => handleCopyToClipboard(request as ActivateMessage<ActivateMessage_copy>), "background");
 			break;
 		}
 		case "bm": {
-			handleBookmark(request as ActivateMessage<ActivateMessage_bm>);
+			safeAsync("handleBookmark", () => handleBookmark(request as ActivateMessage<ActivateMessage_bm>), "background");
 			break;
 		}
 		case "win": {
-			handleOpenNewWin(request as ActivateMessage<ActivateMessage_win>);
+			safeAsync("handleOpenNewWin", () => handleOpenNewWin(request as ActivateMessage<ActivateMessage_win>), "background");
 			break;
 		}
 		case "tabs": {
-			handleOpenNewTabs(request as ActivateMessage<ActivateMessage_tabs>, sender);
+			safeAsync("handleOpenNewTabs", () => handleOpenNewTabs(request as ActivateMessage<ActivateMessage_tabs>, sender), "background");
 			break;
 		}
 	}
