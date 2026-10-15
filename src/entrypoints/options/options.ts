@@ -3,6 +3,7 @@ import { browser } from "wxt/browser";
 
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import { isSettings } from "@/assets/js/lib/SettingsGuard";
+import { safeAsync } from "@/assets/js/lib/safeAsync";
 import { detectOs } from "@/assets/js/lib/detectOs";
 import { detectBrowser } from "@/assets/js/lib/detectBrowser";
 
@@ -287,7 +288,7 @@ function tour3() {
 		? Information.stores.chrome
 		: Information.stores.firefox;
 
-	browser.tabs.create({ url: store.reviews, active: true });
+	safeAsync("openStoreReview", () => browser.tabs.create({ url: store.reviews, active: true }), "options");
 }
 
 /**
@@ -822,10 +823,14 @@ function save_settings() {
 		return;
 	}
 
-	browser.runtime.sendMessage({
-		message: "update",
-		settings: currentSettings
-	});
+	safeAsync(
+		"saveSettings",
+		() => browser.runtime.sendMessage({
+			message: "update",
+			settings: currentSettings
+		}),
+		"options"
+	);
 }
 
 function save_block() {
