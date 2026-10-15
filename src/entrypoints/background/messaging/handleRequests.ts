@@ -7,11 +7,14 @@
 // WXT provided cross-browser compatible API and Types
 import type { Browser } from "wxt/browser";
 
+import { safeAsync } from "@/assets/js/lib/safeAsync";
 import { handleActivate } from "./handleActivate";
+import { handleUpdateSettings } from "./handleUpdateSettings";
 
 import type {
 	ActivateMessage,
-	Messages
+	Messages,
+	UpdateMessage
 } from "@/assets/js/types/Messages";
 import type { Settings } from "@/assets/js/types/Settings";
 import type { Deps } from "../deps";
@@ -38,7 +41,7 @@ export function handleRequests(
 			return deps.settingsManager.load();
 		}
 		case "update": {
-			deps.settingsManager.save(request.settings).then(() => deps.contentScriptManager.broadcastSettingsUpdate());
+			safeAsync("handleUpdateSettings", () => handleUpdateSettings(request as UpdateMessage, deps), "background");
 			return;
 		}
 	}

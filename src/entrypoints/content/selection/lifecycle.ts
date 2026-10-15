@@ -1,6 +1,8 @@
 // WXT provided cross-browser compatible API.
 import { browser } from "wxt/browser";
 
+import { safeAsync } from "@/assets/js/lib/safeAsync";
+
 import { OS_LINUX } from "@/assets/js/constants/os";
 import {
 	MOUSE_BUTTON_LEFT,
@@ -493,24 +495,27 @@ export function scroll(): void {
 /**
  * The core hit-testing loop, called on every pointer move during a selection attempt.
  *
- * Before the box has grown past the drag threshold, does nothing but report whether that
- * threshold has now been crossed (via its return value) - once it has, calls start() to
- * actually begin the visible selection. After that, starts the auto-scroll interval if
- * needed, then walks every candidate link, showing/hiding its highlight box depending on
- * whether it now overlaps the selection box, and (when `open` is true, i.e. on release)
- * collects the overlapping links to be opened via a message to the background script.
- * "Smart select": if an "important" link (see start()) enters the box, the whole
- * selection restarts in smart mode, which only collects important links; if the last
- * important link leaves the box again, smart mode is dropped and selection restarts in
- * normal mode. In both restart cases this function returns false so callers (pointermove's
- * loop) immediately re-run it against the same coordinates under the new mode.
+ * **Drag threshold check:**
+ * Before the selection box grows past the minimum drag threshold, checks whether
+ * the threshold has been crossed. Once reached, calls `start()` to begin the visible selection.
+ *
+ * **Hit-testing and activation:**
+ * Starts the auto-scroll interval if needed, and tests each candidate link.
+ * Shows or hides each link's highlight box based on whether it overlaps the selection box.
+ * When `open` is true (pointerup / release), collects and dispatches the overlapping links
+ * to the background script.
+ *
+ * **Smart select mode:**
+ * If an "important" link enters the box, the selection restarts in smart mode (filtering
+ * to only important links). If the last important link leaves, it reverts to normal mode.
+ * In both transition cases, this function returns false so callers immediately re-run
+ * hit-testing at the same coordinates under the updated mode.
  *
  * @param {number} x - The page X coordinate to test against (also stored on `window.mouse_x`).
  * @param {number} y - The page Y coordinate to test against (also stored on `window.mouse_y`).
- * @param {boolean} open - Whether overlapping links should be collected to be opened (true on pointerup).
- * @returns {boolean} False if smart-select mode just changed and the caller should
- *   immediately re-run detect() at the same coordinates; true otherwise (including the
- *   "drag threshold not yet reached" case).
+ * @param {boolean} open - Whether overlapping links should be collected and dispatched (true on release).
+ * @returns {boolean} False if smart-select mode transitioned and the caller should
+ *   immediately re-run detect() at the same coordinates; otherwise true.
  */
 export function detect(x: number, y: number, open: boolean): boolean {
 	window.mouse_x = x;
@@ -531,7 +536,7 @@ export function detect(x: number, y: number, open: boolean): boolean {
 
 	let count = 0;
 	const count_tabs = new Set;
-	const open_tabs = [];
+	const open_tabs: ActivateMessage["urls"] = [];
 	for (const link of window.links) {
 		if (
 			(!window.smart_select || link.important)
@@ -596,11 +601,15 @@ export function detect(x: number, y: number, open: boolean): boolean {
 	window.count_label.innerText = count_tabs.size.toString();
 
 	if (open_tabs.length > 0) {
-		browser.runtime.sendMessage({
-			message: "activate",
-			urls: open_tabs,
-			setting: window.settings[window.setting]
-		} as ActivateMessage);
+		safeAsync(
+			"activate",
+			() => browser.runtime.sendMessage({
+				message: "activate",
+				urls: open_tabs,
+				setting: window.settings[window.setting]
+			} as ActivateMessage),
+			"content"
+		);
 	}
 
 	return true;

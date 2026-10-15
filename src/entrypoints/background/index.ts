@@ -1,6 +1,7 @@
 // WXT provided cross-browser compatible API
 import { browser } from "wxt/browser";
 
+import { safeAsync } from "@/assets/js/lib/safeAsync";
 import { initBackground } from "./init/initBackground";
 import { handleRequests } from "./messaging/handleRequests";
 import { ContentScriptManager } from "./scripts/ContentScriptManager";
@@ -29,10 +30,10 @@ function main(): void {
 	browser.runtime.onMessage.addListener((request: Messages, sender) => handleRequests(request, sender, deps));
 
 	browser.action.onClicked.addListener(() => {
-		browser.runtime.openOptionsPage();
+		safeAsync("openOptionsPage", () => browser.runtime.openOptionsPage(), "background");
 	});
 
-	initBackground(deps);
+	safeAsync("initBackground", () => initBackground(deps), "background");
 }
 
 export default defineBackground(

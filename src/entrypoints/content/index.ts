@@ -99,6 +99,8 @@ function main(): void {
 				window.addEventListener("touchmove", touchmove, { capture: true, passive: false });
 			}
 		}
+	}).catch((error: unknown) => {
+		console.error("[content] Failed to initialize:", error);
 	});
 
 	browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
