@@ -52,9 +52,9 @@ function main(): void {
 		{
 			message: "init"
 		} as InitMessage
-	).then((response: InitResponse | null) => {
-		if (response === null) {
-			console.error("Failed to initialize: received null response from background.");
+	).then((response: InitResponse | null | undefined) => {
+		if (!response) {
+			console.error("Failed to initialize: received an empty response from background.");
 		} else {
 			if (Object.hasOwn(response, "error")) {
 				console.warn("Failed to load settings, falling back to default settings:", response);

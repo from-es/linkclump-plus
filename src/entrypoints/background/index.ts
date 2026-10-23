@@ -27,7 +27,7 @@ const deps: Deps = {
  * @returns {void}
  */
 function main(): void {
-	browser.runtime.onMessage.addListener((request: Messages, sender) => handleRequests(request, sender, deps));
+	browser.runtime.onMessage.addListener((request: Messages, sender, sendResponse) => handleRequests(request, sender, sendResponse, deps));
 
 	browser.action.onClicked.addListener(() => {
 		safeAsync("openOptionsPage", () => browser.runtime.openOptionsPage(), "background");
