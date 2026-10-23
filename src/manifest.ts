@@ -89,18 +89,29 @@ export const manifest: UserManifest = {
 		"service_worker": "/background.js",
 		"type": "module"
 	},
-	"content_scripts": [
-		{
-			"matches": [
-				"<all_urls>"
-			],
-			"all_frames": true,
-			"run_at": "document_idle",
-			"js": [
-				"/content-scripts/content.js"
-			]
-		}
-	],
+	/**
+	 * Notes: The "content_scripts" definition is intentionally commented out.
+	 *
+	 * WXT automatically generates the "content_scripts" entry in manifest.json from
+	 * `defineContentScript()` in `src/entrypoints/content/index.ts`. If an entry is also defined
+	 * here, WXT will not merge them, resulting in duplicate entries for
+	 * `content-scripts/content.js` in the built manifest.json.
+	 *
+	 * The commented-out block below is kept solely to document the content script's configuration;
+	 * the actual active definition and settings reside in `src/entrypoints/content/index.ts`.
+	 */
+	// "content_scripts": [
+	// 	{
+	// 		"matches": [
+	// 			"<all_urls>"
+	// 		],
+	// 		"all_frames": true,
+	// 		"run_at": "document_idle",
+	// 		"js": [
+	// 			"/content-scripts/content.js"
+	// 		]
+	// 	}
+	// ],
 	"options_ui": {
 		"open_in_tab": true,
 		"page": "/options.html"

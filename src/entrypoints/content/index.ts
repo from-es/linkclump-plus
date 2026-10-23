@@ -28,16 +28,14 @@ import type {
 // Content Scripts (https://wxt.dev/guide/essentials/entrypoints.html#content-scripts)
 export default defineContentScript(
 	{
-		// Notes: content scripts (content.js) are called twice
-		//
-		// When building with WXT,
-		// specifying "run_at": "document_end" in the "content_scripts" of the manifest causes the content scripts to be called twice.
-		//
-		// Notes: Error during build if ‘matches: [’<all_urls>‘]’ is not specified within defineContentScript() in content.js
-		//
-		// ERROR  Entrypoint validation failed: 1 error, 0 warnings
-		// src\entrypoints\content.js	- ERROR matches is required (recieved: undefined)
+		// Required by WXT / WebExtensions manifest: matches must specify URL patterns
 		matches: [ "<all_urls>" ],
+
+		// Run in all frames (including iframes) to detect embedded links
+		allFrames: true,
+
+		// Execute after the page has finished loading (same as manifest default)
+		runAt: "document_idle",
 
 		// Executed when content script is loaded, can be async
 		main
