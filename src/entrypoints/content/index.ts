@@ -1,24 +1,8 @@
 // WXT provided cross-browser compatible API.
 import { browser } from "wxt/browser";
 
-import { CUSTOM_TAG_LINKCLUMP } from "@/assets/js/constants/ui";
 import { detectOs } from "@/assets/js/lib/detectOs";
-
-import {
-	createBox,
-	createCountLabel,
-	createCustomElement
-} from "./dom/selectionBox";
-import {
-	blur,
-	keydown,
-	keyup
-} from "./keyboard/keyState";
-import {
-	contextmenu,
-	pointerdown,
-	touchmove
-} from "./pointer/pointerEvents";
+import { applySettings } from "./settings/applySettings";
 
 import type {
 	InitMessage,
@@ -60,42 +44,7 @@ function main(): void {
 				console.warn("Failed to load settings, falling back to default settings:", response);
 			}
 
-			window.settings = response.actions;
-
-			let allowed = true;
-			for (const blocked of response.blocked) {
-				if (!blocked || !blocked.match(/\S/g)) {
-					continue;
-				}
-				const re = new RegExp(blocked, "i");
-
-				if (re.test(window.location.href)) {
-					allowed = false;
-					console.info("Blocked on this site by matching pattern:", { pattern: blocked, url: window.location.href });
-				}
-			}
-
-			if (allowed) {
-				// setting up the box and count label
-				window.linkclump = createCustomElement(CUSTOM_TAG_LINKCLUMP);
-				window.linkclump.style.pointerEvents = "none";
-				window.linkclump.style.touchAction = "none";
-				window.box = createBox();
-				window.count_label = createCountLabel();
-
-				(window.linkclump).appendChild(window.box);
-				(window.linkclump).appendChild(window.count_label);
-				(document.body).appendChild(window.linkclump);
-
-				// add event listeners
-				window.addEventListener("pointerdown", pointerdown, true);
-				window.addEventListener("keydown", keydown, true);
-				window.addEventListener("keyup", keyup, true);
-				window.addEventListener("blur", blur, true);
-				window.addEventListener("contextmenu", contextmenu, true);
-				// non-passive: required to cancel native panning once the touch hold is confirmed
-				window.addEventListener("touchmove", touchmove, { capture: true, passive: false });
-			}
+			applySettings(response);
 		}
 	}).catch((error: unknown) => {
 		console.error("[content] Failed to initialize:", error);
@@ -103,7 +52,7 @@ function main(): void {
 
 	browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		if (request.message === "update") {
-			window.settings = request.settings.actions;
+			applySettings(request.settings);
 
 			sendResponse("Update settings of content.js.");
 		}
