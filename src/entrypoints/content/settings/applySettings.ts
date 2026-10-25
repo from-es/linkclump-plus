@@ -38,7 +38,7 @@ let listenerController: AbortController | null = null;
 export function applySettings(settings: Pick<Settings, "actions" | "blocked">): void {
 	window.settings = settings.actions;
 
-	if (isBlockedUrl(settings.blocked, window.location.href)) {
+	if (isBlockedUrl(settings.blocked ?? [], window.location.href)) {
 		disableContentScript();
 	} else {
 		enableContentScript();

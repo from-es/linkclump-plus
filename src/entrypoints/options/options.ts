@@ -4,6 +4,10 @@ import { browser } from "wxt/browser";
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import { isSettings } from "@/assets/js/lib/SettingsGuard";
 import { safeAsync } from "@/assets/js/lib/safeAsync";
+import {
+	findInvalidPattern,
+	getRegExpError
+} from "@/assets/js/lib/regexp";
 import { detectOs } from "@/assets/js/lib/detectOs";
 import { detectBrowser } from "@/assets/js/lib/detectBrowser";
 
@@ -252,6 +256,7 @@ function initEvent() {
 		setup_text(keys);
 
 		$("#form_block").val((currentSettings.blocked || []).join("\n"));
+		check_block(currentSettings.blocked || [], "Ignored:");
 
 		if (isFirstTime) {
 			tour1();
@@ -357,6 +362,7 @@ function load_action(id: string | null) {  // into form
 
 	// hide warning and let it show later if required
 	$(".warning").hide();
+	$("#form_error").hide();
 
 	// place the form at the top of the window+10
 	$(".form").css("margin-top", ($(window).scrollTop() ?? 0) + 10);
@@ -771,6 +777,16 @@ function save_action(event: Event | JQuery.TriggeredEvent) {
 				if (ignore.length > 0 && ignore[ignore.length - 1] === "") {
 					ignore.pop();
 				}
+
+				// the words are used as regular expressions, so refuse to save invalid ones
+				const words = ignore.map(String);
+				const invalidWord = findInvalidPattern(words);
+				const combinedError = invalidWord === null && words.length > 0 ? getRegExpError(words.join("|")) : null;
+				if (invalidWord !== null || combinedError !== null) {
+					const detail = invalidWord !== null ? `"${invalidWord.pattern}" is not a valid regular expression: ${invalidWord.message}` : `the words cannot be combined into one regular expression: ${combinedError}`;
+					$("#form_error").text(`Not saved: in "filter links", ${detail}`).show();
+					return;
+				}
 				const selVal = Number($(`#form_option_selection_${name}`).val() ?? 0);
 				ignore.unshift(selVal);
 
@@ -833,6 +849,25 @@ function save_settings() {
 	);
 }
 
+/**
+ * Shows (or hides) the message about invalid regular expressions below the blocklist.
+ *
+ * @param {readonly string[]} sites - Lines of the blocklist.
+ * @param {string} prefix - Text that starts the message, e.g. what happens to the list.
+ * @returns {boolean} True if every pattern is valid.
+ */
+function check_block(sites: readonly string[], prefix: string): boolean {
+	const invalid = findInvalidPattern(sites);
+
+	if (invalid === null) {
+		$("#block_error").hide().text("");
+		return true;
+	}
+
+	$("#block_error").text(`${prefix} "${invalid.pattern}" is not a valid regular expression: ${invalid.message}`).show();
+	return false;
+}
+
 function save_block() {
 	if (!currentSettings) {
 		return;
@@ -841,6 +876,12 @@ function save_block() {
 	// replace any whitespace at end to stop empty site listings
 	const rawSites = String($("#form_block").val() ?? "");
 	const sites = rawSites.replace(/^\s+|\s+$/g, "").split("\n");
+
+	// every line is used as a regular expression; keep the previously saved list while an
+	// invalid pattern is being typed
+	if (!check_block(sites, "Not saved:")) {
+		return;
+	}
 
 	if (Array.isArray(sites)) {
 		currentSettings.blocked = sites;

@@ -1,6 +1,7 @@
 // WXT provided cross-browser compatible API.
 import { browser } from "wxt/browser";
 
+import { createRegExp } from "@/assets/js/lib/regexp";
 import { safeAsync } from "@/assets/js/lib/safeAsync";
 
 import { OS_LINUX } from "@/assets/js/constants/os";
@@ -301,6 +302,18 @@ export function start(): void {
 		return;
 	}
 
+	// create RegExp once. This is done before the page is touched: the filter words are user
+	// input and may not form a valid expression. An invalid filter selects no links, instead of
+	// throwing in the middle of the setup and leaving the page with text selection turned off.
+	const re1 = /^javascript:/i;
+	const ignoreList = selectedAction.options?.ignore ?? [];
+	const re2 = ignoreList.length > 1 ? createRegExp(ignoreList.slice(1).join("|")) : null;
+	const filterIsInvalid = ignoreList.length > 1 && re2 === null;
+	if (filterIsInvalid) {
+		console.error("The filter words are not a valid regular expression, so no links are selected:", ignoreList.slice(1));
+	}
+	const re3 = /^H\d$/i;
+
 	// stop user from selecting text/elements
 	document.body.style.userSelect = "none";
 
@@ -309,14 +322,7 @@ export function start(): void {
 	window.count_label.style.visibility = "visible";
 
 	// find all links (find them each time as they could have moved)
-	const page_links = document.links;
-
-
-	// create RegExp once
-	const re1 = /^javascript:/i;
-	const ignoreList = selectedAction.options?.ignore ?? [];
-	const re2 = new RegExp(ignoreList.slice(1).join("|"), "i");
-	const re3 = /^H\d$/i;
+	const page_links: ArrayLike<HTMLAnchorElement | HTMLAreaElement> = filterIsInvalid ? [] : document.links;
 
 	for (let i = 0; i < page_links.length; i++) {
 		const rawLink = page_links[i];
@@ -335,7 +341,7 @@ export function start(): void {
 		}
 
 		// include/exclude links
-		if (ignoreList.length > 1) {
+		if (re2 !== null) {
 			if (re2.test(rawLink.href) || re2.test(rawLink.innerHTML)) {
 				if (Number(ignoreList[0]) === FILTER_EXCLUDE_LINKS) {
 					continue;
