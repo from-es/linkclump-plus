@@ -30,3 +30,13 @@ export const BOOKMARK_CHROME_OTHER_ID = "2" as const;
 export const BOOKMARK_FIREFOX_MENU_GUID = "menu________" as const;
 export const BOOKMARK_FIREFOX_UNFILED_GUID = "unfiled_____" as const;
 export const BOOKMARK_FIREFOX_TOOLBAR_GUID = "toolbar_____" as const;
+
+/**
+ * Fallback name for the parent bookmark folder when manifest name is unavailable.
+ */
+export const BOOKMARK_PARENT_FOLDER_FALLBACK_NAME = "Collected Links" as const;
+
+/**
+ * Web Locks lock name for bookmark operation serialization (parent/subfolder creation and link additions).
+ */
+export const BOOKMARK_CREATION_LOCK_NAME = "Linkclump Plus: Action Bookmarked" as const;

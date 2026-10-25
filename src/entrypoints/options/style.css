@@ -287,6 +287,21 @@ button:hover.button {
 	border-radius: 0.25rem;
 }
 
+/* [Blocklist] */
+.blocklist-guide {
+	margin: 0.5rem 1rem 0.5rem 1rem;
+	font-size: 0.9em;
+	color: #333;
+	line-height: 1.5;
+}
+
+.blocklist-guide code {
+	background-color: #f0f0f0;
+	padding: 0.1rem 0.3rem;
+	border-radius: 0.2rem;
+	font-size: 0.95em;
+}
+
 /* [Blocklist] >> <textarea> */
 #form_block {
 	margin: 0 1rem 1rem;
@@ -437,6 +452,14 @@ button:hover.button {
 	padding: 0.5rem;
 }
 
+.error-message {
+	display: none;
+	margin: 0 0.5rem 0;
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.25rem;
+	color: #ffffff;
+	background-color: #ED2E01;
+}
 
 /*
 	id="form_options" > p

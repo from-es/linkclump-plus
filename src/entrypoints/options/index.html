@@ -56,9 +56,16 @@
 		<div id="block" class="info-box">
 			<h2>Blocklist</h2>
 
-			<p>To stop "Linkclump Plus" on certain sites, please list the URLs below (one per line).</p>
+			<p>To stop "Linkclump Plus" on certain sites, list the domains or URLs below (one per line):</p>
 
-			<textarea id="form_block"></textarea>
+			<ul class="blocklist-guide">
+				<li><code>example.com</code> — Blocks all pages and subdomains on this site. <b>Do not use wildcards (e.g. <code>*.example.com</code>).</b></li>
+				<li><code>mail.google.com</code> — Blocks only this specific subdomain.</li>
+				<li><code>example.com/editor/</code> — Blocks only pages under <code>/editor/</code> (the rest of the site / top URL remains active).</li>
+			</ul>
+
+			<textarea id="form_block" placeholder="example.com&#10;mail.google.com&#10;example.com/editor/"></textarea>
+			<div id="block_error" class="error-message"></div>
 		</div>
 
 		<div id="files" class="info-box">
@@ -196,6 +203,7 @@
 
 			<div id="form_options"></div>
 			<div id="form_extra"></div>
+			<div id="form_error" class="error-message"></div>
 
 			<div class="buttons-side-by-side">
 				<button id="cancel" class="button cancel">Cancel</button>
