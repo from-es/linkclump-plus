@@ -33,6 +33,8 @@
 	--width-size-form: clamp(720px, calc(50rem * 0.9), 1920px);
 
 	--img-background-image: url("/img/background.png");
+	--warning-no-actions: "No actions are configured. Please click \"Add Action\" below to create at least one action.";
+	--warning-no-actions-test: "No actions are currently configured. Please click the \"Options\" button below and add at least one action to test Linkclump Plus.";
 }
 
 *:not(img) {
@@ -450,6 +452,29 @@ button:hover.button {
 	background-color: #ED2E01;
 	display: none;
 	padding: 0.5rem;
+}
+
+#settings:empty::before {
+	content: var(--warning-no-actions);
+	display: block;
+	margin: 0.5rem 0;
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.25rem;
+	color: #fff;
+	background-color: #ff8c00;
+}
+
+.warning-no-actions {
+	display: none;
+	margin: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.25rem;
+	color: #fff;
+	background-color: #ff8c00;
+}
+
+.warning-no-actions::before {
+	content: var(--warning-no-actions-test);
 }
 
 .error-message {
