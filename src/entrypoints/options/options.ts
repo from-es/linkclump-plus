@@ -562,9 +562,15 @@ function setup_text(keys: Record<number, string>) {
 		actionSetting = currentSettings.actions[i];
 		break;
 	}
+
 	if (actionSetting === undefined) {
+		$("#guide_instruction").hide();
+		$("#guide_no_actions").show();
 		return;
 	}
+	$("#guide_no_actions").hide();
+	$("#guide_instruction").show();
+
 	const trigger = optionsSchema.triggers[actionSetting.mouse];
 	const actionDef = optionsSchema.actions[actionSetting.action];
 	if (trigger) {

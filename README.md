@@ -1,7 +1,7 @@
 # Linkclump Plus
 
 <!-- badge -->
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/from-es/linkclump-plus)
+[![Ask DeepWiki](./material/deepwiki/badge.svg)](https://deepwiki.com/from-es/linkclump-plus)
 
 ## About
 
