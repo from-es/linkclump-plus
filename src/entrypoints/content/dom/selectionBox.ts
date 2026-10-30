@@ -197,7 +197,7 @@ export function getXY(element: HTMLElement): { x: number, y: number } {
 		}
 	} while (parent);
 
-	let scrollParent: Element | null = element;
+	let scrollParent: Element | null = element.parentElement;
 	while (scrollParent && scrollParent !== document.body) {
 		if (scrollParent.scrollLeft) {
 			x -= scrollParent.scrollLeft;
