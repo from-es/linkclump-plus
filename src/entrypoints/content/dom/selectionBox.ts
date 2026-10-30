@@ -79,7 +79,7 @@ export function createCountLabel(): HTMLElement {
 
 	window.count_label.style.lineHeight = `${base * 1}px`;
 	window.count_label.style.fontSize = `${base * 1}px`;
-	window.count_label.style.font = "Arial, sans-serif";
+	window.count_label.style.fontFamily = "Arial, sans-serif";
 	window.count_label.style.fontWeight = COUNTER_FONT_WEIGHT_DEFAULT.toString();
 
 	window.count_label.style.color = "black";
