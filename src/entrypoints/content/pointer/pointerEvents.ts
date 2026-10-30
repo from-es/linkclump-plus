@@ -101,7 +101,7 @@ export function pointerdown(event: PointerEvent): void {
 		};
 
 		const cancelTouchOnMove = (moveEvent: PointerEvent) => {
-			if (shouldCancelOnMove(getArmedTouchHold(), pointerId, moveEvent.pageX, moveEvent.pageY, DRAG_THRESHOLD_MIN_PX)) {
+			if (shouldCancelOnMove(getArmedTouchHold(), moveEvent.pointerId, moveEvent.pageX, moveEvent.pageY, DRAG_THRESHOLD_MIN_PX)) {
 				cancelTouchOnEnd();
 			}
 		};
