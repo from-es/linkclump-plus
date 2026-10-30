@@ -704,7 +704,8 @@ function displayOptions(action: string) {
 	}
 }
 
-function displayKeys(mouseButton: number): Record<number, string> {
+export function displayKeys(mouseButton: number, osOverride?: OsType): Record<number, string> {
+	const currentOs = osOverride ?? os;
 	const key = $("#form_key");
 	key.empty();
 	const keys: Record<number, string> = [];
@@ -712,18 +713,18 @@ function displayKeys(mouseButton: number): Record<number, string> {
 	keys[KEY_CODE_SHIFT] = "shift";
 	keys[KEY_CODE_CTRL] = "ctrl";
 
-	if (os !== OS_LINUX) {
+	if (currentOs !== OS_LINUX) {
 		keys[KEY_CODE_ALT] = "alt";
 	}
 
-	if (os === OS_MAC) {
+	if (currentOs === OS_MAC) {
 		keys[KEY_CODE_META] = "cmd";
 	}
 
 	// if not left or windows then allow no key
 	// NOTE mouseButton is sometimes a string, sometimes an int
 	const mb = (typeof mouseButton === "string") ? Number.parseInt(mouseButton, 10) : mouseButton;
-	if (mb !== MOUSE_BUTTON_RIGHT || os === OS_WIN) {
+	if (mb !== MOUSE_BUTTON_RIGHT || currentOs === OS_WIN) {
 		keys[KEY_CODE_NONE] = "";
 	}
 
