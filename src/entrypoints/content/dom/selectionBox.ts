@@ -15,7 +15,7 @@ import {
  */
 export function createCustomElement(tagName: string, options?: ElementCreationOptions): HTMLElement {
 	if (!tagName || typeof tagName !== "string") {
-		throw (`Error, Invalid value passed to createCustomElement(tagName). tagName >> ${tagName}`);
+		throw new TypeError(`Invalid value passed to createCustomElement(tagName). tagName >> ${String(tagName)}`);
 	}
 
 	const custom = document.createElement(tagName, options);
@@ -79,7 +79,7 @@ export function createCountLabel(): HTMLElement {
 
 	window.count_label.style.lineHeight = `${base * 1}px`;
 	window.count_label.style.fontSize = `${base * 1}px`;
-	window.count_label.style.font = "Arial, sans-serif";
+	window.count_label.style.fontFamily = "Arial, sans-serif";
 	window.count_label.style.fontWeight = COUNTER_FONT_WEIGHT_DEFAULT.toString();
 
 	window.count_label.style.color = "black";
@@ -197,7 +197,7 @@ export function getXY(element: HTMLElement): { x: number, y: number } {
 		}
 	} while (parent);
 
-	let scrollParent: Element | null = element;
+	let scrollParent: Element | null = element.parentElement;
 	while (scrollParent && scrollParent !== document.body) {
 		if (scrollParent.scrollLeft) {
 			x -= scrollParent.scrollLeft;

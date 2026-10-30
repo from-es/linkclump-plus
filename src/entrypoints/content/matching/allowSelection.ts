@@ -15,7 +15,6 @@ import {
 	KEY_CODE_META
 } from "@/assets/js/constants/keyboard";
 import {
-	COUNTER_FONT_SIZE_DEFAULT,
 	COUNTER_FONT_SIZE_MIN,
 	COUNTER_FONT_SIZE_MAX,
 	COUNTER_FONT_WEIGHT_MIN,
@@ -134,9 +133,9 @@ export function allowSelection(event?: PointerEvent): boolean {
 						window.count_label.style.backgroundColor = "transparent";
 					}
 				}
-				if (setting?.options?.fontsizeofcounter && (typeof setting.options.fontsizeofcounter === "number")) {
-					const num = setting.options.fontsizeofcounter;
-					const base = num || COUNTER_FONT_SIZE_DEFAULT;
+				const size = setting?.options?.fontsizeofcounter;
+				if (typeof size === "number" && (COUNTER_FONT_SIZE_MIN <= size && size <= COUNTER_FONT_SIZE_MAX)) {
+					const base = size;
 
 					window.count_label.style.fontSize = `${base * 1}px`;
 					window.count_label.style.lineHeight = `${base * 1}px`;
@@ -144,15 +143,14 @@ export function allowSelection(event?: PointerEvent): boolean {
 					window.count_label.style.padding = `${base * 0.50}px`;
 					window.count_label.style.borderWidth = `${base * 0.25}px`;
 					window.count_label.style.borderRadius = `${base * 0.50}px`;
-				} else {
-					console.warn(`Invalid fontsizeofcounter value (expected number between ${COUNTER_FONT_SIZE_MIN} and ${COUNTER_FONT_SIZE_MAX}):`, setting.options.fontsizeofcounter);
+				} else if (size !== undefined) {
+					console.warn(`Invalid fontsizeofcounter value (expected number between ${COUNTER_FONT_SIZE_MIN} and ${COUNTER_FONT_SIZE_MAX}):`, size);
 				}
-				if (setting?.options?.fontweightofcounter && (typeof setting.options.fontweightofcounter === "number") && (COUNTER_FONT_WEIGHT_MIN <= setting.options.fontweightofcounter && setting.options.fontweightofcounter <= COUNTER_FONT_WEIGHT_MAX)) {
-					const weight = setting.options.fontweightofcounter;
-
+				const weight = setting?.options?.fontweightofcounter;
+				if (typeof weight === "number" && (COUNTER_FONT_WEIGHT_MIN <= weight && weight <= COUNTER_FONT_WEIGHT_MAX)) {
 					window.count_label.style.fontWeight = weight.toString();
-				} else {
-					console.warn(`Invalid fontweightofcounter value (expected number between ${COUNTER_FONT_WEIGHT_MIN} and ${COUNTER_FONT_WEIGHT_MAX}):`, setting.options.fontweightofcounter);
+				} else if (weight !== undefined) {
+					console.warn(`Invalid fontweightofcounter value (expected number between ${COUNTER_FONT_WEIGHT_MIN} and ${COUNTER_FONT_WEIGHT_MAX}):`, weight);
 				}
 			}
 
