@@ -15,7 +15,7 @@ import {
  */
 export function createCustomElement(tagName: string, options?: ElementCreationOptions): HTMLElement {
 	if (!tagName || typeof tagName !== "string") {
-		throw (`Error, Invalid value passed to createCustomElement(tagName). tagName >> ${tagName}`);
+		throw new TypeError(`Invalid value passed to createCustomElement(tagName). tagName >> ${String(tagName)}`);
 	}
 
 	const custom = document.createElement(tagName, options);
