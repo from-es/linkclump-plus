@@ -151,7 +151,11 @@ export function pointerup(event: PointerEvent): void {
 		if (allowSelection(event) && window.timer === 0) {
 			window.timer = setTimeout(function () {
 				updateBox(event.pageX, event.pageY);
-				detect(event.pageX, event.pageY, true);
+
+				// smart selection mode may change; re-run at the same coordinates (same as pointermove)
+				while (!detect(event.pageX, event.pageY, true)) {
+					// empty
+				}
 
 				stop();
 				window.timer = 0;
