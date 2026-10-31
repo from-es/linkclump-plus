@@ -62,9 +62,8 @@ const testData = {
 
 describe("handleOpenNewWin", () => {
 	beforeEach(() => {
-		// Arrange: Current window #1; the newly created window is #2
+		// Arrange: Sender window #1; the newly created window is #2
 		vi.clearAllMocks();
-		vi.mocked(browser.windows.getCurrent).mockResolvedValue({ id: 1 } as never);
 		vi.mocked(browser.windows.create).mockResolvedValue({ id: 2 } as never);
 		vi.mocked(browser.windows.update).mockResolvedValue({} as never);
 		vi.mocked(browser.tabs.create).mockResolvedValue({ id: 100 } as never);
@@ -78,7 +77,7 @@ describe("handleOpenNewWin", () => {
 				setting: { action: "win", options }
 			} as IntentionalAnyForValidation as ActivateMessage<never>;
 
-			await handleOpenNewWin(request);
+			await handleOpenNewWin(request, { tab: { windowId: 1 } } as IntentionalAnyForValidation);
 
 			return {
 				windows: vi.mocked(browser.windows.create).mock.calls.map(([ properties ]) => properties),

@@ -52,7 +52,7 @@ export function handleActivate(request: ActivateMessage, sender: Browser.runtime
 			break;
 		}
 		case "win": {
-			safeAsync("handleOpenNewWin", () => handleOpenNewWin(request as ActivateMessage<ActivateMessage_win>), "background");
+			safeAsync("handleOpenNewWin", () => handleOpenNewWin(request as ActivateMessage<ActivateMessage_win>, sender), "background");
 			break;
 		}
 		case "tabs": {

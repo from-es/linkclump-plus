@@ -59,8 +59,7 @@ describe("handleOpenNewTabs", () => {
 	beforeEach(() => {
 		// Arrange: The sender tab is #10 at index 3 in window #7
 		vi.clearAllMocks();
-		vi.mocked(browser.tabs.get).mockResolvedValue({ id: 10, index: 3 } as never);
-		vi.mocked(browser.windows.getCurrent).mockResolvedValue({ id: 7 } as never);
+		vi.mocked(browser.tabs.get).mockResolvedValue({ id: 10, index: 3, windowId: 7 } as never);
 		vi.mocked(browser.tabs.create).mockResolvedValue({ id: 100 } as never);
 	});
 
