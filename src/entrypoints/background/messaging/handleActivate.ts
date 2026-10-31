@@ -44,7 +44,7 @@ export function handleActivate(request: ActivateMessage, sender: Browser.runtime
 
 	switch (request.setting.action) {
 		case "copy": {
-			safeAsync("handleCopyToClipboard", () => handleCopyToClipboard(request as ActivateMessage<ActivateMessage_copy>), "background");
+			safeAsync("handleCopyToClipboard", () => handleCopyToClipboard(request as ActivateMessage<ActivateMessage_copy>, sender), "background");
 			break;
 		}
 		case "bm": {
