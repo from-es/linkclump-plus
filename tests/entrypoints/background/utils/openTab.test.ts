@@ -78,6 +78,16 @@ const testData = {
 			name: "should not close the opened tab before closeTime elapses",
 			input: { urls: [ "https://a.example" ], delay: 0, windowId: 1, closeTime: 3000, advanceMs: 2999 },
 			expected: { created: [ { windowId: 1, url: "https://a.example", active: false, openerTabId: undefined } ], removed: [] }
+		},
+		{
+			name: "should do nothing when the list is empty",
+			input: { urls: [], delay: 1000, advanceMs: 2000 },
+			expected: { created: [], removed: [] }
+		},
+		{
+			name: "should skip entries without a URL and handle the rest immediately",
+			input: { urls: [ "", "https://b.example" ], delay: 1000, advanceMs: 0 },
+			expected: { created: [ { windowId: undefined, url: "https://b.example", active: false } ], removed: [] }
 		}
 	]
 } as const satisfies Record<string, readonly TestCase<Input>[]>;
