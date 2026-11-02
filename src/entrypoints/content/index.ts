@@ -2,8 +2,9 @@
 import { browser } from "wxt/browser";
 
 import { detectOs } from "@/assets/js/lib/detectOs";
-import { applySettings } from "./settings/applySettings";
+import { applySettings, initContentScriptContext } from "./settings/applySettings";
 
+import type { ContentScriptContext } from "wxt/utils/content-script-context";
 import type {
 	InitMessage,
 	InitResponse
@@ -29,9 +30,12 @@ export default defineContentScript(
 /**
  * The content script's entry point (passed to `defineContentScript`).
  *
+ * @param {ContentScriptContext} ctx - Content script context provided by WXT.
  * @returns {void}
  */
-function main(): void {
+function main(ctx: ContentScriptContext): void {
+	initContentScriptContext(ctx);
+
 	browser.runtime.sendMessage(
 		{
 			message: "init"
