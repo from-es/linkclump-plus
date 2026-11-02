@@ -6,6 +6,10 @@
  * pointer capture release, and event suppression.
  * The matching, box geometry and touch hold modules are mocked; they have their own tests.
  *
+ * The click that follows a release is swallowed (suppressNextClick), so pressing on a link, dragging and releasing
+ * does not activate that link; jsdom has no pointer-capture retargeting, so this verifies the handler contract
+ * only and the browser behavior is covered by the manual page under `tests/page/click-after-release/`.
+ *
  * Standard `it` block is used for the fixed defect verification section instead of `TestRunner` on purpose:
  * it verifies the integration behavior of the `pointerup()` bounce timer retry loop and message dispatch
  * when smart selection mode toggles at the release coordinates.
@@ -20,10 +24,10 @@
 
 import { describe, it, afterEach, beforeEach, expect, vi } from "vitest";
 import { browser } from "wxt/browser";
-import { pointercancel, pointermove, pointerout, pointerup, preventEscalation, wheel } from "@/entrypoints/content/selection/lifecycle";
+import { pointercancel, pointermove, pointerout, pointerup, preventEscalation, suppressNextClick, wheel } from "@/entrypoints/content/selection/lifecycle";
 import { allowSelection } from "@/entrypoints/content/matching/allowSelection";
 import { updateBox } from "@/entrypoints/content/dom/selectionBox";
-import { MOUSEUP_BOUNCE_TIMEOUT_MS } from "@/assets/js/constants/timing";
+import { CLICK_SUPPRESS_TIMEOUT_MS, MOUSEUP_BOUNCE_TIMEOUT_MS } from "@/assets/js/constants/timing";
 import { resetContentWindow } from "../../../shared/support/contentWindow";
 import { TestRunner, type TestCase } from "../../../shared/support/TestRunner";
 import { type IntentionalAnyForValidation } from "../../../shared/types";
@@ -51,6 +55,21 @@ interface UpInput {
 	readonly boxOn: boolean;
 	/** `window.timer` before the event (non-zero = a bounce timer is already pending). */
 	readonly timer?: number;
+}
+
+interface ClickInput {
+	/** Event types dispatched, in order, on an element inside the page. */
+	readonly events: readonly string[];
+	/** Milliseconds advanced between suppressNextClick() and the first event (`null` = dispatched at once). */
+	readonly elapsedMs: number | null;
+}
+
+/** Observed result of one dispatched click-like event. */
+interface ClickResult {
+	/** True when the default action was cancelled. */
+	readonly prevented: boolean;
+	/** True when the event propagated down to the page (was not stopped at `window`). */
+	readonly reached: boolean;
 }
 
 const BODY_LOCKED = "none";
@@ -138,6 +157,29 @@ const testData = {
 			expected: { boxUpdates: [ [ 30, 40 ] ], stopped: true, timerReset: true }
 		}
 	],
+	suppressCases: [
+		{ name: "should cancel the click that follows the release", input: { events: [ "click" ], elapsedMs: null }, expected: [ { prevented: true, reached: false } ] },
+		{ name: "should cancel the auxclick that follows the release", input: { events: [ "auxclick" ], elapsedMs: null }, expected: [ { prevented: true, reached: false } ] },
+		{
+			name: "should cancel only the first click",
+			input: { events: [ "click", "click" ], elapsedMs: null },
+			expected: [ { prevented: true, reached: false }, { prevented: false, reached: true } ]
+		},
+		{
+			name: "should still cancel a click arriving just before the timeout elapses",
+			input: { events: [ "click" ], elapsedMs: CLICK_SUPPRESS_TIMEOUT_MS - 1 },
+			expected: [ { prevented: true, reached: false } ]
+		},
+		{
+			name: "should not touch a click that arrives after the timeout elapses",
+			input: { events: [ "click" ], elapsedMs: CLICK_SUPPRESS_TIMEOUT_MS },
+			expected: [ { prevented: false, reached: true } ]
+		}
+	],
+	upClickCases: [
+		{ name: "should cancel the following click when a selection box was shown", input: { boxOn: true }, expected: true },
+		{ name: "should leave the following click alone on a false alarm (no selection box)", input: { boxOn: false }, expected: false }
+	],
 	captureCases: [
 		{ name: "should release the pointer capture held by the target", input: { hasCapture: true, throws: false }, expected: 1 },
 		{ name: "should not release a capture the target does not hold", input: { hasCapture: false, throws: false }, expected: 0 },
@@ -173,6 +215,38 @@ function wasStopped(): boolean {
 	return document.body.style.userSelect === "";
 }
 
+/**
+ * Dispatches click-like events on a fresh element inside the page and reports what happened to each.
+ *
+ * @param {readonly string[]} types - Event types to dispatch, in order.
+ * @returns {ClickResult[]} One result per dispatched event.
+ */
+function dispatchOnPage(types: readonly string[]): ClickResult[] {
+	const target = document.createElement("a");
+	document.body.append(target);
+
+	let reached = false;
+	const markReached = (): void => {
+		reached = true;
+	};
+	document.addEventListener("click", markReached);
+	document.addEventListener("auxclick", markReached);
+
+	const results = types.map((type) => {
+		reached = false;
+		const event = new MouseEvent(type, { bubbles: true, cancelable: true });
+
+		target.dispatchEvent(event);
+
+		return { prevented: event.defaultPrevented, reached };
+	});
+
+	document.removeEventListener("click", markReached);
+	document.removeEventListener("auxclick", markReached);
+
+	return results;
+}
+
 describe("selection pointer handlers", () => {
 	beforeEach(() => {
 		// Arrange: Idle window state; the page is "locked" for text selection like during a real selection
@@ -184,6 +258,8 @@ describe("selection pointer handlers", () => {
 	});
 
 	afterEach(() => {
+		// release the one-shot click listeners (CLICK_SUPPRESS_TIMEOUT_MS only; bounce timers stay pending)
+		vi.advanceTimersByTime(CLICK_SUPPRESS_TIMEOUT_MS);
 		vi.useRealTimers();
 	});
 
@@ -248,6 +324,17 @@ describe("selection pointer handlers", () => {
 		}, { matcher: "toBe" });
 	});
 
+	describe("suppressNextClick", () => {
+		TestRunner.success(testData.suppressCases, undefined, ({ events, elapsedMs }: ClickInput) => {
+			suppressNextClick();
+			if (elapsedMs !== null) {
+				vi.advanceTimersByTime(elapsedMs);
+			}
+
+			return dispatchOnPage(events);
+		});
+	});
+
 	describe("pointerup", () => {
 		TestRunner.success(testData.upCases, undefined, ({ trusted, allowed, boxOn, timer }: UpInput) => {
 			vi.mocked(allowSelection).mockReturnValue(allowed);
@@ -275,6 +362,17 @@ describe("selection pointer handlers", () => {
 
 				return { boxUpdates: vi.mocked(updateBox).mock.calls, stopped: wasStopped(), timerReset: window.timer === 0 };
 			});
+		});
+
+		describe("click after release", () => {
+			TestRunner.success(testData.upClickCases, undefined, ({ boxOn }: { boxOn: boolean }) => {
+				vi.mocked(allowSelection).mockReturnValue(true);
+				window.box_on = boxOn;
+
+				pointerup(createEvent(true).event);
+
+				return dispatchOnPage([ "click" ]).some((result) => result.prevented);
+			}, { matcher: "toBe" });
 		});
 
 		describe("pointer capture", () => {

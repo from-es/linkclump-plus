@@ -10,6 +10,7 @@ import {
 	MOUSE_BUTTON_NONE
 } from "@/assets/js/constants/mouseButton";
 import {
+	CLICK_SUPPRESS_TIMEOUT_MS,
 	MOUSEUP_BOUNCE_TIMEOUT_MS,
 	SCROLL_DETECT_INTERVAL_MS
 } from "@/assets/js/constants/timing";
@@ -39,6 +40,40 @@ import type { ActivateMessage } from "@/assets/js/types/Messages";
 export function preventEscalation(event: Event): void {
 	event.stopPropagation();
 	event.preventDefault();
+}
+
+/**
+ * Swallows the `click` (and `auxclick`) that the browser dispatches right after the pointer is released.
+ *
+ * startSelection() captures the pointer on the element the press started on. Browsers then
+ * retarget the trailing click to that element, so pressing on a link, dragging and releasing
+ * would activate that link natively (the original tab navigates, a `target="_blank"` link opens
+ * an extra tab, and Ctrl+release opens an extra background tab). preventDefault() on pointerdown /
+ * pointerup does not cancel that click, so it has to be cancelled explicitly.
+ *
+ * The listeners are registered in the capture phase on `window`, fire at most once, and are
+ * removed again after CLICK_SUPPRESS_TIMEOUT_MS, so a later, deliberate click is never affected.
+ *
+ * @returns {void}
+ */
+export function suppressNextClick(): void {
+	const types = [ "click", "auxclick" ] as const;
+
+	const release = (): void => {
+		clearTimeout(timerId);
+		for (const type of types) {
+			window.removeEventListener(type, handler, true);
+		}
+	};
+	const handler = (event: Event): void => {
+		preventEscalation(event);
+		release();
+	};
+	const timerId = setTimeout(release, CLICK_SUPPRESS_TIMEOUT_MS);
+
+	for (const type of types) {
+		window.addEventListener(type, handler, true);
+	}
 }
 
 /**
@@ -123,7 +158,8 @@ export function wheel(): void {
  * window (in case this release is immediately followed by another press meant to extend
  * the same selection) before detecting links at the release point, opening them, and
  * stopping; otherwise stops immediately without opening anything. Also releases pointer
- * capture if this pointer had it. Only registered while a selection is active; see
+ * capture if this pointer had it, and (when a selection box was shown) swallows the click
+ * that follows the release - see suppressNextClick(). Only registered while a selection is active; see
  * startSelection()/stop().
  *
  * @param {PointerEvent} event - The pointerup event.
@@ -147,6 +183,9 @@ export function pointerup(event: PointerEvent): void {
 	preventEscalation(event);
 
 	if (window.box_on) {
+		// the click that follows this release would activate the link the press started on
+		suppressNextClick();
+
 		// all the detection of the pointer to bounce
 		if (allowSelection(event) && window.timer === 0) {
 			window.timer = setTimeout(function () {

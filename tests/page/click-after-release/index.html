@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+
+	<link rel="stylesheet" href="./css/style.css" type="text/css">
+
+	<title>Click After Release Test</title>
+</head>
+<body>
+
+<main>
+	<article>
+		<h1>Click After Release Test</h1>
+
+		<h2>About</h2>
+
+		<p>This page is a test page to verify that Linkclump Plus does not activate a link by itself when a selection is released.</p>
+
+		<p>
+			While a selection is dragged, Linkclump Plus captures the pointer on the element the press started on.
+			Browsers then send the <code>click</code> that follows the release to that element, so a selection that
+			<strong>starts on a link</strong> used to activate that link natively: the original tab navigates, a
+			<code>target="_blank"</code> link opens an extra tab, and releasing with Ctrl held opens an extra background tab.
+			A selection that starts outside every link was never affected.
+		</p>
+
+		<h2>Procedure</h2>
+
+		<ol>
+			<li>Set the action to <em>Opened as New Tabs</em> (default: key <code>Z</code> + left mouse button). Repeat with <code>Ctrl</code> as the key if you like.</li>
+			<li>Hold the key, press the mouse button at the <em>Start</em> position, drag over the links, and release at the <em>End</em> position of each row below.</li>
+			<li>Compare the result with <em>Expected</em>. <em>Outside</em> means the grey area to the right of the links (or the white area around the list).</li>
+			<li>Reload this page between rows if it navigated.</li>
+		</ol>
+
+		<table>
+			<thead>
+				<tr><th>Selection</th><th>Start</th><th>End</th><th>Expected</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Several links</td><td>Outside</td><td>Outside</td><td>Selected links open</td></tr>
+				<tr><td>Several links</td><td>Outside</td><td>On another link</td><td>Selected links open</td></tr>
+				<tr><td>Several links</td><td>On a link</td><td>Outside</td><td>Selected links open; no extra tab; this page does not navigate</td></tr>
+				<tr><td>Several links</td><td>On a link</td><td>On another link</td><td>Selected links open; no extra tab; this page does not navigate</td></tr>
+				<tr><td>One link</td><td>Outside</td><td>On the link</td><td>The link opens</td></tr>
+				<tr><td>One link</td><td>On the link</td><td>On the same link</td><td>The link opens once; no extra tab; this page does not navigate</td></tr>
+				<tr><td>One link</td><td>On the link</td><td>Outside</td><td>The link opens once; no extra tab; this page does not navigate</td></tr>
+			</tbody>
+		</table>
+
+		<p>Also confirm that ordinary clicks are not swallowed: after a selection, click a link normally a moment later. It must work as usual.</p>
+
+		<h2>Click Monitor</h2>
+
+		<p>
+			A line is added whenever a <code>click</code> (or <code>auxclick</code>) <strong>reaches the page</strong>.
+			Right after a selection is released, no line should appear. A line marked <span class="ng">REACHED</span>
+			right after a release means the stray click was not suppressed.
+		</p>
+
+		<p>
+			<label><input type="checkbox" id="block" checked> Cancel the default action of clicks in the monitor (keeps this page from navigating, so the log can be read)</label>
+			<button type="button" id="reset">Clear log</button>
+		</p>
+
+		<pre id="monitor"></pre>
+
+		<h2>Links (<code>target</code> not set: the original tab navigates)</h2>
+
+		<ul class="links">
+			<li><a href="https://example.com/?test=click-after-release&amp;link=1">Link 1</a></li>
+			<li><a href="https://example.com/?test=click-after-release&amp;link=2">Link 2</a></li>
+			<li><a href="https://example.com/?test=click-after-release&amp;link=3">Link 3</a></li>
+			<li><a href="https://example.com/?test=click-after-release&amp;link=4">Link 4</a></li>
+		</ul>
+
+		<h2>Links (<code>target="_blank"</code>: an extra tab opens)</h2>
+
+		<ul class="links">
+			<li><a href="https://example.org/?test=click-after-release&amp;link=5" target="_blank" rel="noopener">Link 5</a></li>
+			<li><a href="https://example.org/?test=click-after-release&amp;link=6" target="_blank" rel="noopener">Link 6</a></li>
+			<li><a href="https://example.org/?test=click-after-release&amp;link=7" target="_blank" rel="noopener">Link 7</a></li>
+			<li><a href="https://example.org/?test=click-after-release&amp;link=8" target="_blank" rel="noopener">Link 8</a></li>
+		</ul>
+	</article>
+</main>
+
+<script>
+(function () {
+	"use strict";
+
+	var monitor = document.getElementById("monitor");
+	var block   = document.getElementById("block");
+	var count   = 0;
+
+	// Bubble phase on purpose: Linkclump Plus swallows the stray click at `window` (capture phase),
+	// so a suppressed click never gets here and only a click that would activate a link is logged.
+	function log(event) {
+		// only clicks on the links below matter; the controls of this page must keep working
+		var link = event.target instanceof Element ? event.target.closest(".links a") : null;
+
+		if (!link) {
+			return;
+		}
+
+		var target = link.tagName.toLowerCase();
+		var text   = link.textContent.trim();
+
+		count += 1;
+		monitor.insertAdjacentHTML("beforeend", "<div class=\"ng\">REACHED #" + count + ": " + event.type + " on &lt;" + target + "&gt; " + text.replace(/</g, "&lt;") + "</div>");
+
+		if (block.checked) {
+			event.preventDefault();
+		}
+	}
+
+	document.addEventListener("click", log);
+	document.addEventListener("auxclick", log);
+
+	document.getElementById("reset").addEventListener("click", function () {
+		monitor.textContent = "";
+		count = 0;
+	});
+}());
+</script>
+
+</body>
+</html>
