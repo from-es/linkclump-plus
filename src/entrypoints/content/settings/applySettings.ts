@@ -18,13 +18,49 @@ import { isBlockedUrl } from "./blocklist";
 
 import { CUSTOM_TAG_LINKCLUMP } from "@/assets/js/constants/ui";
 
+import type { ContentScriptContext } from "wxt/utils/content-script-context";
 import type { Settings } from "@/assets/js/types/Settings";
+
+/**
+ * Content script context provided by WXT to detect extension reload and invalidation.
+ */
+let contentContext: ContentScriptContext | null = null;
 
 /**
  * Aborts the listeners registered by enableContentScript() all at once. Null while the content script is
  * turned off for this frame (blocked URL, or settings not loaded yet).
  */
 let listenerController: AbortController | null = null;
+
+/**
+ * Initializes the content script context to watch for extension reload/invalidation.
+ *
+ * @param {ContentScriptContext} ctx - Content script context provided by WXT.
+ * @returns {void}
+ */
+export function initContentScriptContext(ctx: ContentScriptContext): void {
+	contentContext = ctx;
+	ctx.onInvalidated(() => {
+		disableContentScript();
+	});
+}
+
+/**
+ * Wraps an event listener with a check for context invalidation. If the extension
+ * context is invalidated, the listener drops the event.
+ *
+ * @template {Event} E
+ * @param {(event: E) => void} listener - Event listener to wrap.
+ * @returns {(event: E) => void} Guarded listener.
+ */
+function guarded<E extends Event>(listener: (event: E) => void): (event: E) => void {
+	return (event: E): void => {
+		if (contentContext?.isInvalid) {
+			return;
+		}
+		listener(event);
+	};
+}
 
 /**
  * Applies the settings received from the background script (on page load and whenever the
@@ -71,13 +107,13 @@ function enableContentScript(): void {
 	(document.body).appendChild(window.linkclump);
 
 	// add event listeners (all of them are removed at once through the signal in disableContentScript())
-	window.addEventListener("pointerdown", pointerdown, { capture: true, signal });
-	window.addEventListener("keydown", keydown, { capture: true, signal });
-	window.addEventListener("keyup", keyup, { capture: true, signal });
-	window.addEventListener("blur", blur, { capture: true, signal });
-	window.addEventListener("contextmenu", contextmenu, { capture: true, signal });
+	window.addEventListener("pointerdown", guarded(pointerdown), { capture: true, signal });
+	window.addEventListener("keydown", guarded(keydown), { capture: true, signal });
+	window.addEventListener("keyup", guarded(keyup), { capture: true, signal });
+	window.addEventListener("blur", guarded(blur), { capture: true, signal });
+	window.addEventListener("contextmenu", guarded(contextmenu), { capture: true, signal });
 	// non-passive: required to cancel native panning once the touch hold is confirmed
-	window.addEventListener("touchmove", touchmove, { capture: true, passive: false, signal });
+	window.addEventListener("touchmove", guarded(touchmove), { capture: true, passive: false, signal });
 }
 
 /**

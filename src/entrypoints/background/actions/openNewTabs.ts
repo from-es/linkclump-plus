@@ -24,14 +24,15 @@ export async function handleOpenNewTabs(request: ActivateMessage<ActivateMessage
 	}
 
 	const tab = await browser.tabs.get(sender.tab.id);
-	const currentWindow = await browser.windows.getCurrent();
 	let tabIndex = null;
 
 	if (!request.setting.options.end) {
 		tabIndex = tab.index + 1;
 	}
 
-	const windowId = currentWindow ? currentWindow.id : undefined;
+	// Open the tabs in the window of the tab where the links were selected. The "current window"
+	// of the background script is the last focused window, which can be a different one.
+	const windowId = tab.windowId;
 	const delay = (request.setting.options.delay ?? 0) * SECONDS_TO_MS;
 	const closeTime = (request.setting.options.close ?? 0) * SECONDS_TO_MS;
 

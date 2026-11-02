@@ -36,7 +36,7 @@ export function handleRequests(
 ): boolean {
 	switch (request.message) {
 		case "activate": {
-			handleActivate(request as ActivateMessage, sender);
+			safeAsync("handleActivate", () => handleActivate(request as ActivateMessage, sender), "background");
 			return false;
 		}
 		case "init": {

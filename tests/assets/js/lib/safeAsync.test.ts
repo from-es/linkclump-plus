@@ -60,6 +60,38 @@ const testData = {
 			},
 			expected: [ "[safeAsync] Error in asyncFailure:", ASYNC_ERROR ]
 		}
+	],
+	invalidationCases: [
+		{
+			name: "should downgrade 'Extension context invalidated' to debug log and avoid console.error",
+			input: {
+				taskName: "sendMessage",
+				task: () => {
+					throw new Error("Extension context invalidated.");
+				},
+				scope: "content"
+			},
+			expected: {
+				errorCalls: 0,
+				debugCalls: 1,
+				debugMessage: "[content] Skipped sendMessage: the extension context is invalidated."
+			}
+		},
+		{
+			name: "should handle case-insensitive context invalidation error message",
+			input: {
+				taskName: "asyncAction",
+				task: async () => {
+					await Promise.reject(new Error("Error: extension context invalidated"));
+				},
+				scope: "background"
+			},
+			expected: {
+				errorCalls: 0,
+				debugCalls: 1,
+				debugMessage: "[background] Skipped asyncAction: the extension context is invalidated."
+			}
+		}
 	]
 } as const satisfies Record<string, readonly TestCase[]>;
 
@@ -78,14 +110,17 @@ function createErrorSpy() {
 
 describe("safeAsync", () => {
 	let errorSpy: ReturnType<typeof createErrorSpy>;
+	let debugSpy: ReturnType<typeof vi.spyOn>;
 
 	beforeEach(() => {
-		// Arrange: Silence and capture console.error
+		// Arrange: Silence and capture console.error and console.debug
 		errorSpy = createErrorSpy();
+		debugSpy = vi.spyOn(console, "debug").mockImplementation(() => {});
 	});
 
 	afterEach(() => {
 		errorSpy.mockRestore();
+		debugSpy.mockRestore();
 	});
 
 	describe("Task execution", () => {
@@ -117,6 +152,19 @@ describe("safeAsync", () => {
 			await vi.waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
 
 			return spy.mock.calls[0];
+		});
+	});
+
+	describe("Extension context invalidation", () => {
+		TestRunner.success(testData.invalidationCases, () => ({ errorSpy, debugSpy }), async ({ taskName, task, scope }: FailureInput, { errorSpy: errSpy, debugSpy: dbgSpy }) => {
+			safeAsync(taskName, task, scope);
+			await vi.waitFor(() => expect(dbgSpy).toHaveBeenCalledTimes(1));
+
+			return {
+				errorCalls: errSpy.mock.calls.length,
+				debugCalls: dbgSpy.mock.calls.length,
+				debugMessage: dbgSpy.mock.calls[0]?.[0]
+			};
 		});
 	});
 });

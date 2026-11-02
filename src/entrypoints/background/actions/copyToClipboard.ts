@@ -10,21 +10,26 @@ import type {
 import type { CopyFormat } from "@/assets/js/types/Settings";
 
 /**
- * Sends a message to the active tab to copy the specified text to clipboard.
+ * Sends a message to the frame where the links were selected to copy the specified text to clipboard.
+ *
+ * The message goes only to that frame, which is the one the user is working in and that has the
+ * focus. Without a frame ID, the message reaches every frame of the tab, and each of them would
+ * create a textarea and try to copy (taking the focus, and failing in frames without a body).
  *
  * @param {string} text - Text to copy to clipboard.
+ * @param {Browser.runtime.MessageSender} sender - Sender of the activate message (tab and frame).
  * @returns {Promise<void>}
  */
-export async function copyToClipboard(text: string): Promise<void> {
-	const queryInfo: Browser.tabs.QueryInfo = {
-		active: true,
-		currentWindow: true
-	};
-	const tabs = await browser.tabs.query(queryInfo);
-	const tab = tabs[0];
-	if (tab?.id) {
-		await browser.tabs.sendMessage(tab.id, { message: "copyToClipboard", text: text });
+export async function copyToClipboard(text: string, sender: Browser.runtime.MessageSender): Promise<void> {
+	if (sender.tab?.id === undefined) {
+		return;
 	}
+
+	await browser.tabs.sendMessage(
+		sender.tab.id,
+		{ message: "copyToClipboard", text: text },
+		{ frameId: sender.frameId }
+	);
 }
 
 /**
@@ -111,9 +116,10 @@ export function formatLink({ url, title }: ActivateMessage["urls"][0], copyForma
  * Handles the copy action by formatting links and sending them to the clipboard.
  *
  * @param {ActivateMessage<ActivateMessage_copy>} request - Activate message for copy action.
+ * @param {Browser.runtime.MessageSender} sender - Sender of the activate message (tab and frame).
  * @returns {Promise<void>}
  */
-export async function handleCopyToClipboard(request: ActivateMessage<ActivateMessage_copy>): Promise<void> {
+export async function handleCopyToClipboard(request: ActivateMessage<ActivateMessage_copy>, sender: Browser.runtime.MessageSender): Promise<void> {
 	let text = "";
 	for (let i = 0; i < request.urls.length; i++) {
 		const urlItem = request.urls[i];
@@ -128,5 +134,5 @@ export async function handleCopyToClipboard(request: ActivateMessage<ActivateMes
 		text = `<ul>\n${text}</ul>\n`;
 	}
 
-	await copyToClipboard(text);
+	await copyToClipboard(text, sender);
 }

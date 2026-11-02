@@ -73,8 +73,7 @@ interface CopyInput {
 }
 
 interface SendInput {
-	/** Tabs returned by \`browser.tabs.query\`. */
-	readonly tabs: readonly { readonly id?: number }[];
+	readonly sender: { readonly tab?: { readonly id?: number }, readonly frameId?: number };
 }
 
 const clipboardData = {
@@ -96,9 +95,21 @@ const clipboardData = {
 		}
 	],
 	sendCases: [
-		{ name: "should send the text to the first active tab", input: { tabs: [ { id: 5 }, { id: 6 } ] }, expected: [ [ 5, { message: "copyToClipboard", text: "TEXT" } ] ] },
-		{ name: "should send nothing when there is no active tab", input: { tabs: [] }, expected: [] },
-		{ name: "should send nothing when the active tab has no id", input: { tabs: [ {} ] }, expected: [] }
+		{
+			name: "should send the text to the sender tab and frame",
+			input: { sender: { tab: { id: 5 }, frameId: 2 } },
+			expected: [ [ 5, { message: "copyToClipboard", text: "TEXT" }, { frameId: 2 } ] ]
+		},
+		{
+			name: "should send nothing when the sender has no tab",
+			input: { sender: {} },
+			expected: []
+		},
+		{
+			name: "should send nothing when the sender tab has no id",
+			input: { sender: { tab: {} } },
+			expected: []
+		}
 	]
 } as const satisfies Record<string, readonly TestCase[]>;
 
@@ -113,10 +124,8 @@ describe("copyToClipboard", () => {
 	});
 
 	describe("copyToClipboard", () => {
-		TestRunner.success(clipboardData.sendCases, undefined, async ({ tabs }: SendInput) => {
-			vi.mocked(browser.tabs.query).mockResolvedValue(tabs as never);
-
-			await copyToClipboard("TEXT");
+		TestRunner.success(clipboardData.sendCases, undefined, async ({ sender }: SendInput) => {
+			await copyToClipboard("TEXT", sender as IntentionalAnyForValidation);
 
 			return vi.mocked(browser.tabs.sendMessage).mock.calls;
 		});
@@ -124,9 +133,10 @@ describe("copyToClipboard", () => {
 
 	describe("handleCopyToClipboard", () => {
 		TestRunner.success(clipboardData.handleCases, undefined, async ({ urls, copy }: CopyInput) => {
-			vi.mocked(browser.tabs.query).mockResolvedValue([ { id: 1 } ] as never);
-
-			await handleCopyToClipboard({ message: "activate", urls, setting: { action: "copy", options: { copy } } } as IntentionalAnyForValidation as ActivateMessage<never>);
+			await handleCopyToClipboard(
+				{ message: "activate", urls, setting: { action: "copy", options: { copy } } } as IntentionalAnyForValidation as ActivateMessage<never>,
+				{ tab: { id: 1 }, frameId: 0 } as IntentionalAnyForValidation
+			);
 
 			return (vi.mocked(browser.tabs.sendMessage).mock.calls[0]?.[1] as { text: string } | undefined)?.text;
 		}, { matcher: "toBe" });

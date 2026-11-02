@@ -13,9 +13,10 @@
 
 // @vitest-environment-options { "url": "https://example.com/test-page" }
 
-import { describe, afterEach, beforeEach, vi } from "vitest";
-import { applySettings } from "@/entrypoints/content/settings/applySettings";
+import { describe, afterEach, beforeEach, expect, it, vi } from "vitest";
+import { applySettings, initContentScriptContext } from "@/entrypoints/content/settings/applySettings";
 import { CUSTOM_TAG_LINKCLUMP } from "@/assets/js/constants/ui";
+import type { ContentScriptContext } from "wxt/utils/content-script-context";
 import type { Settings } from "@/assets/js/types/Settings";
 import { TestRunner, type TestCase } from "../../../shared/support/TestRunner";
 import { type IntentionalAnyForValidation } from "../../../shared/types";
@@ -110,6 +111,26 @@ describe("Content script lifecycle and blocklist coordination", () => {
 				boxDefined: window.box !== undefined,
 				countLabelDefined: window.count_label !== undefined
 			};
+		});
+	});
+
+	describe("Context invalidation", () => {
+		it("should disable content script and remove DOM elements when context is invalidated", () => {
+			let invalidationCallback: (() => void) | undefined;
+			const mockCtx = {
+				isInvalid: false,
+				onInvalidated: vi.fn((cb: () => void) => {
+					invalidationCallback = cb;
+				})
+			} as unknown as ContentScriptContext;
+
+			initContentScriptContext(mockCtx);
+			applySettings({ actions: ACTIVE_ACTIONS, blocked: [] });
+			expect(document.querySelector(CUSTOM_TAG_LINKCLUMP)).not.toBeNull();
+
+			// Trigger invalidation callback
+			invalidationCallback?.();
+			expect(document.querySelector(CUSTOM_TAG_LINKCLUMP)).toBeNull();
 		});
 	});
 });
