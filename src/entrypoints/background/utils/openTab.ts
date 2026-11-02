@@ -24,7 +24,19 @@ export function openTab(
 ): void {
 	const url = urls.shift()?.url;
 
-	if (!url || urls.length > 0) {
+	// An entry without a URL (or an empty list) opens nothing. Skip delay and carry on with
+	// the rest immediately, or stop when there is nothing left: otherwise the function would
+	// schedule itself forever and open a blank tab every time.
+	if (!url) {
+		if (urls.length > 0) {
+			openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime);
+		}
+		return;
+	}
+
+	// The current entry has a valid URL. If subsequent links remain to be processed, schedule
+	// the next tab creation after the specified delay interval.
+	if (urls.length > 0) {
 		setTimeout(
 			() => {
 				openTab(urls, delay, windowId, openerTabId, tabIndex, closeTime);

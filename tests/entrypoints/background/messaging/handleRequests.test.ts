@@ -76,6 +76,13 @@ const testData = {
 			input: { request: INIT_REQUEST, load: () => Promise.reject(new Error("Storage load failed")) },
 			expected: { responseArgs: [ undefined ], loadCalls: 1 }
 		}
+	],
+	syncErrorCases: [
+		{
+			name: "should catch synchronous errors in handleActivate without crashing",
+			input: { request: ACTIVATE_REQUEST },
+			expected: { returned: false, errorLogged: true }
+		}
 	]
 } as const satisfies Record<string, readonly TestCase[]>;
 
@@ -151,6 +158,23 @@ describe("handleRequests messaging protocol (H2 migration)", () => {
 			await vi.waitFor(() => expect(sendResponse).toHaveBeenCalledTimes(1));
 
 			return { responseArgs: sendResponse.mock.calls[0], loadCalls: loadMock.mock.calls.length };
+		});
+	});
+
+	describe("Synchronous error handling", () => {
+		TestRunner.success(testData.syncErrorCases, () => context, async ({ request }: RequestInput, { sendResponse, deps }) => {
+			vi.mocked(handleActivate).mockImplementationOnce(() => {
+				throw new Error("Simulated synchronous error");
+			});
+
+			const returned = handleRequests(request, DUMMY_SENDER, sendResponse, deps);
+			await vi.waitFor(() => expect(console.error).toHaveBeenCalled());
+
+			const errorLogged = vi.mocked(console.error).mock.calls.some(([ msg ]) =>
+				typeof msg === "string" && msg.includes("[background] Error in handleActivate:")
+			);
+
+			return { returned, errorLogged };
 		});
 	});
 });

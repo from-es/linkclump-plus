@@ -34,6 +34,17 @@
 const DEFAULT_SCOPE = "safeAsync";
 
 /**
+ * Checks whether an error is caused by the extension context being invalidated
+ * (e.g. after the extension was reloaded or updated).
+ *
+ * @param {unknown} error - Error to inspect.
+ * @returns {boolean} True if the error indicates context invalidation.
+ */
+function isExtensionContextInvalidated(error: unknown): boolean {
+	return error instanceof Error && /Extension context invalidated/i.test(error.message);
+}
+
+/**
  * Runs a task in a fire-and-forget manner and logs any failure.
  * Handles both synchronous throws and Promise rejections.
  *
@@ -46,6 +57,10 @@ export function safeAsync(taskName: string, task: () => unknown, scope: string =
 	void (async () => {
 		await task();
 	})().catch((error: unknown) => {
+		if (isExtensionContextInvalidated(error)) {
+			console.debug(`[${scope}] Skipped ${taskName}: the extension context is invalidated.`);
+			return;
+		}
 		console.error(`[${scope}] Error in ${taskName}:`, error);
 	});
 }

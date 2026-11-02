@@ -23,6 +23,23 @@ import type {
 } from "@/assets/js/types/Messages";
 
 /**
+ * Validates that an incoming message conforms to the ActivateMessage structure.
+ *
+ * @param {unknown} request - Payload to validate.
+ * @returns {request is ActivateMessage} True if the payload matches the ActivateMessage structure.
+ */
+function isActivateMessage(request: unknown): request is ActivateMessage {
+	if (typeof request !== "object" || request === null) {
+		return false;
+	}
+	const { urls, setting } = request as Partial<ActivateMessage>;
+	return Array.isArray(urls)
+		&& typeof setting === "object" && setting !== null
+		&& typeof setting.action === "string"
+		&& typeof setting.options === "object" && setting.options !== null;
+}
+
+/**
  * Preprocesses URLs and dispatches action based on user settings.
  *
  * @param {ActivateMessage} request - Activate message containing URLs and configuration.
@@ -30,6 +47,11 @@ import type {
  * @returns {void}
  */
 export function handleActivate(request: ActivateMessage, sender: Browser.runtime.MessageSender): void {
+	if (!isActivateMessage(request)) {
+		console.error("[background] Ignored a malformed activate message:", request);
+		return;
+	}
+
 	if (request.setting.options.block) {
 		request.urls = uniqueUrl(request.urls);
 	}
@@ -44,7 +66,7 @@ export function handleActivate(request: ActivateMessage, sender: Browser.runtime
 
 	switch (request.setting.action) {
 		case "copy": {
-			safeAsync("handleCopyToClipboard", () => handleCopyToClipboard(request as ActivateMessage<ActivateMessage_copy>), "background");
+			safeAsync("handleCopyToClipboard", () => handleCopyToClipboard(request as ActivateMessage<ActivateMessage_copy>, sender), "background");
 			break;
 		}
 		case "bm": {
@@ -52,12 +74,15 @@ export function handleActivate(request: ActivateMessage, sender: Browser.runtime
 			break;
 		}
 		case "win": {
-			safeAsync("handleOpenNewWin", () => handleOpenNewWin(request as ActivateMessage<ActivateMessage_win>), "background");
+			safeAsync("handleOpenNewWin", () => handleOpenNewWin(request as ActivateMessage<ActivateMessage_win>, sender), "background");
 			break;
 		}
 		case "tabs": {
 			safeAsync("handleOpenNewTabs", () => handleOpenNewTabs(request as ActivateMessage<ActivateMessage_tabs>, sender), "background");
 			break;
+		}
+		default: {
+			console.warn("[background] Unknown action in the activate message:", (request.setting as { action?: unknown }).action);
 		}
 	}
 }

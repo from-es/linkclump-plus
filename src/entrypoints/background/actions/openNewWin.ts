@@ -1,5 +1,5 @@
-// WXT provided cross-browser compatible API
-import { browser } from "wxt/browser";
+// WXT provided cross-browser compatible API and Types
+import { browser, type Browser } from "wxt/browser";
 
 import { SECONDS_TO_MS } from "@/assets/js/constants/timing";
 
@@ -15,12 +15,11 @@ import type {
  * and remaining links are queued as tabs.
  *
  * @param {ActivateMessage<ActivateMessage_win>} request - Activate message for win action.
+ * @param {Browser.runtime.MessageSender} sender - Sender of the message containing tab information.
  * @returns {Promise<void>} Promise resolving when window creation logic completes.
  */
-export async function handleOpenNewWin(request: ActivateMessage<ActivateMessage_win>): Promise<void> {
-	const currentWindow = await browser.windows.getCurrent();
+export async function handleOpenNewWin(request: ActivateMessage<ActivateMessage_win>, sender: Browser.runtime.MessageSender): Promise<void> {
 	const url = request.urls.shift()?.url;
-
 	if (!url) {
 		return;
 	}
@@ -30,7 +29,11 @@ export async function handleOpenNewWin(request: ActivateMessage<ActivateMessage_
 		"focused": !request.setting.options.unfocus
 	});
 
-	const windowId = window ? window.id : currentWindow.id;
+	// The window where the links were selected. It is used to give the focus back when the new
+	// window must not take it. The "current window" of the background script is the last focused
+	// window and needs an extra round trip, so it is not used.
+	const senderWindowId = sender.tab?.windowId;
+	const windowId = window ? window.id : senderWindowId;
 	const delay = (request.setting.options.delay ?? 0) * SECONDS_TO_MS;
 
 	if (request.urls.length > 0) {
@@ -44,9 +47,9 @@ export async function handleOpenNewWin(request: ActivateMessage<ActivateMessage_
 		);
 	}
 
-	if (currentWindow.id && request.setting.options.unfocus) {
+	if (senderWindowId !== undefined && request.setting.options.unfocus) {
 		await browser.windows.update(
-			currentWindow.id,
+			senderWindowId,
 			{ "focused": true }
 		);
 	}
