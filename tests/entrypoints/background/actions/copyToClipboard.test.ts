@@ -44,6 +44,14 @@ const testData = {
 			},
 			expected: "<a href=\"https://example.com/page?a=1&amp;b=&quot;test&quot;\">&lt;Script&gt; &amp; &quot;Quotes&quot;</a>\n"
 		},
+		{
+			name: "should format AS_LINK_HTML (format 4) and escape single quotes and backticks in title and url",
+			input: {
+				link: { url: "https://example.com/page?id='1'&tag=`test`", title: "It's `Code` & 'Text'" },
+				format: CopyFormatType.AS_LINK_HTML as CopyFormat
+			},
+			expected: "<a href=\"https://example.com/page?id=&#x27;1&#x27;&amp;tag=&#x60;test&#x60;\">It&#x27;s &#x60;Code&#x60; &amp; &#x27;Text&#x27;</a>\n"
+		},
 		{ name: "should format AS_LIST_LINK_HTML (format 5)", input: { link: STANDARD_LINK, format: CopyFormatType.AS_LIST_LINK_HTML as CopyFormat }, expected: "<li><a href=\"https://example.com/page\">Example Title</a></li>\n" },
 		{
 			name: "should format AS_MARKDOWN (format 6) and escape brackets and parentheses",

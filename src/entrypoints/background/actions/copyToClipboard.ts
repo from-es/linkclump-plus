@@ -2,6 +2,7 @@
 import { browser, type Browser } from "wxt/browser";
 
 import { CopyFormatType } from "@/assets/js/constants/CopyFormat";
+import { escapeHTML } from "@/assets/js/lib/escapeHTML";
 
 import type {
 	ActivateMessage,
@@ -42,20 +43,6 @@ export async function copyToClipboard(text: string, sender: Browser.runtime.Mess
  */
 function normalizeTitle(title: string): string {
 	return title.replace(/\s+/g, " ").trim();
-}
-
-/**
- * Escapes the characters that are significant in HTML text and in a double-quoted attribute.
- *
- * @param {string} text - Text to embed in HTML.
- * @returns {string} Escaped text.
- */
-function escapeHtml(text: string): string {
-	return text
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;");
 }
 
 /**
@@ -102,9 +89,9 @@ export function formatLink({ url, title }: ActivateMessage["urls"][0], copyForma
 		case CopyFormatType.TITLES_ONLY:
 			return `${singleLineTitle}\n`;
 		case CopyFormatType.AS_LINK_HTML:
-			return `<a href="${escapeHtml(url)}">${escapeHtml(singleLineTitle)}</a>\n`;
+			return `<a href="${escapeHTML(url)}">${escapeHTML(singleLineTitle)}</a>\n`;
 		case CopyFormatType.AS_LIST_LINK_HTML:
-			return `<li><a href="${escapeHtml(url)}">${escapeHtml(singleLineTitle)}</a></li>\n`;
+			return `<li><a href="${escapeHTML(url)}">${escapeHTML(singleLineTitle)}</a></li>\n`;
 		case CopyFormatType.AS_MARKDOWN:
 			return `[${escapeMarkdownText(singleLineTitle)}](${escapeMarkdownUrl(url)})\n`;
 		default:
