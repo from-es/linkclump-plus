@@ -8,7 +8,7 @@
 	<script type="module" src="./options.ts"></script>
 	<link rel="stylesheet" href="./style.css" />
 
-	<title>Options- Linkclump Plus</title>
+	<title>Options - Linkclump Plus</title>
 </head>
 <body>
 	<div id="page1" class="page">
@@ -58,15 +58,16 @@
 		<div id="block" class="info-box">
 			<h2>Blocklist</h2>
 
-			<p>To stop "Linkclump Plus" on certain sites, list the domains or URLs below (one per line):</p>
+			<p>To stop "Linkclump Plus" on certain sites, list the URLs or domains below (one per line):</p>
 
 			<ul class="blocklist-guide">
-				<li><code>example.com</code> — Blocks all pages and subdomains on this site. <b>Do not use wildcards (e.g. <code>*.example.com</code>).</b></li>
-				<li><code>mail.google.com</code> — Blocks only this specific subdomain.</li>
-				<li><code>example.com/editor/</code> — Blocks only pages under <code>/editor/</code> (the rest of the site / top URL remains active).</li>
+				<li><code>https://example.com/</code> — <b>Recommended.</b> Blocks this site and all pages under it, avoiding unintended matches on other domains.</li>
+				<li><code>https://mail.google.com/</code> — Blocks only this specific subdomain.</li>
+				<li><code>https://example.com/editor/</code> — Blocks only pages under <code>/editor/</code> (the rest of the site remains active).</li>
+				<li><code>example.com</code> — Blocks the domain and all subdomains, but may also match other sites (e.g. <code>notexample.com</code>). <b>Do not use wildcards (e.g. <code>*.example.com</code>).</b></li>
 			</ul>
 
-			<textarea id="form_block" placeholder="example.com&#10;mail.google.com&#10;example.com/editor/"></textarea>
+			<textarea id="form_block" placeholder="https://example.com/&#10;https://mail.google.com/&#10;https://example.com/editor/"></textarea>
 			<div id="block_error" class="error-message"></div>
 		</div>
 
@@ -87,88 +88,121 @@
 			<h2>FAQ</h2>
 
 			<dl>
-				<dt>To use on local pages (i.e. file:// URLs)</dt>
+				<dt>Linkclump Plus isn't working.</dt>
 				<dd>
-					<p>To use "Linkclump Plus" on URLs beginning with <b>"<code>file://</code>"</b>, allow access to local files.</p>
+					<ul>
+						<li>Make sure you are pressing the correct mouse button and key combination.</li>
+						<li>Linkclump Plus doesn't work on browser internal pages (such as <code>chrome://</code> or <code>about:</code> pages), extension store pages, or other browser-restricted pages.</li>
+						<li>On <code>file://</code> pages, you must first allow access to local files (see the "<b>To use on local pages</b>" in this FAQ).</li>
+					</ul>
+				</dd>
+
+				<dt>Link selection doesn't work with my laptop's built-in trackpad.</dt>
+				<dd>
+					<p>On Windows and Linux, pressing a letter key (such as the default <code>Z</code>) temporarily disables the built-in trackpad — this is an OS feature, not a bug in Linkclump Plus.</p>
+					<p><b>Solution:</b> On the Options page, change the <b>key</b> of the Action from a letter key to a modifier key: <code>Ctrl</code>, <code>Shift</code>, or <code>Alt</code> (Windows only). An external mouse is not affected.</p>
+				</dd>
+
+				<dt>Why can't I set right-click without a key on macOS or Linux?</dt>
+				<dd>
+					<p>On macOS and Linux, the browser opens the right-click menu when you <em>press</em> the mouse button, before Linkclump Plus can tell whether you are dragging. Without a key, Linkclump Plus would have to block the menu on every right-click.</p>
+					<p><b>Solution:</b> Always combine right-click with a key such as <code>Shift</code>, <code>Ctrl</code>, or <code>Cmd</code> (macOS). On Windows, right-click without a key is possible but is not recommended.</p>
+				</dd>
+
+				<dt>Can I use Linkclump Plus on a touch screen?</dt>
+				<dd>
+					<p>Yes. Press and hold for about 0.5 seconds, then drag to draw the selection box. The Action set to the <b>Left</b> mouse button runs when you release.</p>
+					<p>If you move your finger more than about 8 px before the hold is recognized, the page scrolls as usual instead.</p>
+				</dd>
+
+				<dt>To use on local pages (i.e. <code>file://</code> URLs)</dt>
+				<dd>
+					<p>To use Linkclump Plus on URLs beginning with <b>"<code>file://</code>"</b>, allow access to local files.</p>
 
 					<ul>
-						<li>Google Chrome & Chromium-based browsers
+						<li>Google Chrome &amp; Chromium-based browsers
 							<ol>
-								<li>Open "Extensions" -> "Manage extensions" from the menu, or open <b>"<code>chrome://extensions</code>"</b> in the address bar.</li>
-								<li>Click "Details" for "Linkclump Plus".</li>
-								<li>Enable "Allow access to file URLs".</li>
+								<li>Open <b>"<code>chrome://extensions</code>"</b> in the address bar.</li>
+								<li>Click <b>Details</b> for Linkclump Plus.</li>
+								<li>Turn on <b>Allow access to file URLs</b>.</li>
 							</ol>
 						</li>
-						<li>Mozilla Firefox & Firefox-based browsers
-							<ol>
-								<li>Open "Extensions and Themes" from the menu, or open <b>"<code>about:addons</code>"</b> in the address bar.</li>
-								<li>Open "Manage" from the "Linkclump Plus" menu.</li>
-								<li>Click "Permissions and data".</li>
-								<li>Enable "Access local files on your computer".</li>
-							</ol>
+						<li>Mozilla Firefox &amp; Firefox-based browsers
+							<ul>
+								<li>version 153 and later
+									<ol>
+										<li>Open <b>"<code>about:addons</code>"</b> in the address bar.</li>
+										<li>Select <b>Manage</b> from the Linkclump Plus menu.</li>
+										<li>Select <b>Permissions and data</b>.</li>
+										<li>Turn on <b>Access local files on your computer</b>.</li>
+									</ol>
+								</li>
+								<li>Version 152 or earlier
+									<ol>
+										<li>Open <b>"<code>about:addons</code>"</b> in the address bar.</li>
+										<li>Select <b>Manage</b> from the Linkclump Plus menu.</li>
+										<li>Select <b>Permissions and data</b>.</li>
+										<li>Turn on <b>Access your data for all websites</b>.</li>
+									</ol>
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</dd>
 
-				<dt>Double tabs?</dt>
-				<dd>Make sure you don't have a similar extension installed. If you also have "Snap
-					Links Lite" installed it might appear that you are only using "Linkclump Plus", but actually these
-					extensions are also working in the background and will try to open tabs also.</dd>
+				<dt>Tabs open twice, or two counters appear when I select links.</dt>
+				<dd>Another extension that does the same job is running at the same time. If the original Linkclump or Snap Links Lite is installed and enabled, both extensions react to the same drag. Turn off or remove the other extension.</dd>
 
-				<dt>Two counters are displayed when selecting a range?</dt>
+				<dt>The auto-close timer (<b>close tab time</b>) doesn't always close tabs.</dt>
 				<dd>
-					Make sure that "Linkclump" is not "Installed & Enabled". If it is "Installed & Enabled", it may appear that you are only using "Linkclump Plus",
-					 but in reality these extensions are also running in the background and the counter displayed will include those extensions.</dd>
+					<p>The timer runs in the extension's background process. The browser can stop that process while it is idle, which cancels any pending timers before they fire.</p>
+					<p><b>Recommendation:</b> Keep <b>close tab time</b> and <b>delay in opening</b> values short — 20 seconds or less.</p>
+				</dd>
 
-				<dt>Mandatory key?</dt>
-				<dd>If you want to use the right mouse button on the Linux/Mac operating systems
-					then you have to select a key. This is due to the way Chrome is designed on these systems and is
-					necessary to make "Linkclump Plus" work. Left and middle mouse buttons are not affected.</dd>
-
-				<dt>Not working?</dt>
-				<dd>Make sure you are pressing the correct mouse button and key combination. Please
-					note that chrome automatically disables in-browser extensions on the chrome webstore/extension web
-					pages for security purposes.</dd>
-
-				<dt>Does not do what you want it to do?</dt>
-				<dd>There are a hand full of extension/add ons for different
-					browsers that allow you to open multiple links and therefore there are going to be differences with
-					functionality. I've tried to create this extension so that it is fast and versatile. You are very
-					welcome and encouraged to contribute new features and code improvements to the "Linkclump" project.</dd>
-
-				<dt>Issues when zoomed out?</dt>
-				<dd>When zoomed out the scrolling functionality will be jerky and there
-					isn't much that can be done about it.</dd>
-
-				<dt>Issue where the cursor and box were misaligned on some pages when selecting a link?</dt>
+				<dt>The selection box and the cursor are misaligned on some pages.</dt>
 				<dd>
-					<p>This happens when you have a width specified for the body element of visited page.</p>
-					<p>This may be improved by using the Chrome extension
-						"<a href="https://chromewebstore.google.com/detail/Stylus/clngdbkpkpeebahjckkjfobafhncgmne" title="https://chromewebstore.google.com/detail/Stylus/clngdbkpkpeebahjckkjfobafhncgmne" target="_blank">Stylus</a>"
-						to overwrite the style sheet specified in the body element of the relevant page.</p>
+					<p>This happens on pages whose <code>body</code> element has a fixed width with <code>margin: 0 auto</code>. You can work around it with the <a href="https://chromewebstore.google.com/detail/Stylus/clngdbkpkpeebahjckkjfobafhncgmne" title="https://chromewebstore.google.com/detail/Stylus/clngdbkpkpeebahjckkjfobafhncgmne" target="_blank">Stylus</a> extension:</p>
+					<ol>
+						<li>Install Stylus and create a new style for the affected site.</li>
+						<li>Add the following CSS (adjust the width to match the site):
+							<pre><code>/* Step 1: Remove the width constraint from body. */
+body { margin: 0 !important; width: initial !important; }
+
+/* Step 2: Apply the width to the direct children of body. */
+header, nav, main, footer {
+	margin-left: auto;
+	margin-right: auto;
+	width: 1080px;
+}</code></pre>
+						</li>
+					</ol>
+				</dd>
+
+				<dt>Links I opened aren't marked as visited (link color does not change).</dt>
+				<dd>
+					<p>This is a change in <b>Google Chrome 136</b> (April 2025), not a bug in Linkclump Plus. Chrome now partitions visited-link history by site (<b>Partitioned :visited links history</b>), so links that an extension opens may not appear as visited on other pages (their color does not change to the site's visited style).</p>
+					<p>For background, workarounds, and security considerations, see <a href="https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/Notices.md#opened-links-not-marked-as-visited-chrome--edge" target="_blank">Notices</a>.</p>
 				</dd>
 
 				<dt>What is Linkclump Plus?</dt>
 				<dd>
-					<p>This "<a id="faq-store-link" href="https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm" title="https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm" target="_blank">Linkclump Plus</a>" is a fork of <a href="https://github.com/wvanderp/linkclump" title="https://github.com/wvanderp/linkclump" target="_blank">linkclump-ng</a> with some fixes and additional features.
+					<p>This <a id="faq-store-link" href="https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm" title="https://chromewebstore.google.com/detail/linkclump-plus/ainlglbojoodfdbndbfofojhmjbmelmm" target="_blank">Linkclump Plus</a> is a fork of <a href="https://github.com/wvanderp/linkclump" title="https://github.com/wvanderp/linkclump" target="_blank">linkclump-ng</a> with some fixes and additional features.
 						<a href="https://github.com/wvanderp/linkclump" title="https://github.com/wvanderp/linkclump" target="_blank">linkclump-ng</a> is a fork from <a href="https://github.com/benblack86/linkclump" title="https://github.com/benblack86/linkclump" target="_blank">linkclump</a> and has been updated to Manifest V3.</p>
-					<p>If you have any issues or feature requests with "Linkclump Plus", please report them on <a href="https://github.com/from-es/linkclump-plus" title="https://github.com/from-es/linkclump-plus" target="_blank">GitHub</a>.</p>
+					<p>If you have any issues or feature requests with Linkclump Plus, please report them on <a href="https://github.com/from-es/linkclump-plus" title="https://github.com/from-es/linkclump-plus" target="_blank">GitHub</a>.</p>
 				</dd>
 
 				<dt>Where is the source code?</dt>
 				<dd>
-					<p>Please see the links below for "Linkclump Plus" and the original code.</p>
-
 					<ul>
 						<li>Linkclump
 							<ul>
 								<li><a href="https://github.com/benblack86/linkclump" title="https://github.com/benblack86/linkclump" target="_blank">benblack86/linkclump - GitHub</a> (original code)</li>
-								<li><a href="https://github.com/wvanderp/linkclump" title="https://github.com/wvanderp/linkclump" target="_blank">wvanderp/linkclump - GitHub</a> (manifest v3 version, fork from linkclump)</li>
+								<li><a href="https://github.com/wvanderp/linkclump" title="https://github.com/wvanderp/linkclump" target="_blank">wvanderp/linkclump - GitHub</a> (Manifest V3 port)</li>
 							</ul>
 						</li>
 						<li>Linkclump Plus
 							<ul>
-								<li><a href="https://github.com/from-es/linkclump-plus" title="https://github.com/from-es/linkclump-plus" target="_blank">from-es/linkclump-plus - GitHub</a> (additional features, fork from linkclump-ng)</li>
+								<li><a href="https://github.com/from-es/linkclump-plus" title="https://github.com/from-es/linkclump-plus" target="_blank">from-es/linkclump-plus - GitHub</a></li>
 							</ul>
 						</li>
 					</ul>
