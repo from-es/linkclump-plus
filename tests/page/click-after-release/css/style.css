@@ -54,3 +54,16 @@ th, td {
 	color: #c00;
 	font-weight: bold;
 }
+#monitor .ok {
+	color: #008800;
+}
+
+iframe.test-frame {
+	display: block;
+	width: 100%;
+	max-width: 600px;
+	height: 100px;
+	margin: 1rem 0;
+	border: 2px dashed #888;
+	background-color: #fafafa;
+}

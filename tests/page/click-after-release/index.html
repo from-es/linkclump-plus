@@ -47,6 +47,7 @@
 				<tr><td>One link</td><td>Outside</td><td>On the link</td><td>The link opens</td></tr>
 				<tr><td>One link</td><td>On the link</td><td>On the same link</td><td>The link opens once; no extra tab; this page does not navigate</td></tr>
 				<tr><td>One link</td><td>On the link</td><td>Outside</td><td>The link opens once; no extra tab; this page does not navigate</td></tr>
+				<tr><td>Several links (cross-frame)</td><td>Outside / On link</td><td>Inside iframe below</td><td>Selected links open; pointerup is not lost to child frame</td></tr>
 			</tbody>
 		</table>
 
@@ -55,9 +56,9 @@
 		<h2>Click Monitor</h2>
 
 		<p>
-			A line is added whenever a <code>click</code> (or <code>auxclick</code>) <strong>reaches the page</strong>.
-			Right after a selection is released, no line should appear. A line marked <span class="ng">REACHED</span>
-			right after a release means the stray click was not suppressed.
+			A log entry is recorded whenever a <code>click</code> (or <code>auxclick</code>) event propagates to the <code>window</code> object.
+			Because Linkclump Plus swallows stray clicks during the capture phase, <strong>no log should appear right after a selection is released</strong>.
+			An entry marked <span class="ng">REACHED</span> right after a release means the trailing click leaked through and was not suppressed.
 		</p>
 
 		<p>
@@ -84,6 +85,12 @@
 			<li><a href="https://example.org/?test=click-after-release&amp;link=7" target="_blank" rel="noopener">Link 7</a></li>
 			<li><a href="https://example.org/?test=click-after-release&amp;link=8" target="_blank" rel="noopener">Link 8</a></li>
 		</ul>
+
+		<h2>Embedded iframe (Cross-frame drag test)</h2>
+
+		<p>Start dragging links above and release inside this iframe. With pointer capture, the selection completes and opens all selected links. (Without pointer capture, release is lost to the child document and 0 tabs open.)</p>
+
+		<iframe class="test-frame" srcdoc="<!DOCTYPE html><html><body style='font-family:sans-serif;margin:1rem;color:#555;'><strong>Child iframe area</strong><br>Release pointer here to verify cross-frame pointer capture.</body></html>"></iframe>
 	</article>
 </main>
 
@@ -95,34 +102,70 @@
 	var block   = document.getElementById("block");
 	var count   = 0;
 
-	// Bubble phase on purpose: Linkclump Plus swallows the stray click at `window` (capture phase),
-	// so a suppressed click never gets here and only a click that would activate a link is logged.
-	function log(event) {
-		// only clicks on the links below matter; the controls of this page must keep working
-		var link = event.target instanceof Element ? event.target.closest(".links a") : null;
+	if (monitor) {
+		monitor.textContent = "Click Monitor ready. (Listening for click and auxclick events...)\n";
+	}
 
-		if (!link) {
+	function getTargetElement(target) {
+		if (!target) {
+			return null;
+		}
+		if (target.nodeType === 3) {
+			return target.parentElement;
+		}
+		return target instanceof Element ? target : null;
+	}
+
+	// Bubble phase on purpose: Linkclump Plus swallows the stray click at `window` (capture phase),
+	// so a suppressed click never gets here and only a click that reaches the page is logged.
+	function log(event) {
+		var targetEl = getTargetElement(event.target);
+
+		// Ignore clicks on monitor controls (checkbox, reset button)
+		if (targetEl && (targetEl.closest("#block") || targetEl.closest("#reset") || targetEl.closest("label"))) {
 			return;
 		}
 
-		var target = link.tagName.toLowerCase();
-		var text   = link.textContent.trim();
+		var link = targetEl ? targetEl.closest(".links a") : null;
+
+		// Cancel default navigation early if block is checked to keep the page and log intact
+		if (link && block && block.checked) {
+			event.preventDefault();
+		}
 
 		count += 1;
-		monitor.insertAdjacentHTML("beforeend", "<div class=\"ng\">REACHED #" + count + ": " + event.type + " on &lt;" + target + "&gt; " + text.replace(/</g, "&lt;") + "</div>");
+		var now = new Date().toTimeString().split(" ")[0];
+		var type = event.type;
+		var targetDesc = link
+			? "&lt;" + link.tagName.toLowerCase() + "&gt; \"" + (link.textContent || "").trim() + "\""
+			: targetEl
+				? "&lt;" + targetEl.tagName.toLowerCase() + (targetEl.id ? "#" + targetEl.id : "") + "&gt;"
+				: "unknown";
 
-		if (block.checked) {
-			event.preventDefault();
+		var cssClass = link ? "ng" : "ok";
+		var prefix = link ? "REACHED #" + count : "CLICK #" + count;
+
+		if (monitor) {
+			monitor.insertAdjacentHTML(
+				"beforeend",
+				"[" + now + "] <span class=\"" + cssClass + "\">" + prefix + ": " + type + " on " + targetDesc + "</span>\n"
+			);
+			monitor.scrollTop = monitor.scrollHeight;
 		}
 	}
 
-	document.addEventListener("click", log);
-	document.addEventListener("auxclick", log);
+	window.addEventListener("click", log, false);
+	window.addEventListener("auxclick", log, false);
 
-	document.getElementById("reset").addEventListener("click", function () {
-		monitor.textContent = "";
-		count = 0;
-	});
+	var resetBtn = document.getElementById("reset");
+	if (resetBtn) {
+		resetBtn.addEventListener("click", function () {
+			if (monitor) {
+				monitor.textContent = "Log cleared.\n";
+			}
+			count = 0;
+		});
+	}
 }());
 </script>
 

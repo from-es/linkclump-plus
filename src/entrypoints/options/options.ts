@@ -4,6 +4,7 @@ import { browser } from "wxt/browser";
 import { importFile, exportFile } from "@/assets/js/lib/SettingsFileManager";
 import { isSettings } from "@/assets/js/lib/SettingsGuard";
 import { safeAsync } from "@/assets/js/lib/safeAsync";
+import { escapeHTML } from "@/assets/js/lib/escapeHTML";
 import {
 	findInvalidPattern,
 	getRegExpError
@@ -419,16 +420,23 @@ function delete_action(id: string, div: JQuery) {
 }
 
 function setup_action(actionSetting: ActionSetting, id: string): JQuery {
-	const setting = $(`<div class='setting' id='action_${id}'>`);
+	const setting = $(`<div class='setting' id='action_${escapeHTML(id)}'>`);
 
 	const actionDef = optionsSchema.actions[actionSetting.action];
 	const actionName = actionDef ? actionDef.name : actionSetting.action;
-	const h3 = `<h3>${actionName}</h3>`;
-	const activateKey = (actionSetting.key > 0 && keys[actionSetting.key]) ? `"<b>${keys[actionSetting.key]}</b>" key and ` : "";
+	const h3 = $("<h3>").text(actionName);
 	const triggerDef = optionsSchema.triggers[actionSetting.mouse];
 	const triggerName = triggerDef ? triggerDef.name : String(actionSetting.mouse);
-	const activateMouse = `"<b>${triggerName}</b>" mouse button`;
-	const activate = `<p>Activate by ${activateKey}${activateMouse}.</p>`;
+	const activate = $("<p>").text("Activate by ");
+	const keyName = actionSetting.key > 0 ? keys[actionSetting.key] : undefined;
+	if (keyName) {
+		activate.append(document.createTextNode('"'));
+		activate.append($("<b>").text(keyName));
+		activate.append(document.createTextNode('" key and '));
+	}
+	activate.append(document.createTextNode('"'));
+	activate.append($("<b>").text(triggerName));
+	activate.append(document.createTextNode('" mouse button.'));
 	setting.append(h3);
 	setting.append(activate);
 
@@ -482,9 +490,12 @@ function setup_action(actionSetting: ActionSetting, id: string): JQuery {
 			}
 		}
 
-		list.append(`<li>${text}</li>`);
+		list.append($("<li>").text(text));
 	}
-	list.append(`<li>selection box color: <span style='background-color: ${actionSetting.color}' class='color'></span></li>`);
+	const colorItem = $("<li>").text("selection box color: ");
+	const colorSpan = $("<span class='color'>").css("background-color", actionSetting.color);
+	colorItem.append(colorSpan);
+	list.append(colorItem);
 
 	setting.append(list);
 
@@ -579,8 +590,9 @@ function setup_text(keys: Record<number, string>) {
 	if (actionDef) {
 		$("#action_name").text(actionDef.name);
 	}
-	if (actionSetting.key > 0 && keys[actionSetting.key]) {
-		$("#key_name").html(`the <b>${keys[actionSetting.key]}</b> key and`);
+	const selectedKeyName = actionSetting.key > 0 ? keys[actionSetting.key] : undefined;
+	if (selectedKeyName) {
+		$("#key_name").html(`the <b>${escapeHTML(selectedKeyName)}</b> key and`);
 	} else {
 		$("#key_name").html("");
 	}

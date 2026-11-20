@@ -277,6 +277,10 @@ export function startSelection(event: PointerEvent, startX: number, startY: numb
 	if (allowSelection(event)) {
 		if (event.target instanceof Element && typeof event.target.setPointerCapture === "function") {
 			try {
+				// Keep pointer capture: without it, (1) releasing a selection over an iframe
+				// causes pointerup to be absorbed by the child document (losing all selected
+				// tabs), and (2) single-link selections inside the same <a> element will still
+				// trigger native click navigation. Trailing clicks are cancelled by suppressNextClick().
 				event.target.setPointerCapture(event.pointerId);
 			} catch {
 				// Ignore
