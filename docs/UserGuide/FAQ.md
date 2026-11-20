@@ -155,6 +155,22 @@ Changes apply to all open tabs without reloading. For regular expressions and ad
 
 ---
 
+### Q. It doesn't work in Private Windows or Incognito mode.
+
+**A.** By default, extensions are disabled in private browsing windows for privacy reasons. To use Linkclump Plus in private windows, explicitly allow it from your browser's extension management page.
+
+- **Google Chrome and Chromium-based browsers:**
+  1. Open `chrome://extensions` in the address bar.
+  2. Click **Details** for Linkclump Plus.
+  3. Turn on **Allow in Incognito**.
+
+- **Mozilla Firefox and Firefox-based browsers:**
+  1. Open `about:addons` in the address bar.
+  2. Select **Manage** from the Linkclump Plus menu.
+  3. Under **Run in Private Windows**, select **Allow**.
+
+---
+
 ### Q. It doesn't work on store pages, extension pages, or browser internal pages.
 
 **A.** For security reasons, browsers don't run extensions on some pages. Linkclump Plus can't change this.

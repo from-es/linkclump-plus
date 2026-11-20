@@ -66,68 +66,86 @@ The extension uses Manifest V3. WXT generates the `manifest.json` for each brows
 ## 2. Directory structure
 
 ```text
-linkclump-plus/                  # Repository root (location of package.json)
+linkclump-plus/                # Repository root (location of package.json)
 │
-├── src/                         # Source code
-│   ├── manifest.ts              # Manifest V3 definition (version, permissions, minimum browser versions)
+├── src/                       # Source code
+│   ├── manifest.ts            # Manifest V3 definition
 │   │
-│   ├── assets/js/               # Modules shared by multiple entrypoints
-│   │   ├── constants/           # Constants (actions, keys, mouse buttons, timing, settings, and so on)
-│   │   ├── lib/                 # Utilities (OS and browser detection, safeAsync, settings guard,
-│   │   │                        #   settings file import/export, regular expressions, and so on)
-│   │   │   └── colorpicker/     # Third-party color picker (JavaScript, excluded from ESLint)
-│   │   └── types/               # Shared types (Settings, Messages, Options, and so on)
+│   ├── assets/js/             # Modules shared across multiple entrypoints
+│   │   ├── constants/         # Constants (actions, keys, mouse buttons, timing, settings)
+│   │   ├── lib/               # Shared utilities (browser/OS detection, safeAsync, settings guard)
+│   │   │   └── colorpicker/   # Third-party color picker (excluded from ESLint)
+│   │   └── types/             # Shared type definitions (Settings, Messages, Options)
 │   │
-│   ├── entrypoints/             # WXT entrypoints (the root of each build artifact)
-│   │   ├── background/          # Background process (service worker in Chrome, event page in Firefox)
-│   │   │   ├── index.ts         # Composition root: creates the managers and registers listeners
-│   │   │   ├── deps.ts          # Type of the dependencies that index.ts passes to the handlers
-│   │   │   ├── actions/         # Action execution: open tabs, open a window, copy, bookmark
-│   │   │   ├── init/            # Start-up initialization (first install)
-│   │   │   ├── messaging/       # Receives and dispatches messages (activate, init, update)
-│   │   │   ├── scripts/         # Content script injection and settings broadcast
-│   │   │   ├── settings/        # Settings read and write (SettingsManager and StorageManager)
-│   │   │   └── utils/           # Utilities (opening a tab, URL deduplication)
+│   ├── entrypoints/           # WXT entrypoints (each build artifact root)
+│   │   ├── background/        # Background process (service worker / event page)
+│   │   │   ├── index.ts       # Composition root
+│   │   │   ├── deps.ts        # Dependency injection container types
+│   │   │   ├── actions/       # Action execution (open tabs/windows, copy, bookmark)
+│   │   │   ├── init/          # First-install initialization
+│   │   │   ├── messaging/     # Message dispatchers (activate, init, update)
+│   │   │   ├── scripts/       # Content script injection and settings broadcast
+│   │   │   ├── settings/      # Settings and storage managers
+│   │   │   └── utils/         # Background utilities (tab opening, URL deduplication)
 │   │   │
-│   │   ├── content/             # Content script (injected into every frame of each page)
-│   │   │   ├── dom/             # Selection box and counter label
-│   │   │   ├── keyboard/        # Keyboard state tracking
-│   │   │   ├── matching/        # Matching the pressed button and key against the Actions
-│   │   │   ├── pointer/         # Pointer and context menu event handling
-│   │   │   ├── selection/       # Selection lifecycle (start, update, stop)
-│   │   │   ├── settings/        # Applying settings and the blocklist
-│   │   │   ├── touch/           # Touch long-press detection
-│   │   │   ├── types/           # Types for the per-page state kept on `window`
-│   │   │   └── utils/           # Utilities (trusted event check)
+│   │   ├── content/           # Content script (injected into all frames)
+│   │   │   ├── dom/           # Selection box and counter label
+│   │   │   ├── keyboard/      # Keyboard state tracking
+│   │   │   ├── matching/      # Action trigger matching
+│   │   │   ├── pointer/       # Pointer and context menu event handling
+│   │   │   ├── selection/     # Selection lifecycle (start, update, stop)
+│   │   │   ├── settings/      # Settings and blocklist application
+│   │   │   ├── touch/         # Touch long-press detection
+│   │   │   ├── types/         # Content script state types
+│   │   │   └── utils/         # Event utilities
 │   │   │
-│   │   └── options/             # Options page
-│   │       ├── index.html       # Page HTML
-│   │       ├── options.ts       # UI logic (jQuery)
-│   │       └── style.css        # Stylesheet
+│   │   └── options/           # Options page
+│   │       ├── index.html     # Page HTML
+│   │       ├── options.ts     # UI logic (jQuery)
+│   │       └── style.css      # Stylesheet
 │   │
-│   └── public/                  # Static files that are copied as is at build time
-│       ├── img/                 # Extension icons (16, 32, 48, and 128 px) and the images of the Options page
-│       └── playground/          # Playground page for functional verification
+│   └── public/                # Static assets copied directly to build output
+│       ├── img/               # Extension icons and Options page graphics
+│       └── playground/        # Test page for manual verification
 │
-├── tests/                       # Test assets (see testing.md)
-│   ├── assets/                  # Unit tests for src/assets/js/
-│   ├── entrypoints/             # Tests for background, content, and Options page logic
-│   ├── shared/                  # Shared test infrastructure (TestRunner, setup, fixtures, types)
-│   ├── _vitest-check/           # Smoke tests for the test environment itself
-│   └── page/                    # Manual test pages
+├── tests/                     # Test assets (see tests/README.md)
+│   ├── assets/                # Tests for src/assets/js/
+│   ├── entrypoints/           # Tests for background, content, and options
+│   ├── shared/                # Shared test infrastructure (TestRunner, mocks, fixtures)
+│   ├── _vitest-check/         # Test environment smoke tests
+│   └── page/                  # Manual functional test pages
 │
-├── docs/                        # User guide and developer guide
-├── material/                    # Reference material (excluded from ESLint)
-├── .github/                     # GitHub issue templates and workflows
-├── .wxt/                        # Files that WXT generates (do not edit; ignored by Git)
-│   └── tsconfig.json            # TypeScript config that defines the path aliases
-├── .output/                     # Build output (ignored by Git)
+├── docs/                      # User Guide and Developer Guide
+├── material/                  # Store listings, icons, and review documentation
+├── .github/                   # Issue templates and CI workflows
+├── .wxt/                      # WXT-generated files (ignored by Git)
+│   └── tsconfig.json          # Base path aliases config
+├── .output/                   # Build output directories (ignored by Git)
 │
-├── wxt.config.ts                # WXT build config (Vite settings, per-browser manifest)
-├── tsconfig.json                # Root TypeScript config (extends .wxt/tsconfig.json)
-├── eslint.config.js             # ESLint config
-└── package.json                 # npm scripts, dependencies, and the extension version
+├── wxt.config.ts              # WXT build configuration and browser manifests
+├── tsconfig.json              # Root TypeScript configuration
+├── eslint.config.js           # ESLint flat configuration
+└── package.json               # npm scripts, dependencies, and metadata
 ```
+
+### Key directories and components
+
+- **`src/`**: The core extension source code.
+  - **`manifest.ts`**: The Manifest V3 definition (version, permissions, minimum browser versions).
+  - **`assets/js/`**: Modules shared by multiple entrypoints (`constants/`, `lib/`, `types/`).
+  - **`entrypoints/`**: The root of each build artifact managed by WXT.
+    - **`background/`**: Background process (service worker in Chrome, event page in Firefox) managing tabs, windows, bookmarks, and settings state.
+    - **`content/`**: Content script injected into every frame of web pages to handle mouse/touch drag selection and link collection.
+    - **`options/`**: Options page UI (`index.html`, `options.ts`, `style.css`).
+  - **`public/`**: Static files copied directly into build output (`img/` for icons and graphics, `playground/` for functional testing).
+- **`tests/`**: Automated unit and integration tests (Vitest) and manual test pages. See [tests/README.md](../../tests/README.md) and [testing.md](./testing.md).
+- **`docs/`**: Official documentation, divided into `UserGuide/` and `DeveloperGuide/`.
+- **`material/`**: Extension store assets, icons, screenshots, and review documentation.
+- **Root configuration files**:
+  - **`wxt.config.ts`**: WXT framework configuration (Vite settings, per-browser manifest generation).
+  - **`tsconfig.json`**: Root TypeScript configuration extending `.wxt/tsconfig.json`.
+  - **`eslint.config.js`**: Project-wide ESLint flat configuration.
+  - **`package.json`**: Dependencies, npm scripts, and extension version.
 
 ### Dependency wiring in the background process
 
