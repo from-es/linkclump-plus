@@ -8,8 +8,9 @@
 	h5 : 16.0 px > 1.00 rem
 	h6 : 16.0 px > 1.00 rem
 
-	p  : 14.0 px > 0.875 rem
-	a  : 14.0 px > 0.875 rem
+	a   : 14.0 px > 0.875 rem
+	code: 14.0 px > 0.875 rem
+	p   : 14.0 px > 0.875 rem
 
 	button   : 14.0 px > 0.875 rem
 	li       : 14.0 px > 0.875 rem
@@ -20,7 +21,10 @@
 */
 
 :root {
+	--line-height-base: 1.5;
+
 	--font-size-base: 16px;
+	--font-size-smaller: 0.875rem;
 
 	--font-size-h1: 1.75rem;
 	--font-size-h2: 1.50rem;
@@ -42,6 +46,8 @@
 }
 
 html {
+	overflow-y: scroll;
+
 	margin: 0;
 	padding: 0;
 
@@ -52,7 +58,16 @@ body {
 	margin: 0;
 	padding: 0;
 
+	color: #000;
+	font-family: Arial, sans-serif;
 	font-size: 1rem;
+	line-height: var(--line-height-base);
+
+	background-color: #F4F4F4;
+	background-image: var(--img-background-image);
+	background-repeat: no-repeat;
+	background-position: 2rem 2rem;
+	background-attachment: fixed;
 }
 
 a {
@@ -68,7 +83,7 @@ a:hover {
 }
 
 button {
-	font-size: 0.85rem;
+	font-size: var(--font-size-smaller);
 }
 
 h1 {
@@ -96,15 +111,15 @@ h6 {
 }
 
 input[type=checkbox] {
-	width: 0.875rem;
-	height: 0.875rem;
+	width: var(--font-size-smaller);
+	height: var(--font-size-smaller);
 }
 
 input[type=text],
 input[type=number],
 select,
 option {
-	font-size: 0.875rem;
+	font-size: var(--font-size-smaller);
 }
 
 li {
@@ -112,7 +127,18 @@ li {
 }
 
 textarea {
-	font-size: 0.875rem;
+	font-size: var(--font-size-smaller);
+}
+
+code {
+	margin-left: 0.1rem;
+	margin-right: 0.1rem;
+	padding: 0.15rem 0.4rem;
+	border-radius: 0.25rem;
+	color: #fff;
+	background: #555;
+	font-size: var(--font-size-smaller);
+	font-family: Consolas, "Courier New", monospace;
 }
 
 
@@ -120,18 +146,6 @@ textarea {
 /* --------------------------------------------------------- */
 
 
-
-body {
-	overflow-y: scroll;
-
-	font-family: Arial, sans-serif;
-
-	background-color: #F4F4F4;
-	background-image: var(--img-background-image);
-	background-repeat: no-repeat;
-	background-position: 2rem 2rem;
-	background-attachment: fixed;
-}
 
 img.logo {
 	display: block;
@@ -158,13 +172,15 @@ button.button {
 	cursor: pointer;
 }
 
-button:hover.button {
+button.button:hover {
+	color: #fff;
 	background: #606060;
 }
 
 .buttons-side-by-side {
 	text-align: center;
 }
+
 
 
 /* --------------------------------------------------------- */
@@ -232,7 +248,7 @@ button:hover.button {
 
 	border-radius: 0.25rem;
 
-	font-weight: normal;
+	font-weight: bold;
 
 	color: #fff;
 	background-color: #299877;
@@ -278,6 +294,8 @@ button:hover.button {
 	margin: 1.0rem 0.5rem;
 }
 
+
+
 /* --------------------------------------------------------- */
 
 
@@ -292,16 +310,9 @@ button:hover.button {
 /* [Blocklist] */
 .blocklist-guide {
 	margin: 0.5rem 1rem 0.5rem 1rem;
-	font-size: 0.9em;
+	font-size: var(--font-size-smaller);
 	color: #333;
 	line-height: 1.5;
-}
-
-.blocklist-guide code {
-	background-color: #f0f0f0;
-	padding: 0.1rem 0.3rem;
-	border-radius: 0.2rem;
-	font-size: 0.95em;
 }
 
 /* [Blocklist] >> <textarea> */
@@ -355,6 +366,24 @@ button:hover.button {
 	background: #cc0000;
 }
 
+.code-block {
+	margin: 1rem 0;
+	padding: 1rem;
+	max-width: calc(100% - 1rem);
+	overflow-x: auto;
+	border-radius: 0.5rem;
+	tab-size: 3;
+	color: #fff;
+	background: #000;
+}
+.code-block code {
+	margin: 0;
+	padding: 0;
+	border-radius: 0;
+	color: inherit;
+	background: transparent;
+}
+
 
 
 /* --------------------------------------------------------- */
@@ -362,7 +391,6 @@ button:hover.button {
 
 
 #form_color {
-	visibility: hidden;
 	display: none;
 }
 
@@ -435,23 +463,21 @@ button:hover.button {
 	position: absolute;
 	width: 12rem;
 	color: #000;
-	font-size: 0.875rem;
+	font-size: var(--font-size-smaller);
 	border: calc(1rem / 16) solid #000;
 	border-radius: 0.25rem;
 	padding: 0.25rem;
 	display: none;
 }
 
-.warning {
-	background-color: #ED2E01;
-	display: none;
-	padding: 0.5rem;
-}
-
+.warning,
 .warning2 {
-	background-color: #ED2E01;
 	display: none;
 	padding: 0.5rem;
+	border-radius: 0.25rem;
+	font-weight: bold;
+	color: #fff;
+	background-color: #d62800;
 }
 
 #settings:empty::before {
@@ -460,6 +486,7 @@ button:hover.button {
 	margin: 0.5rem 0;
 	padding: 0.5rem 0.75rem;
 	border-radius: 0.25rem;
+	font-weight: bold;
 	color: #fff;
 	background-color: #ff8c00;
 }
@@ -469,7 +496,8 @@ button:hover.button {
 	margin: 0.5rem;
 	padding: 0.5rem 0.75rem;
 	border-radius: 0.25rem;
-	color: #fff;
+	font-weight: bold;
+	color: #000;
 	background-color: #ff8c00;
 }
 
@@ -483,7 +511,7 @@ button:hover.button {
 	padding: 0.5rem 0.75rem;
 	border-radius: 0.25rem;
 	color: #ffffff;
-	background-color: #ED2E01;
+	background-color: #d62800;
 }
 
 /*
