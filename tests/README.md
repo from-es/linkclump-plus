@@ -1,12 +1,28 @@
 # Tests Directory
 
-This directory contains the automated test suite and the manual test pages for Linkclump Plus. For detailed guidelines on how to write tests, design patterns (AAA, Data-Driven), templates, and coverage goals, see the [Testing developer guide](../docs/DeveloperGuide/testing.md).
+This directory contains the automated test suite and the manual test pages for Linkclump Plus. For detailed guidelines on how to write tests, design patterns (AAA, Data-Driven), templates, and coverage goals, see the [Testing developer guide](../docs/DeveloperGuide/testing.md). For the overall repository architecture, see [Architecture](../docs/DeveloperGuide/architecture.md).
 
 ---
 
 ## Directory Structure
 
 The test suite is organized to mirror the source tree under `src/`, with shared infrastructure kept separately.
+
+```text
+tests/
+├── assets/           # Tests for shared modules (src/assets/js/)
+│   └── js/lib/       # Tests for core library functions
+├── entrypoints/      # Tests for extension entry points (mirroring src/entrypoints/)
+│   ├── background/   # Tests for the background process
+│   ├── content/      # Tests for the content script
+│   └── options/      # Tests for the Options page logic
+├── shared/           # Shared test infrastructure (do not add test files here)
+│   ├── support/      # TestRunner, global mocks setup, window reset helper
+│   ├── fixtures/     # Static JSON test data and factory functions
+│   └── types/        # Test-specific types (e.g. IntentionalAnyForValidation)
+├── _vitest-check/    # Smoke tests for the test environment (excluded from main run)
+└── page/             # Static HTML pages for manual functional tests
+```
 
 - **`assets/`**: Tests for shared modules under `src/assets/js/`.
   - **`js/lib/`**: Tests for core library functions (`detectBrowser`, `detectOs`, `safeAsync`, `regexp`, `SettingsGuard`, `SettingsFileManager`, and so on).

@@ -74,7 +74,7 @@
 		<div id="files" class="info-box">
 			<h2>Import / Export</h2>
 
-			<p style="color: red">This features is under testing.</p>
+			<p style="color: #c00000">This feature is under testing.</p>
 
 			<p>You can save the settings used in "Linkclump Plus" to an external file (json format) or restore settings from an externally saved file.</p>
 
@@ -82,6 +82,17 @@
 				<button id="import-setting" class="button">Import</button>
 				<button id="export-setting" class="button">Export</button>
 			</div>
+		</div>
+
+		<div id="documentation" class="info-box">
+			<h2>Documentation</h2>
+
+			<p>For detailed documentation on this extension, please refer to the User Guide &amp; Developer Guide.</p>
+
+			<ul>
+				<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/README.md" target="_blank">User Guide</a></li>
+				<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/DeveloperGuide/README.md" target="_blank">Developer Guide</a></li>
+			</ul>
 		</div>
 
 		<div id="faq" class="info-box">
@@ -92,7 +103,8 @@
 				<dd>
 					<ul>
 						<li>Make sure you are pressing the correct mouse button and key combination.</li>
-						<li>Linkclump Plus doesn't work on browser internal pages (such as <code>chrome://</code> or <code>about:</code> pages), extension store pages, or other browser-restricted pages.</li>
+						<li>Linkclump Plus doesn't work on browser internal pages (such as <code>chrome://</code> or <code>about:</code> pages), extension store pages (Chrome Web Store, Firefox Add-ons), or other browser-restricted sites.</li>
+						<li>In Firefox, to use Linkclump Plus in Private Windows, you must allow <b>Run in Private Windows</b> in <code>about:addons</code>.</li>
 						<li>On <code>file://</code> pages, you must first allow access to local files (see the "<b>To use on local pages</b>" in this FAQ).</li>
 					</ul>
 				</dd>
@@ -117,21 +129,21 @@
 
 				<dt>To use on local pages (i.e. <code>file://</code> URLs)</dt>
 				<dd>
-					<p>To use Linkclump Plus on URLs beginning with <b>"<code>file://</code>"</b>, allow access to local files.</p>
+					<p>To use Linkclump Plus on URLs beginning with <code>file://</code>, allow access to local files.</p>
 
 					<ul>
 						<li>Google Chrome &amp; Chromium-based browsers
 							<ol>
-								<li>Open <b>"<code>chrome://extensions</code>"</b> in the address bar.</li>
+								<li>Open <code>chrome://extensions</code> in the address bar.</li>
 								<li>Click <b>Details</b> for Linkclump Plus.</li>
 								<li>Turn on <b>Allow access to file URLs</b>.</li>
 							</ol>
 						</li>
 						<li>Mozilla Firefox &amp; Firefox-based browsers
 							<ul>
-								<li>version 153 and later
+								<li>Version 153 and later
 									<ol>
-										<li>Open <b>"<code>about:addons</code>"</b> in the address bar.</li>
+										<li>Open <code>about:addons</code> in the address bar.</li>
 										<li>Select <b>Manage</b> from the Linkclump Plus menu.</li>
 										<li>Select <b>Permissions and data</b>.</li>
 										<li>Turn on <b>Access local files on your computer</b>.</li>
@@ -139,7 +151,7 @@
 								</li>
 								<li>Version 152 or earlier
 									<ol>
-										<li>Open <b>"<code>about:addons</code>"</b> in the address bar.</li>
+										<li>Open <code>about:addons</code> in the address bar.</li>
 										<li>Select <b>Manage</b> from the Linkclump Plus menu.</li>
 										<li>Select <b>Permissions and data</b>.</li>
 										<li>Turn on <b>Access your data for all websites</b>.</li>
@@ -151,7 +163,9 @@
 				</dd>
 
 				<dt>Tabs open twice, or two counters appear when I select links.</dt>
-				<dd>Another extension that does the same job is running at the same time. If the original Linkclump or Snap Links Lite is installed and enabled, both extensions react to the same drag. Turn off or remove the other extension.</dd>
+				<dd>
+					<p>Another extension that does the same job is running at the same time. If the original Linkclump or Snap Links Lite is installed and enabled, both extensions react to the same drag. Turn off or remove the other extension.</p>
+				</dd>
 
 				<dt>The auto-close timer (<b>close tab time</b>) doesn't always close tabs.</dt>
 				<dd>
@@ -161,11 +175,12 @@
 
 				<dt>The selection box and the cursor are misaligned on some pages.</dt>
 				<dd>
-					<p>This happens on pages whose <code>body</code> element has a fixed width with <code>margin: 0 auto</code>. You can work around it with the <a href="https://chromewebstore.google.com/detail/Stylus/clngdbkpkpeebahjckkjfobafhncgmne" title="https://chromewebstore.google.com/detail/Stylus/clngdbkpkpeebahjckkjfobafhncgmne" target="_blank">Stylus</a> extension:</p>
+					<p>This happens on pages whose <code>body</code> element has a fixed width with <code>margin: 0 auto</code>. You can work around it with the Stylus extension (<a href="https://chromewebstore.google.com/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne" title="https://chromewebstore.google.com/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne" target="_blank">Chrome Web Store</a> / <a href="https://addons.mozilla.org/firefox/addon/styl-us/" title="https://addons.mozilla.org/firefox/addon/styl-us/" target="_blank">Firefox Add-ons</a>):</p>
+
 					<ol>
 						<li>Install Stylus and create a new style for the affected site.</li>
 						<li>Add the following CSS (adjust the width to match the site):
-							<pre><code>/* Step 1: Remove the width constraint from body. */
+							<pre class="code-block"><code>/* Step 1: Remove the width constraint from body. */
 body { margin: 0 !important; width: initial !important; }
 
 /* Step 2: Apply the width to the direct children of body. */
