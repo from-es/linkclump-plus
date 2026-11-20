@@ -61,13 +61,14 @@ Works with Google Chrome and Chromium-based browsers (version 125 or later).
 ## Documentation
 
 - User Guide:
-   - https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/README.md
+	 - https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/README.md
 - Developer guide:
-   - https://github.com/from-es/linkclump-plus/blob/main/docs/DeveloperGuide/README.md
+	 - https://github.com/from-es/linkclump-plus/blob/main/docs/DeveloperGuide/README.md
 
 ## FAQ & Known Issues
 
 For FAQ, known issues, workarounds, and OS- or browser-specific limitations, see:
+
 - Notices: https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/Notices.md
 - FAQ: https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/FAQ.md
 
@@ -83,11 +84,11 @@ Linkclump Plus is a free extension, and the developer cannot offer individual su
 ## Related Links
 
 - Linkclump (Original):
-  - Repository: https://github.com/benblack86/linkclump
+	- Repository: https://github.com/benblack86/linkclump
 - linkclump-ng (Manifest V3 port):
-  - Repository: https://github.com/wvanderp/linkclump
+	- Repository: https://github.com/wvanderp/linkclump
 - Linkclump Plus (This fork):
-  - Repository: https://github.com/from-es/linkclump-plus
-  - Official Extension Store:
-    - Chrome Web Store: https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm
-    - Firefox Add-ons: https://addons.mozilla.org/firefox/addon/linkclump-plus/
+	- Repository: https://github.com/from-es/linkclump-plus
+	- Official Extension Store:
+		- Chrome Web Store: https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm
+		- Firefox Add-ons: https://addons.mozilla.org/firefox/addon/linkclump-plus/
