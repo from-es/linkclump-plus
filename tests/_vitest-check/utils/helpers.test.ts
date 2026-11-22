@@ -8,7 +8,7 @@
  * mask (or be mistaken for) an environment problem.
  *
  * @file
- * @see {@link project/vitest.smoke.config.ts} - Smoke test settings
+ * @see {@link vitest.smoke.config.ts} - Smoke test settings
  */
 
 import { describe, it, afterEach, beforeEach, expect } from "vitest";

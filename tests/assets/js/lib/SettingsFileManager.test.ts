@@ -4,9 +4,9 @@
  * Verifies settings file export (download trigger and filename generation) and import (dialog cancellation).
  *
  * @file
- * @see {@link project/vitest.config.ts} - Global settings
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
- * @see {@link project/tests/shared/support/TestRunner.ts} - Test execution engine
+ * @see {@link vitest.config.ts} - Global settings
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/TestRunner.ts} - Test execution engine
  */
 
 import { describe, afterEach, beforeEach, vi } from "vitest";
@@ -69,15 +69,18 @@ const testData = {
 		}
 	],
 	exportFailureCases: [
-		{ name: "should return false when the download cannot be started", input: { data: {} }, expected: false }
+		{ name: "should throw when the download cannot be started", input: { data: {} }, expected: /Failed to export settings file/ },
+		{ name: "should throw when data is empty", input: { data: null }, expected: /No settings found to export/ }
 	],
-	importCases: [
+	importSuccessCases: [
 		{ name: "should return null if file dialog is canceled", input: { pick: "cancel" }, expected: null },
 		{ name: "should return parsed data for a JSON file", input: { pick: "file", name: "s.json", type: "application/json", content: "{\"a\":1}" }, expected: { a: 1 } },
 		{ name: "should accept a .json file name even when the MIME type is empty", input: { pick: "file", name: "S.JSON", type: "", content: "[1,2]" }, expected: [ 1, 2 ] },
-		{ name: "should return null for a file that is neither JSON MIME nor .json", input: { pick: "file", name: "s.txt", type: "text/plain", content: "{}" }, expected: null },
-		{ name: "should return null for malformed JSON", input: { pick: "file", name: "s.json", type: "application/json", content: "{broken" }, expected: null },
 		{ name: "should return null when no file was selected", input: { pick: "empty" }, expected: null }
+	],
+	importErrorCases: [
+		{ name: "should throw for a file that is neither JSON MIME nor .json", input: { pick: "file", name: "s.txt", type: "text/plain", content: "{}" }, expected: /Invalid file format/ },
+		{ name: "should throw for malformed JSON", input: { pick: "file", name: "s.json", type: "application/json", content: "{broken" }, expected: /Failed to parse settings JSON/ }
 	]
 } as const satisfies Record<string, readonly TestCase[]>;
 
@@ -138,7 +141,7 @@ describe("SettingsFileManager", () => {
 		beforeEach(() => {
 			vi.useFakeTimers({ toFake: [ "Date" ] });
 			vi.setSystemTime(new Date(2026, 9, 27, 23, 45, 0));
-			vi.spyOn(console, "warn").mockImplementation(() => {});
+			vi.spyOn(console, "debug").mockImplementation(() => {});
 			spies = createDownloadSpies();
 		});
 
@@ -161,21 +164,16 @@ describe("SettingsFileManager", () => {
 
 	describe("exportFile (failure)", () => {
 		beforeEach(() => {
-			vi.spyOn(console, "error").mockImplementation(() => {});
 			vi.spyOn(URL, "createObjectURL").mockImplementation(() => {
 				throw new Error("createObjectURL failed");
 			});
 		});
 
-		TestRunner.success(testData.exportFailureCases, undefined, ({ data }: ExportInput) => exportFile(data, "a.json"), { matcher: "toBe" });
+		TestRunner.error(testData.exportFailureCases, undefined, ({ data }: ExportInput) => exportFile(data, "a.json"));
 	});
 
 	describe("importFile", () => {
-		beforeEach(() => {
-			vi.spyOn(console, "error").mockImplementation(() => {});
-		});
-
-		TestRunner.success(testData.importCases, undefined, ({ pick, name, type, content }: ImportInput) => {
+		const simulateFileDialog = ({ pick, name, type, content }: ImportInput) => {
 			// Arrange: Simulate the user's choice in the file dialog
 			vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(function(this: HTMLInputElement) {
 				setTimeout(() => {
@@ -190,6 +188,9 @@ describe("SettingsFileManager", () => {
 			});
 
 			return importFile();
-		});
+		};
+
+		TestRunner.success(testData.importSuccessCases, undefined, simulateFileDialog);
+		TestRunner.error(testData.importErrorCases, undefined, simulateFileDialog);
 	});
 });
