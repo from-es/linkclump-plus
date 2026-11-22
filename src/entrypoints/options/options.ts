@@ -911,37 +911,45 @@ function save_block() {
 
 
 async function import_setting() {
-	const result = await importFile<Settings>();
+	try {
+		const result = await importFile<Settings>();
 
-	// If the user cancels the file selection, result will be null
-	if (result === null) {
-		return;
-	}
-
-	if (isSettings(result)) {
-		currentSettings = result;
-
-		const obj = currentSettings.actions;
-		$("#settings").empty();
-
-		for (const key in obj) {
-			const act = obj[key];
-			if (!act) {
-				continue;
-			}
-			$("#settings").append(setup_action(act, key));
+		// If the user cancels the file selection, result will be null
+		if (result === null) {
+			return;
 		}
 
-		setup_text(keys);
+		if (isSettings(result)) {
+			currentSettings = result;
 
-		save_settings();
-	} else {
-		console.error("Failed to import settings:", result);
+			const obj = currentSettings.actions;
+			$("#settings").empty();
+
+			for (const key in obj) {
+				const act = obj[key];
+				if (!act) {
+					continue;
+				}
+				$("#settings").append(setup_action(act, key));
+			}
+
+			setup_text(keys);
+
+			save_settings();
+		} else {
+			console.error("Failed to import settings:", result);
+		}
+	} catch (error) {
+		console.error("Failed to read settings file:", error);
 	}
 }
 
 function export_setting() {
 	if (currentSettings) {
-		exportFile(currentSettings);
+		try {
+			exportFile(currentSettings);
+		} catch (error) {
+			console.error("Failed to export settings file:", error);
+		}
 	}
 }
