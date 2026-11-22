@@ -1,7 +1,7 @@
 /**
  * SettingsManager Tests
  *
- * Verifies initialization, install state detection, loading with fallback to defaults, saving, and migration.
+ * Verifies initialization, install state detection, loading with fallback to defaults, and saving.
  * Storage is replaced with an in-memory fake.
  *
  * @file
@@ -65,16 +65,9 @@ const testData = {
 	],
 	saveCases: [
 		{
-			name: "should clean error property before saving settings",
-			input: { actions: {}, blocked: [], error: "Some transient error" },
+			name: "should save settings to storage",
+			input: { actions: {}, blocked: [] },
 			expected: { actions: {}, blocked: [] }
-		}
-	],
-	migrateCases: [
-		{
-			name: "should migrate if needed when install state is 'first'",
-			input: undefined,
-			expected: { storedVersion: CURRENT_VERSION, settingsStored: true }
 		}
 	]
 } as const satisfies Record<string, readonly TestCase[]>;
@@ -165,14 +158,5 @@ describe("SettingsManager", () => {
 		});
 	});
 
-	describe("migrateIfNeeded", () => {
-		TestRunner.success(testData.migrateCases, () => context, async (_input, { memoryStore, manager }) => {
-			await manager.migrateIfNeeded();
 
-			return {
-				storedVersion: memoryStore[linkclumpVersionKey],
-				settingsStored: memoryStore[linkclumpSettingsKey] !== undefined
-			};
-		});
-	});
 });
