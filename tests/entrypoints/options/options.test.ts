@@ -4,9 +4,9 @@
  * Verifies which modifier keys are offered per OS and mouse button in the options page key selector.
  *
  * @file
- * @see {@link project/vitest.config.ts} - Global settings
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
- * @see {@link project/tests/shared/support/TestRunner.ts} - Test execution engine
+ * @see {@link vitest.config.ts} - Global settings
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/TestRunner.ts} - Test execution engine
  */
 
 import { describe, beforeEach } from "vitest";

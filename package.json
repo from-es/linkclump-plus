@@ -22,7 +22,7 @@
     "zip:chrome": "wxt zip --browser chrome --mv3",
     "zip:firefox": "wxt zip --browser firefox --mv3",
     "typecheck": "tsc --noEmit",
-    "eslint": "eslint --format stylish src",
+    "eslint": "eslint --format stylish src tests",
     "vitest": "vitest",
     "vitest:run": "vitest run",
     "vitest:ui": "vitest --ui",

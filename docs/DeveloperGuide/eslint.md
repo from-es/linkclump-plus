@@ -22,9 +22,9 @@ The current setup includes:
 
 ## Run ESLint
 
-### Lint the entire source directory
+### Lint source and test directories
 
-To check the entire `src/` directory, run:
+To check the `src/` and `tests/` directories, run:
 
 ```bash
 npm run eslint

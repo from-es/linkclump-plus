@@ -2,7 +2,7 @@
  * Helpers for tests of the content script, which keeps its state on `window`.
  *
  * @file
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
  */
 
 import { OS_WIN } from "@/assets/js/constants/os";

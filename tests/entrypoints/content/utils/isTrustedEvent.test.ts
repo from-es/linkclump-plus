@@ -4,10 +4,10 @@
  * Verifies that only browser-originated (trusted) events are accepted, and that missing events are rejected.
  *
  * @file
- * @see {@link project/vitest.config.ts} - Global settings
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
- * @see {@link project/tests/shared/support/TestRunner.ts} - Test execution engine
- * @see {@link project/tests/shared/types/validation.ts} - Standard type for validation tests
+ * @see {@link vitest.config.ts} - Global settings
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/TestRunner.ts} - Test execution engine
+ * @see {@link tests/shared/types/validation.ts} - Standard type for validation tests
  */
 
 import { describe } from "vitest";

@@ -4,9 +4,9 @@
  * Verifies OS detection from `navigator.platform` and the priority of `navigator.userAgentData.platform`.
  *
  * @file
- * @see {@link project/vitest.config.ts} - Global settings
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
- * @see {@link project/tests/shared/support/TestRunner.ts} - Test execution engine
+ * @see {@link vitest.config.ts} - Global settings
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/TestRunner.ts} - Test execution engine
  */
 
 import { describe, afterEach, beforeEach } from "vitest";
