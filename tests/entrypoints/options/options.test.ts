@@ -9,8 +9,8 @@
  * @see {@link tests/shared/support/TestRunner.ts} - Test execution engine
  */
 
-import { describe, beforeEach } from "vitest";
-import { displayKeys } from "@/entrypoints/options/options";
+import { describe, beforeEach, expect, it } from "vitest";
+import { displayKeys, parseBlocklist } from "@/entrypoints/options/options";
 import { OS_LINUX, OS_MAC, OS_WIN } from "@/assets/js/constants/os";
 import { KEY_CODE_ALT, KEY_CODE_CTRL, KEY_CODE_META, KEY_CODE_NONE, KEY_CODE_SHIFT } from "@/assets/js/constants/keyboard";
 import { MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT } from "@/assets/js/constants/mouseButton";
@@ -67,5 +67,15 @@ describe("options displayKeys (legacy test rewrite)", () => {
 
 	describe("Allow-no-key by mouse button and OS", () => {
 		TestRunner.success(testData.allowNoKeyCases, undefined, ({ mouseButton, os, keyCode }: Input) => displayKeys(mouseButton, os)[keyCode], { matcher: "toBe" });
+	});
+});
+
+describe("parseBlocklist", () => {
+	it("should trim lines and filter out empty lines", () => {
+		const input = "  https://example.com/  \n\n  https://test.com/  \n  ";
+		expect(parseBlocklist(input)).toEqual([
+			"https://example.com/",
+			"https://test.com/"
+		]);
 	});
 });

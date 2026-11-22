@@ -480,6 +480,21 @@ button.button:hover {
 	background-color: #d62800;
 }
 
+.form-row {
+	margin: 0.5rem 0;
+}
+
+.info-note {
+	background-color: #e8f4fd;
+	border-left: 4px solid #2196f3;
+	color: #0d47a1;
+	font-size: 0.85rem;
+	line-height: 1.4;
+	margin: 0.5rem 0 0;
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.25rem;
+}
+
 #settings:empty::before {
 	content: var(--warning-no-actions);
 	display: block;

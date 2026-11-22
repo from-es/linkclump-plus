@@ -15,7 +15,7 @@ Thanks to [benblack86](https://github.com/benblack86 "https://github.com/benblac
 
 - **[User guide](./docs/UserGuide/README.md):** Basic usage, Actions, options, and permissions.
 - **[FAQ](./docs/UserGuide/FAQ.md):** Answers to common setup and usage questions.
-- **[Notices](./docs/UserGuide/Notices.md):** OS- and browser-specific details, known limitations, and known issues.
+- **[Notices](./docs/UserGuide/Notices.md):** OS- and browser-specific details, as well as known limitations and issues.
 - **[Developer guide](./docs/DeveloperGuide/README.md):** Architecture, build setup, testing, and contribution guidelines.
 
 ## Installation
