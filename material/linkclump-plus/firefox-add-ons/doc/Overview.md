@@ -28,9 +28,9 @@ The "Copy to clipboard" action supports seven formats:
 - URLs only (one per line)
 - URLs only, space-separated (all on one line)
 - Titles only
-- HTML anchor tags (`<a href="...">...</a>`, one per line)
-- HTML unordered list (`<ul> with <li><a>` entries)
-- Markdown links (`[Title](URL)`, one per line)
+- HTML anchor tags ("<a href="...">...</a>", one per line)
+- HTML unordered list ("<ul> with <li><a>" entries)
+- Markdown links ("`[Title](URL)`", one per line)
 
 **###** Triggers
 
