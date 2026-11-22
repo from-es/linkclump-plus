@@ -28,6 +28,11 @@ const testData = {
 	matchCases: [
 		{ name: "should return true when URL matches the first entry in blocklist", input: { patterns: [ "blocked-site\\.com", "news\\.example\\.org" ], url: "https://blocked-site.com/subpath" }, expected: true },
 		{ name: "should return true when URL matches a later entry in blocklist", input: { patterns: [ "blocked-site\\.com", "news\\.example\\.org" ], url: "https://news.example.org/article" }, expected: true },
+		{
+			name: "should return true when URL matches an entry with leading or trailing whitespace",
+			input: { patterns: [ "  blocked-site\\.com  " ], url: "https://blocked-site.com/subpath" },
+			expected: true
+		},
 		{ name: "should return false when URL does not match any entry", input: { patterns: [ "blocked-site\\.com" ], url: "https://safe-site.com/home" }, expected: false }
 	],
 	invalidPatternCases: [

@@ -24,7 +24,7 @@ export function isBlockedUrl(blockedPatterns: readonly string[], url: string): b
 			continue;
 		}
 
-		const re = createRegExp(blocked);
+		const re = createRegExp(blocked.trim());
 		if (re === null) {
 			console.warn("Ignoring an invalid blocklist pattern:", blocked);
 			continue;
