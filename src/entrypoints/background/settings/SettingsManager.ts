@@ -46,16 +46,13 @@ export class SettingsManager {
 	}
 
 	/**
-	 * Saves settings to sync storage after removing any transient error messages.
+	 * Saves settings to sync storage.
 	 *
-	 * @param {Settings & { error?: string }} settings - Settings object to save.
+	 * @param {Settings} settings - Settings object to save.
 	 * @returns {Promise<void>}
 	 */
-	async save(settings: Settings & { error?: string }): Promise<void> {
-		const cleanSettings: Settings & { error?: string } = { ...settings };
-		delete cleanSettings.error;
-
-		await this.storageManager.set(linkclumpSettingsKey, cleanSettings);
+	async save(settings: Settings): Promise<void> {
+		await this.storageManager.set(linkclumpSettingsKey, settings);
 	}
 
 	/**
@@ -97,14 +94,5 @@ export class SettingsManager {
 		return settings;
 	}
 
-	/**
-	 * Updates settings if not already initialized.
-	 *
-	 * @returns {Promise<void>}
-	 */
-	async migrateIfNeeded(): Promise<void> {
-		if ((await this.getInstallState()) === "first") {
-			await this.initialize();
-		}
-	}
+
 }

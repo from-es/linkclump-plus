@@ -230,6 +230,7 @@ Linkclump Plus runs separately in every frame of a page (the page itself and eac
 - To select links inside an `<iframe>`, start the drag inside that frame. If you start in the parent page and drag over the `<iframe>`, the links inside it aren't selected.
 - The behavior is the same for same-domain and cross-domain frames. When an `<iframe>` is nested in another, the same rule applies to the frame where the drag started.
 - The blocklist is also checked for each frame, using that frame's own URL.
+- Frames without standard web URLs (such as `<iframe srcdoc="...">` or dynamic `about:blank` frames) are not supported. While they could theoretically be targeted, they are intentionally excluded to prevent blocklist circumvention and avoid instability in dynamic web apps and rich text editors.
 
 This is intentional. Selecting across frames would require coordinating the frames and converting positions between them. That is fragile on pages with unusual styles, for example margins or transforms on the `body` element of a frame.
 

@@ -4,10 +4,10 @@
  * Verifies blocklist matching, invalid pattern skipping (with a warning), empty pattern handling, and invalid argument handling.
  *
  * @file
- * @see {@link project/vitest.config.ts} - Global settings
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
- * @see {@link project/tests/shared/support/TestRunner.ts} - Test execution engine
- * @see {@link project/tests/shared/types/validation.ts} - Standard type for validation tests
+ * @see {@link vitest.config.ts} - Global settings
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/TestRunner.ts} - Test execution engine
+ * @see {@link tests/shared/types/validation.ts} - Standard type for validation tests
  */
 
 import { describe, afterEach, beforeEach, expect, vi } from "vitest";
@@ -28,6 +28,11 @@ const testData = {
 	matchCases: [
 		{ name: "should return true when URL matches the first entry in blocklist", input: { patterns: [ "blocked-site\\.com", "news\\.example\\.org" ], url: "https://blocked-site.com/subpath" }, expected: true },
 		{ name: "should return true when URL matches a later entry in blocklist", input: { patterns: [ "blocked-site\\.com", "news\\.example\\.org" ], url: "https://news.example.org/article" }, expected: true },
+		{
+			name: "should return true when URL matches an entry with leading or trailing whitespace",
+			input: { patterns: [ "  blocked-site\\.com  " ], url: "https://blocked-site.com/subpath" },
+			expected: true
+		},
 		{ name: "should return false when URL does not match any entry", input: { patterns: [ "blocked-site\\.com" ], url: "https://safe-site.com/home" }, expected: false }
 	],
 	invalidPatternCases: [

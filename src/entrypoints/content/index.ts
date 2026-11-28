@@ -19,6 +19,12 @@ export default defineContentScript(
 		// Run in all frames (including iframes) to detect embedded links
 		allFrames: true,
 
+		// NOTE: `matchAboutBlank` is intentionally omitted (defaults to false).
+		// While `matchAboutBlank: true` would enable execution inside about:srcdoc and about:blank,
+		// it bypasses blocklist checks (evaluated against about: URLs) and cannot guarantee
+		// stability in dynamically rewritten frames (document.write).
+		// matchAboutBlank: true,
+
 		// Execute after the page has finished loading (same as manifest default)
 		runAt: "document_idle",
 

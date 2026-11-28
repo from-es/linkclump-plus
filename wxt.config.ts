@@ -38,8 +38,6 @@ const getViteConfig: GetViteConfig = (env: ConfigEnv): WxtViteConfig => {
 		}
 	};
 
-	// console.debug("Debug, [wxt.config.ts] Generated Vite Config:", { env, viteConfig });
-
 	return viteConfig;
 };
 
@@ -65,8 +63,6 @@ const getManifest: GetManifest = (env: ConfigEnv): UserManifest => {
 		default:
 			break;
 	}
-
-	// console.debug("Debug, [wxt.config.ts] Generated Manifest:", { env, manifest: JSON.stringify(mf, null, 2) });
 
 	return mf;
 };

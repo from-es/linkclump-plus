@@ -1,7 +1,7 @@
 {
   "name": "linkclump-plus",
   "description": "Lets you open, copy or bookmark multiple links at the same time. Cross-browser extension supporting both Chrome and Firefox.",
-  "version": "2.18.0",
+  "version": "2.19.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "zip:chrome": "wxt zip --browser chrome --mv3",
     "zip:firefox": "wxt zip --browser firefox --mv3",
     "typecheck": "tsc --noEmit",
-    "eslint": "eslint --format stylish src",
+    "eslint": "eslint --format stylish src tests",
     "vitest": "vitest",
     "vitest:run": "vitest run",
     "vitest:ui": "vitest --ui",

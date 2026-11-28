@@ -79,30 +79,29 @@ const CONTROL_CHARS_REGEX = /[\x00-\x1F\x7F]/gu;
  * Triggers a file open dialog and imports data from a JSON file.
  *
  * @template T - Type of the data object.
- * @returns {Promise<T | null>} Parsed data object, or null if the file dialog was canceled, the file format was invalid, or parsing failed.
+ * @returns {Promise<T | null>} Parsed data object, or null if the file dialog was canceled.
+ * @throws {Error} If the selected file format is invalid, reading fails, or parsing fails.
  */
 async function importFile<T = unknown>(): Promise<T | null> {
+	const file = await showOpenFileDialog(SETTING_FILE.mimetype);
+	if (!file) {
+		return null;
+	}
+
+	const isJsonMime = file.type === SETTING_FILE.mimetype;
+	const isJsonExt = file.name.toLowerCase().endsWith(`.${SETTING_FILE.extension}`);
+
+	if (!isJsonMime && !isJsonExt) {
+		throw new Error(`Invalid file format: selected file is not a JSON file (type: "${file.type}", name: "${file.name}").`);
+	}
+
+	const text = await readAsText(file);
 	try {
-		const file = await showOpenFileDialog(SETTING_FILE.mimetype);
-		if (!file) {
-			return null;
-		}
-
-		const isJsonMime = file.type === SETTING_FILE.mimetype;
-		const isJsonExt = file.name.toLowerCase().endsWith(`.${SETTING_FILE.extension}`);
-
-		if (!isJsonMime && !isJsonExt) {
-			throw new Error(`Invalid file format: selected file is not a JSON file (type: "${file.type}", name: "${file.name}").`);
-		}
-
-		const text = await readAsText(file);
 		const result = JSON.parse(text) as T;
 
 		return result;
 	} catch (error) {
-		console.error("Failed to read settings file:", error);
-
-		return null;
+		throw new Error("Failed to parse settings JSON.", { cause: error });
 	}
 }
 
@@ -115,13 +114,18 @@ async function importFile<T = unknown>(): Promise<T | null> {
  *   generated automatically. Including spaces in the filename is discouraged.
  * @param {ManifestIdentityInfo} [manifest] - Manifest identity info used for default filename
  *   generation. Defaults to runtime manifest.
- * @returns {boolean} True if the export was initiated successfully, false otherwise.
+ * @returns {boolean} True if the export was initiated successfully.
+ * @throws {Error} If no data is provided or the download cannot be initiated.
  */
 function exportFile<T>(
 	data: T,
 	filename?: string,
 	manifest?: ManifestIdentityInfo
 ): boolean {
+	if (!data) {
+		throw new Error("No settings found to export.");
+	}
+
 	const finalFilename = filename ?? generateDefaultFilename(manifest);
 
 	return downloadFile(data, finalFilename, SETTING_FILE.mimetype);
@@ -205,7 +209,8 @@ function readAsText(file: File): Promise<string> {
  * @param {T} data - Data object to serialize and download.
  * @param {string} filename - Download file name.
  * @param {string} mimetype - MIME type of the file.
- * @returns {boolean} True if the download was initiated successfully, false otherwise.
+ * @returns {boolean} True if the download was initiated successfully.
+ * @throws {Error} If serialization or creating the download URL fails.
  */
 function downloadFile<T>(data: T, filename: string, mimetype: string): boolean {
 	try {
@@ -230,9 +235,7 @@ function downloadFile<T>(data: T, filename: string, mimetype: string): boolean {
 
 		return true;
 	} catch (error) {
-		console.error("Failed to export settings file:", error);
-
-		return false;
+		throw new Error("Failed to export settings file.", { cause: error });
 	}
 }
 
@@ -259,8 +262,8 @@ function getManifestIdentityInfo(
 		if (browser?.runtime?.getManifest) {
 			return browser.runtime.getManifest();
 		}
-	} catch (error) {
-		console.warn("Failed to retrieve extension manifest, falling back to default application info:", error);
+	} catch {
+		// Fallback gracefully without console logging in utility layer
 	}
 
 	return { ...fallback };

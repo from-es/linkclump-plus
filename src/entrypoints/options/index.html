@@ -87,11 +87,21 @@
 		<div id="documentation" class="info-box">
 			<h2>Documentation</h2>
 
-			<p>For detailed documentation on this extension, please refer to the User Guide &amp; Developer Guide.</p>
+			<p>For more information on this extension, please refer to the official guides on GitHub.</p>
 
 			<ul>
-				<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/README.md" target="_blank">User Guide</a></li>
-				<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/DeveloperGuide/README.md" target="_blank">Developer Guide</a></li>
+				<li><b>User Guide:</b>
+					<ul>
+						<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/README.md" target="_blank">User Guide</a>: Basic usage, Actions, options, and permissions.</li>
+						<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/FAQ.md" target="_blank">FAQ</a>: Answers to common setup and usage questions.</li>
+						<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/Notices.md" target="_blank">Notices</a>: OS- and browser-specific details, as well as known limitations and issues.</li>
+					</ul>
+				</li>
+				<li><b>Developer Guide:</b>
+					<ul>
+						<li><a href="https://github.com/from-es/linkclump-plus/blob/main/docs/DeveloperGuide/README.md" target="_blank">Developer Guide</a>: Architecture, build setup, testing, and contribution guidelines.</li>
+					</ul>
+				</li>
 			</ul>
 		</div>
 
@@ -235,9 +245,11 @@ header, nav, main, footer {
 			<div class="warning">WARNING: The selected mouse/key match another action already setup</div>
 
 			<p><label for="form_mouse">Mouse button</label><select id="form_mouse"></select></p>
-			<p><label for="form_key">+ key</label><select id="form_key"></select>
+			<div class="form-row">
+				<label for="form_key">+ key</label><select id="form_key"></select>
 				<div id="key_warning" class="warning2"></div>
-			</p>
+				<div id="trackpad_notice" class="info-note" style="display: none;"></div>
+			</div>
 			<p><label for="form_color">Selection box color</label><select id='form_color'></select></p>
 
 			<input type="hidden" id="form_id" value="">

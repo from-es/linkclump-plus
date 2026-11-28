@@ -1,0 +1,107 @@
+/* Protocol filtering test specific styles */
+
+.scheme-badge {
+	display: inline-block;
+	padding: 0.15rem 0.45rem;
+	font-size: 0.78rem;
+	font-weight: 700;
+	font-family: Consolas, "Courier New", monospace;
+	border-radius: 3px;
+	margin-right: 0.5rem;
+	vertical-align: middle;
+}
+
+.scheme-badge-http {
+	background-color: #e3f2fd;
+	color: #0d47a1;
+	border: 1px solid #90caf9;
+}
+
+.scheme-badge-file {
+	background-color: #f3e5f5;
+	color: #4a148c;
+	border: 1px solid #ce93d8;
+}
+
+.scheme-badge-script {
+	background-color: #ffebee;
+	color: #b71c1c;
+	border: 1px solid #ef9a9a;
+}
+
+.scheme-badge-app {
+	background-color: #fff3e0;
+	color: #e65100;
+	border: 1px solid #ffcc80;
+}
+
+.scheme-badge-browser {
+	background-color: #eceff1;
+	color: #263238;
+	border: 1px solid #b0bec5;
+}
+
+.result-badge {
+	display: inline-block;
+	padding: 0.15rem 0.45rem;
+	font-size: 0.78rem;
+	font-weight: 700;
+	border-radius: 3px;
+}
+
+.result-selected {
+	background-color: #e8f5e9;
+	color: #1b5e20;
+	border: 1px solid #a5d6a7;
+}
+
+.result-excluded {
+	background-color: #fbe9e7;
+	color: #bf360c;
+	border: 1px solid #ffab91;
+}
+
+.result-blocked {
+	background-color: #fff8e1;
+	color: #f57f17;
+	border: 1px solid #ffe082;
+}
+
+.protocol-test-list {
+	list-style: none;
+	padding-left: 0;
+	margin: 0.75rem 0;
+}
+
+.protocol-test-item {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem;
+	margin: 0.5rem 0;
+	padding: 0.4rem 0.6rem;
+	background-color: #fafbfc;
+	border: 1px solid #e1e4e8;
+	border-radius: 4px;
+}
+
+.protocol-test-item a {
+	font-family: Consolas, "Courier New", monospace;
+	font-size: 0.92rem;
+	word-break: break-all;
+}
+
+.protocol-test-desc {
+	font-size: 0.85rem;
+	color: #586069;
+	margin-left: auto;
+	white-space: nowrap;
+}
+
+.warning-callout {
+	background-color: #fff8e6;
+	border-left: 4px solid #d97706;
+	padding: 0.75rem 1rem;
+	margin: 1rem 0;
+	border-radius: 0 4px 4px 0;
+	font-size: 0.9rem;
+}

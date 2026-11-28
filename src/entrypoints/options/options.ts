@@ -157,12 +157,12 @@ const optionsSchema: OptionsSchema = {
 		"block": {
 			"name": "block repeat links in selection",
 			"type": "checkbox",
-			"extra": "select to block repeat links from opening"
+			"extra": "select to block repeat links in selection"
 		},
 		"reverse": {
 			"name": "reverse order",
 			"type": "checkbox",
-			"extra": "select to have links opened in reverse order"
+			"extra": "select to process links in reverse order"
 		},
 		"end": {
 			"name": "open tabs at the end",
@@ -603,17 +603,34 @@ function check_selection() {
 	const k = $("#form_key").val();
 	const id = $("#form_id").val();
 
-
 	const keyWarning = $("#key_warning");
 	keyWarning.empty();
 	if (k === "0") {
 		keyWarning.append("WARNING: Not using a key could cause unexpected behavior on some websites");
 		if ($(".warning2").is(":hidden")) {
-			$(".warning2").fadeIn();
+			$(".warning2").stop(true, true).fadeIn();
 		}
 	} else {
 		if (!$(".warning2").is(":hidden")) {
-			$(".warning2").fadeOut();
+			$(".warning2").stop(true, true).fadeOut();
+		}
+	}
+
+	// Trackpad Palm Rejection / AAP Notice for Letter Keys (A-Z)
+	const trackpadNotice = $("#trackpad_notice");
+	const keyNum = Number(k);
+	const isLetterKey = keyNum >= ALPHA_KEYCODE_START && keyNum < ALPHA_KEYCODE_START + ALPHA_KEY_COUNT;
+
+	if (isLetterKey && (os === OS_WIN || os === OS_LINUX)) {
+		const modifierList = os === OS_WIN ? "Ctrl, Shift, or Alt" : "Ctrl or Shift";
+		const osName = os === OS_WIN ? "Windows" : "Linux";
+		trackpadNotice.text(`Note: On ${osName} laptops, pressing a letter key may temporarily disable the built-in trackpad. Use ${modifierList} instead if using a trackpad.`);
+		if (trackpadNotice.is(":hidden")) {
+			trackpadNotice.stop(true, true).slideDown();
+		}
+	} else {
+		if (!trackpadNotice.is(":hidden")) {
+			trackpadNotice.stop(true, true).slideUp();
 		}
 	}
 
@@ -629,7 +646,7 @@ function check_selection() {
 		// not sure if mouse/key are strings or ints
 		if (i !== id && Number(act.mouse) === Number(m) && Number(act.key) === Number(k)) {
 			if ($(".warning").is(":hidden")) {
-				$(".warning").fadeIn();
+				$(".warning").stop(true, true).fadeIn();
 			}
 
 			return;
@@ -637,7 +654,7 @@ function check_selection() {
 	}
 
 	if (!$(".warning").is(":hidden")) {
-		$(".warning").fadeOut();
+		$(".warning").stop(true, true).fadeOut();
 	}
 }
 
@@ -887,14 +904,26 @@ function check_block(sites: readonly string[], prefix: string): boolean {
 	return false;
 }
 
+/**
+ * Splits raw blocklist input into trimmed, non-empty pattern lines.
+ *
+ * @param {string} rawSites - Multiline string from textarea.
+ * @returns {string[]} Array of non-empty, trimmed pattern strings.
+ */
+export function parseBlocklist(rawSites: string): string[] {
+	return rawSites
+		.split("\n")
+		.map((line) => line.trim())
+		.filter((line) => line.length > 0);
+}
+
 function save_block() {
 	if (!currentSettings) {
 		return;
 	}
 
-	// replace any whitespace at end to stop empty site listings
 	const rawSites = String($("#form_block").val() ?? "");
-	const sites = rawSites.replace(/^\s+|\s+$/g, "").split("\n");
+	const sites = parseBlocklist(rawSites);
 
 	// every line is used as a regular expression; keep the previously saved list while an
 	// invalid pattern is being typed
@@ -911,37 +940,45 @@ function save_block() {
 
 
 async function import_setting() {
-	const result = await importFile<Settings>();
+	try {
+		const result = await importFile<Settings>();
 
-	// If the user cancels the file selection, result will be null
-	if (result === null) {
-		return;
-	}
-
-	if (isSettings(result)) {
-		currentSettings = result;
-
-		const obj = currentSettings.actions;
-		$("#settings").empty();
-
-		for (const key in obj) {
-			const act = obj[key];
-			if (!act) {
-				continue;
-			}
-			$("#settings").append(setup_action(act, key));
+		// If the user cancels the file selection, result will be null
+		if (result === null) {
+			return;
 		}
 
-		setup_text(keys);
+		if (isSettings(result)) {
+			currentSettings = result;
 
-		save_settings();
-	} else {
-		console.error("Failed to import settings:", result);
+			const obj = currentSettings.actions;
+			$("#settings").empty();
+
+			for (const key in obj) {
+				const act = obj[key];
+				if (!act) {
+					continue;
+				}
+				$("#settings").append(setup_action(act, key));
+			}
+
+			setup_text(keys);
+
+			save_settings();
+		} else {
+			console.error("Failed to import settings:", result);
+		}
+	} catch (error) {
+		console.error("Failed to read settings file:", error);
 	}
 }
 
 function export_setting() {
 	if (currentSettings) {
-		exportFile(currentSettings);
+		try {
+			exportFile(currentSettings);
+		} catch (error) {
+			console.error("Failed to export settings file:", error);
+		}
 	}
 }

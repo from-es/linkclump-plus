@@ -9,10 +9,10 @@
  * it verifies direct CSS style property assignment on a freshly created DOM element.
  *
  * @file
- * @see {@link project/vitest.config.ts} - Global settings
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
- * @see {@link project/tests/shared/support/TestRunner.ts} - Test execution engine
- * @see {@link project/tests/shared/types/validation.ts} - Standard type for validation tests
+ * @see {@link vitest.config.ts} - Global settings
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/TestRunner.ts} - Test execution engine
+ * @see {@link tests/shared/types/validation.ts} - Standard type for validation tests
  */
 
 import { describe, it, afterEach, beforeEach, expect, vi } from "vitest";

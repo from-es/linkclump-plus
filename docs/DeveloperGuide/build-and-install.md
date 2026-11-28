@@ -110,7 +110,7 @@ Runs `tsc --noEmit`, which checks the types without writing any files.
 npm run eslint
 ```
 
-Runs ESLint on the `src/` directory. For the rules and the VS Code integration, see [ESLint](./eslint.md).
+Runs ESLint on the `src/` and `tests/` directories. For the rules and the VS Code integration, see [ESLint](./eslint.md).
 
 ---
 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Nested iframe Level 1 (Child)</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-size: 15px;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			background-color: #fff4e6;
+			color: #d9480f;
+		}
+		main {
+			padding: 1rem;
+		}
+		.badge {
+			padding: 0.2rem 0.5rem;
+			font-size: 0.75rem;
+			font-weight: bold;
+			border-radius: 3px;
+			background-color: #ffe8cc;
+			color: #d9480f;
+			border: 1px solid #ffd8a8;
+		}
+		.links {
+			margin: 0.5rem 0 0.75rem 0;
+			padding: 0.5rem;
+			background-color: #ffffff;
+			border: 1px solid #ffc078;
+			border-radius: 4px;
+			list-style: none;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+		.links li {
+			margin: 0;
+		}
+		.links a {
+			display: inline-block;
+			padding: 0.3rem 0.6rem;
+			background-color: #f76707;
+			color: #ffffff;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: 500;
+		}
+		.links a:hover {
+			background-color: #d9480f;
+		}
+		.nested-frame {
+			display: block;
+			width: 100%;
+			height: 170px;
+			border: 2px dashed #f76707;
+			border-radius: 4px;
+			margin-top: 0.5rem;
+			box-sizing: border-box;
+		}
+		.instruction {
+			margin: 0.25rem 0 0.5rem 0;
+			font-size: 0.85rem;
+			color: #862e9c;
+		}
+	</style>
+</head>
+<body>
+<main>
+	<div>
+		<span class="badge">Level 1 (Child iframe)</span>
+		<strong>Inside Level 1 iframe (<code>./subpages/nested-outer.html</code>)</strong>
+	</div>
+	<p class="instruction">Level 1 links (must not select Level 2 links):</p>
+	<ul class="links">
+		<li><a href="https://www.google.com" target="_blank" rel="noopener">[Nested Lv1] Google</a></li>
+		<li><a href="https://www.bing.com" target="_blank" rel="noopener">[Nested Lv1] Bing</a></li>
+		<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">[Nested Lv1] Yahoo</a></li>
+	</ul>
+
+	<iframe class="nested-frame" src="./nested-inner.html"></iframe>
+</main>
+</body>
+</html>

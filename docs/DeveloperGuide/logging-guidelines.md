@@ -107,6 +107,11 @@ To enforce separation of concerns (SoC) between architectural layers, the follow
 - On validation failure or unrecoverable state, use `throw` to propagate the exception to the caller.
 - If internal state output is needed for diagnosis, use `console.debug` — not `console.error`.
 
+> [!NOTE]
+> **Exception for `safeAsync`**
+>
+> `assets/js/lib/safeAsync.ts` is an explicit exception. As the top-level error boundary for fire-and-forget asynchronous tasks, it catches otherwise-unhandled Promise rejections and logs them with `console.error` to ensure failure visibility without terminating the runtime process.
+
 ```typescript
 // Correct: the utility layer throws and doesn't log errors.
 function validateSetting(value: unknown): number {

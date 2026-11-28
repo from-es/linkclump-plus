@@ -5,7 +5,7 @@
  * becomes one `it` block, following the Arrange → Act → Assert pattern.
  *
  * @file
- * @see {@link project/tests/shared/support/setup.ts} - Shared mocks
+ * @see {@link tests/shared/support/setup.ts} - Shared mocks
  */
 
 import { it, expect } from "vitest";

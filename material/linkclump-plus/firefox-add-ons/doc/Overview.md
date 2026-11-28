@@ -28,15 +28,17 @@ The "Copy to clipboard" action supports seven formats:
 - URLs only (one per line)
 - URLs only, space-separated (all on one line)
 - Titles only
-- HTML anchor tags (`<a href="...">...</a>`, one per line)
-- HTML unordered list (`<ul> with </ul>` entries)
-- Markdown links (`[Title](URL))`, one per line)
+- HTML anchor tags ("<a href="...">...</a>", one per line)
+- HTML unordered list ("<ul> with <li><a>" entries)
+- Markdown links ("`[Title](URL)`", one per line)
 
 **###** Triggers
 
 Each action is started by a unique combination of a mouse button (left, middle, or right) and a key (Shift, Ctrl, Alt, Cmd on macOS, or any letter A–Z). The Options page lists only the combinations that are valid for your operating system.
 
 Touch screens are supported: press and hold for about 0.5 seconds, then drag.
+
+**Note for laptop users:** on Windows and Linux, using a modifier key (Ctrl, Shift, or Alt) is recommended when using a built-in trackpad.
 
 **###** Blocklist
 
@@ -60,16 +62,18 @@ Works with Mozilla Firefox and Firefox-based browsers (version 152 or later).
 
 **##** Documentation
 
-- User Guide:
-   - https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/README.md
-- Developer guide:
-   - https://github.com/from-es/linkclump-plus/blob/main/docs/DeveloperGuide/README.md
+- **User guide** — Basic usage, Actions, options, and permissions:
+	- https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/README.md
+- **FAQ** — Answers to common setup and usage questions:
+	- https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/FAQ.md
+- **Notices** — OS- and browser-specific details, as well as known limitations and issues:
+	- https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/Notices.md
+- **Developer guide** — Architecture, build setup, testing, and contribution guidelines:
+	- https://github.com/from-es/linkclump-plus/blob/main/docs/DeveloperGuide/README.md
 
 **##** FAQ & Known Issues
 
-For FAQ, known issues, workarounds, and OS- or browser-specific limitations, see:
-- Notices: https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/Notices.md
-- FAQ: https://github.com/from-es/linkclump-plus/blob/main/docs/UserGuide/FAQ.md
+For a full list of known issues, workarounds, and OS- or browser-specific limitations, see Notices and FAQ above.
 
 **##** Support
 
@@ -78,11 +82,11 @@ Linkclump Plus is a free extension, and the developer cannot offer individual su
 **##** Related Links
 
 - **Linkclump** (Original):
-  - Repository: https://github.com/benblack86/linkclump
+	- Repository: https://github.com/benblack86/linkclump
 - **linkclump-ng** (Manifest V3 port):
-  - Repository: https://github.com/wvanderp/linkclump
+	- Repository: https://github.com/wvanderp/linkclump
 - **Linkclump Plus** (This fork):
-  - Repository: https://github.com/from-es/linkclump-plus
-  - Official Extension Store:
-    - Chrome Web Store: https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm
-    - Firefox Add-ons: https://addons.mozilla.org/firefox/addon/linkclump-plus/
+	- Repository: https://github.com/from-es/linkclump-plus
+	- Official Extension Store:
+		- Chrome Web Store: https://chromewebstore.google.com/detail/ainlglbojoodfdbndbfofojhmjbmelmm
+		- Firefox Add-ons: https://addons.mozilla.org/firefox/addon/linkclump-plus/

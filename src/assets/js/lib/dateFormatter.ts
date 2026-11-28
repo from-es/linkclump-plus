@@ -33,8 +33,8 @@ const DATE_MAX = 8640000000000000;   // Maximum valid date in milliseconds
  * @param {Date} date - The Date object to format.
  * @param {string} [format] - The format string to apply. Defaults to "YYYYMMDDThhmmss".
  * @returns {string} The formatted date string.
- * @throws {TypeError} - Thrown when `date` is not a Date instance or is an invalid Date (`getTime()` returns NaN).
- * @throws {TypeError} - Thrown when `format` is not a string.
+ * @throws {TypeError} Thrown when `date` is not a Date instance or is an invalid Date (`getTime()` returns NaN).
+ * @throws {TypeError} Thrown when `format` is not a string.
  */
 export function dateFormatter(
 	date: Date,
