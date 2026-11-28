@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+	<link rel="stylesheet" href="../assets/css/common.css" type="text/css">
 	<link rel="stylesheet" href="./css/style.css" type="text/css">
 
 	<title>CSS Layout Functionality Test</title>
@@ -12,50 +13,95 @@
 
 <main>
 	<article>
-		<div class="verification">
-			<h1>CSS Layout Functionality Test</h1>
+		<h1>CSS Layout Functionality Test</h1>
 
+		<nav class="nav-bar">
+			<a class="nav-back-btn" href="../index.html">Return to Test Page Index</a>
+		</nav>
+
+		<section>
 			<h2>About</h2>
 
-			<p>This page is a test page to verify the Linkclump Plus's link selection function within elements to which the following basic CSS layout properties are applied:</p>
+			<p>This page verifies Linkclump Plus's link selection function within elements to which basic CSS layout properties (margin, padding, width constraints, positioning) are applied.</p>
 
-			<ul>
-				<li><code>margin</code></li>
-				<li><code>padding</code></li>
-				<li><code>max-width</code></li>
-				<li><code>min-width</code></li>
-				<li><code>position</code></li>
-			</ul>
+			<div class="note-box">
+				<strong>Known Historical Precaution:</strong>
+				<p>Pages with fixed <code>body</code> width and <code>margin: 0 auto</code> can shift cursor coordinate mapping relative to document bounds. This page allows testing combinations of body constraints and container positions.</p>
+			</div>
+		</section>
 
-			<p>It confirms whether Linkclump Plus can correctly select links under various CSS layout settings.</p>
+		<section>
+			<h2>Procedure &amp; Expected Results</h2>
 
-			<h2>Default Style</h2>
+			<ol>
+				<li>Select style options below to apply CSS properties to <code>body</code> or <code>#linklist-container</code>.</li>
+				<li>Hold the configured key and drag-select across the "Target Link List".</li>
+				<li>Verify that Linkclump Plus's selection box and detected link highlights align accurately with the target links.</li>
+			</ol>
 
-<pre><code>
+			<table>
+				<thead>
+					<tr>
+						<th>Applied Style Property</th>
+						<th>Target Element</th>
+						<th>Expected Result</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>margin: 3rem;</code> / <code>padding: 3rem;</code></td>
+						<td><code>body</code></td>
+						<td>Offset added to body is correctly accounted for; links are selected at their visual positions.</td>
+					</tr>
+					<tr>
+						<td><code>width: 1280px; margin: 0 auto;</code></td>
+						<td><code>body</code></td>
+						<td>Centered body bounds align with viewport; selection box tracks pointer without horizontal drift.</td>
+					</tr>
+					<tr>
+						<td><code>position: relative / absolute</code></td>
+						<td><code>#linklist-container</code></td>
+						<td>Repositioned container links are accurately hit-tested at their shifted coordinates.</td>
+					</tr>
+					<tr>
+						<td><code>position: fixed / sticky</code></td>
+						<td><code>#linklist-container</code></td>
+						<td>Links staying in viewport during scroll are detected at current viewport offset.</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3>Default Page Style</h3>
+
+			<p>This is the baseline CSS applied before options below are selected:</p>
+
+<pre class="code-block"><code>:root {
+	--font-size-base: 16px;
+}
+
 html, body {
 	margin : 0;
 	padding: 0;
-
-	font-size: 16px;
 }
 
 html {
-	background-color: #000;
-}
-
-body {
-	background-color: #fff;
+	font-size: var(--font-size-base);
 }
 
 main {
-	padding: 1rem 0;
-}
-</code></pre>
+	margin: 0;
+	padding: 0;
+}</code></pre>
+		</section>
 
-			<h2>Style Selection</h2>
+		<section>
+			<h2>Test Cases</h2>
 
-			<fieldset>
-				<legend>Add Style</legend>
+			<section class="case-card">
+				<h3>Style Selection</h3>
+
+				<fieldset>
+					<legend>Body Margin &amp; Padding</legend>
 
 					<label>
 						<input type="checkbox" id="css-add-style-margin-to-body" />
@@ -65,63 +111,79 @@ main {
 						<input type="checkbox" id="css-add-style-padding-to-body" />
 						Apply "body &gt;&gt; padding: 3rem;"
 					</label>
-			</fieldset>
+					<label>
+						<input type="checkbox" id="css-add-style-margin-0-auto-to-body" />
+						Apply "body &gt;&gt; margin: 0 auto;"
+					</label>
 
-			<fieldset>
-				<legend>Add Style</legend>
-					<label>
-						<input type="radio" id="css-add-style-initwidth-to-body" name="maxmin-width" checked />
-						Apply "body &gt;&gt; max-width & min-width initial"
-					</label>
-					<label>
-						<input type="radio" id="css-add-style-maxwidth-to-body" name="maxmin-width" />
-						Apply "body &gt;&gt; max-width: 1280px;"
-					</label>
-					<label>
-						<input type="radio" id="css-add-style-minwidth-to-body" name="maxmin-width" />
-						Apply "body &gt;&gt; min-width: 1280px;"
-					</label>
-			</fieldset>
+				</fieldset>
 
-			<fieldset>
-				<legend>Add Style</legend>
-					<label>
-						<input type="radio" id="css-add-style-position-static" name="position" checked />
-						Apply "#linklist-container &gt;&gt; position: static;"
-					</label>
-					<label>
-						<input type="radio" id="css-add-style-position-relative" name="position" />
-						Apply "#linklist-container &gt;&gt; position: relative; top: 3rem; left: 3rem;"
-					</label>
-					<label>
-						<input type="radio" id="css-add-style-position-absolute" name="position" />
-						Apply "#linklist-container &gt;&gt; position: absolute; top: 3rem; left: 3rem;"
-					</label>
-					<label>
-						<input type="radio" id="css-add-style-position-fixed" name="position" />
-						Apply "#linklist-container &gt;&gt; position: fixed; top: 3rem; right: 3rem;"
-					</label>
-					<label>
-						<input type="radio" id="css-add-style-position-sticky" name="position" />
-						Apply "#linklist-container &gt;&gt; position: sticky; top: 1rem;"
-					</label>
-			</fieldset>
-		</div>
+				<fieldset>
+					<legend>Body Width Constraints</legend>
+						<label>
+							<input type="radio" id="css-add-style-initwidth-to-body" name="maxmin-width" checked />
+							Apply "body &gt;&gt; max-width &amp; min-width initial"
+						</label>
+						<label>
+							<input type="radio" id="css-add-style-maxwidth-to-body" name="maxmin-width" />
+							Apply "body &gt;&gt; max-width: 1280px;"
+						</label>
+						<label>
+							<input type="radio" id="css-add-style-minwidth-to-body" name="maxmin-width" />
+							Apply "body &gt;&gt; min-width: 1280px;"
+						</label>
+						<label>
+							<input type="radio" id="css-add-style-fixedwidth-to-body" name="maxmin-width" />
+							Apply "body &gt;&gt; width: 1280px;"
+						</label>
+				</fieldset>
 
-		<div class="verification" id="linklist-container">
-			<h2>Link for operation check</h2>
+				<fieldset>
+					<legend>Container Positioning</legend>
+						<label>
+							<input type="radio" id="css-add-style-position-static" name="position" checked />
+							Apply "#linklist-container &gt;&gt; position: static;"
+						</label>
+						<label>
+							<input type="radio" id="css-add-style-position-relative" name="position" />
+							Apply "#linklist-container &gt;&gt; position: relative; top: 3rem; left: 3rem;"
+						</label>
+						<label>
+							<input type="radio" id="css-add-style-position-absolute" name="position" />
+							Apply "#linklist-container &gt;&gt; position: absolute; top: 3rem; left: 3rem;"
+						</label>
+						<label>
+							<input type="radio" id="css-add-style-position-fixed" name="position" />
+							Apply "#linklist-container &gt;&gt; position: fixed; top: 3rem; right: 3rem;"
+						</label>
+						<label>
+							<input type="radio" id="css-add-style-position-sticky" name="position" />
+							Apply "#linklist-container &gt;&gt; position: sticky; top: 1rem;"
+						</label>
+				</fieldset>
+			</section>
 
-			<div id="linklist">
-				<ul>
-					<li><a href="https://www.google.com" target="_blank" rel="noopener">Google</a></li>
-					<li><a href="https://www.bing.com" target="_blank" rel="noopener">Bing</a></li>
-					<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">Yahoo</a></li>
-					<li><a href="https://duckduckgo.com" target="_blank" rel="noopener">DuckDuckGo</a></li>
-				</ul>
-			</div>
-		</div>
+			<section class="case-card">
+				<h3>Target Link List</h3>
 
-		<div style="height: 1280px;"></div>
+				<p>This link list is the target of the style settings selected above. Depending on the option, the CSS is applied either to <code>&lt;body&gt;</code> or to the <code>#linklist-container</code> element wrapping this list. Hold the configured key and drag-select across the links below; verify that Linkclump Plus still detects and selects them correctly regardless of the applied style. (To test <code>position: sticky;</code>, scroll down the page after selecting that option.)</p>
+
+				<div id="linklist-container">
+					<div id="linklist">
+						<ul>
+							<li><a href="https://www.google.com" target="_blank" rel="noopener">Google</a></li>
+							<li><a href="https://www.bing.com" target="_blank" rel="noopener">Bing</a></li>
+							<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">Yahoo</a></li>
+							<li><a href="https://duckduckgo.com" target="_blank" rel="noopener">DuckDuckGo</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="scroll-spacer-tall">
+					<p><b>Note</b>: The height of this section is added to "height: 96rem;" to allow for scrolling, which is useful for testing (for "position: sticky; top: 1rem;") link selection in a scrollable context.</p>
+				</div>
+			</section>
+		</section>
 	</article>
 </main>
 

@@ -1,60 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../assets/css/common.css" type="text/css">
+	<link rel="stylesheet" href="./css/style.css" type="text/css">
+
 	<title>Visibility and Overlap Test Page</title>
-	<style>
-		body { font-family: sans-serif; margin: 20px; }
-		.container { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; }
-		.hidden-display { display: none; }
-		.hidden-visibility { visibility: hidden; }
-		.hidden-opacity { opacity: 0; }
-		.hidden-size { width: 0; height: 0; overflow: hidden; }
-		.hidden-position { position: absolute; left: -9999px; }
-		.overlapping-container { position: relative; width: 300px; height: 150px; border: 2px solid blue; margin-bottom: 20px; }
-		.box { position: absolute; width: 100px; height: 100px; border: 1px solid black; display: flex; justify-content: center; align-items: center; }
-		.box-a { background-color: rgba(255, 0, 0, 0.5); top: 10px; left: 10px; z-index: 1; }
-		.box-b { background-color: rgba(0, 255, 0, 0.5); top: 50px; left: 50px; z-index: 2; }
-		.box-c { background-color: rgba(0, 0, 255, 0.5); top: 90px; left: 90px; z-index: 3; }
-		.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 0, 0.3); z-index: 4; display: flex; justify-content: center; align-items: center; }
-	</style>
 </head>
 <body>
 
-	<h1>Visibility and Overlap Test Page</h1>
-	<p>This page verifies Linkclump Plus's behavior with hidden and overlapping elements.</p>
+<main>
+	<article>
+		<h1>Visibility and Overlap Test Page</h1>
 
-	<h2>Hidden Elements</h2>
-	<div class="container">
-		<h3>Display: none</h3>
-		<p class="hidden-display"><a href="#hidden-display">Hidden Link (display: none)</a></p>
-		<p>Visible text after hidden link.</p>
+		<nav class="nav-bar">
+			<a class="nav-back-btn" href="../index.html">Return to Test Page Index</a>
+		</nav>
 
-		<h3>Visibility: hidden</h3>
-		<p class="hidden-visibility"><a href="#hidden-visibility">Hidden Link (visibility: hidden)</a></p>
-		<p>Visible text after hidden link.</p>
+		<section>
+			<h2>About</h2>
 
-		<h3>Opacity: 0</h3>
-		<p class="hidden-opacity"><a href="#hidden-opacity">Hidden Link (opacity: 0)</a></p>
-		<p>Visible text after hidden link.</p>
+			<p>This page verifies Linkclump Plus's behavior with hidden and overlapping elements, comparing browser layout reality with Linkclump Plus's hit-testing specifications.</p>
 
-		<h3>Zero Size</h3>
-		<div class="hidden-size"><a href="#hidden-size">Hidden Link (zero size)</a></div>
-		<p>Visible text after hidden link.</p>
+			<div class="note-box">
+				<strong>Specification &amp; Security Background:</strong>
+				<ul>
+					<li><strong>Current Filter Rule:</strong> To maximize scanning performance across heavy pages, Linkclump Plus checks only <code>display: none</code> and <code>visibility: hidden</code> on candidate links.</li>
+					<li><strong>Opacity &amp; Overlays:</strong> Elements styled with <code>opacity: 0</code> or occluded beneath opaque/semi-transparent layers (<code>z-index</code> overlays) are detected and selected if their geometric bounding box intersects the drag area.</li>
+					<li><strong>Roadmap Consideration:</strong> Filtering transparent links (<code>opacity: 0</code>) and zero-size elements to prevent accidental activation of invisible/deceptive clickjacking links is proposed as an optional feature for future major versions.</li>
+				</ul>
+			</div>
+		</section>
 
-		<h3>Off-screen Position</h3>
-		<div class="hidden-position"><a href="#hidden-position">Hidden Link (off-screen)</a></div>
-		<p>Visible text after hidden link.</p>
-	</div>
+		<section>
+			<h2>Procedure &amp; Expected Results</h2>
 
-	<h2>Overlapping Elements</h2>
-	<div class="overlapping-container">
-		<div class="box box-a"><a href="#box-a">Box A</a></div>
-		<div class="box box-b"><a href="#box-b">Box B</a></div>
-		<div class="box box-c"><a href="#box-c">Box C</a></div>
-		<div class="overlay">Overlay Text</div>
-	</div>
+			<ol>
+				<li>For each hidden-element test case below, drag-select over the target area.</li>
+				<li>For the Overlapping Elements case, drag-select across the stacked boxes and overlay.</li>
+				<li>Compare results with the specification behavior listed below:</li>
+			</ol>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Target Element State</th>
+						<th>Filter Rule</th>
+						<th>Expected Result (Current Specification)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>display: none</code></td>
+						<td>Filtered in <code>start()</code></td>
+						<td><strong>Ignored:</strong> Link is completely excluded from hit-testing.</td>
+					</tr>
+					<tr>
+						<td><code>visibility: hidden</code></td>
+						<td>Filtered in <code>start()</code></td>
+						<td><strong>Ignored:</strong> Link is excluded even though it consumes layout space.</td>
+					</tr>
+					<tr>
+						<td><code>opacity: 0</code></td>
+						<td>Not filtered</td>
+						<td><strong>Selected:</strong> Transparent link is detected per its layout bounding box.</td>
+					</tr>
+					<tr>
+						<td><code>width: 0; height: 0;</code></td>
+						<td>Zero-area bounds</td>
+						<td><strong>Ignored:</strong> Zero-dimension bounding box does not intersect selection box.</td>
+					</tr>
+					<tr>
+						<td><code>position: absolute; left: -9999px;</code></td>
+						<td>Out of viewport</td>
+						<td><strong>Ignored:</strong> Link coordinates fall far outside the on-screen selection area.</td>
+					</tr>
+					<tr>
+						<td><strong>Overlapping Elements &amp; Overlay</strong></td>
+						<td>Bounding box only</td>
+						<td><strong>All Selected:</strong> Box A, B, and C are all detected regardless of <code>z-index</code> or overlay text.</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section>
+			<h2>Test Cases</h2>
+
+			<section class="case-card">
+				<h3>Hidden Elements: Display: none</h3>
+				<p class="hidden-display"><a href="#hidden-display">Hidden Link (display: none)</a></p>
+				<p>Visible text after hidden link.</p>
+			</section>
+
+			<section class="case-card">
+				<h3>Hidden Elements: Visibility: hidden</h3>
+				<p class="hidden-visibility"><a href="#hidden-visibility">Hidden Link (visibility: hidden)</a></p>
+				<p>Visible text after hidden link.</p>
+			</section>
+
+			<section class="case-card">
+				<h3>Hidden Elements: Opacity: 0</h3>
+				<p class="hidden-opacity"><a href="#hidden-opacity">Hidden Link (opacity: 0)</a></p>
+				<p>Visible text after hidden link.</p>
+			</section>
+
+			<section class="case-card">
+				<h3>Hidden Elements: Zero Size</h3>
+				<div class="hidden-size"><a href="#hidden-size">Hidden Link (zero size)</a></div>
+				<p>Visible text after hidden link.</p>
+			</section>
+
+			<section class="case-card">
+				<h3>Hidden Elements: Off-screen Position</h3>
+				<div class="hidden-position"><a href="#hidden-position">Hidden Link (off-screen)</a></div>
+				<p>Visible text after hidden link.</p>
+			</section>
+
+			<section class="case-card">
+				<h3>Overlapping Elements</h3>
+				<div class="overlapping-container">
+					<div class="box box-a"><a href="#box-a">Box A</a></div>
+					<div class="box box-b"><a href="#box-b">Box B</a></div>
+					<div class="box box-c"><a href="#box-c">Box C</a></div>
+					<div class="overlay">Overlay Text</div>
+				</div>
+			</section>
+		</section>
+	</article>
+</main>
 
 </body>
 </html>
