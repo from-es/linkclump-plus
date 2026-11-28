@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Right Frame Content</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-size: 15px;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			background-color: #eff6ff;
+			color: #1e40af;
+		}
+		main {
+			padding: 1.25rem;
+		}
+		.badge {
+			padding: 0.2rem 0.5rem;
+			font-size: 0.8rem;
+			font-weight: bold;
+			border-radius: 3px;
+			background-color: #dbeafe;
+			color: #1e40af;
+			border: 1px solid #93c5fd;
+		}
+		.links {
+			margin: 1rem 0;
+			padding: 0.75rem;
+			background-color: #ffffff;
+			border: 1px solid #bfdbfe;
+			border-radius: 4px;
+			list-style: none;
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+		.links li {
+			margin: 0;
+		}
+		.links a {
+			display: inline-block;
+			padding: 0.4rem 0.8rem;
+			background-color: #2563eb;
+			color: #ffffff;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: 500;
+		}
+		.links a:hover {
+			background-color: #1d4ed8;
+		}
+		.back-link {
+			margin-top: 1.5rem;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+			padding: 0.45rem 0.95rem;
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: #0969da;
+			background-color: #f6f8fa;
+			border: 1px solid #d0d7de;
+			border-radius: 6px;
+			text-decoration: none;
+		}
+		.back-link:hover {
+			background-color: #e2e8f0;
+			border-color: #0969da;
+			text-decoration: none;
+		}
+	</style>
+</head>
+<body>
+<main>
+	<span class="badge"><code>&lt;frame name="right_frame"&gt;</code></span>
+	<h2>Right Frame (HTML <code>&lt;frameset&gt;</code>)</h2>
+	<p>Drag-selecting inside this right frame should highlight only links in the right frame.</p>
+
+	<ul class="links">
+		<li><a href="https://github.com" target="_blank" rel="noopener">[Right Frame] GitHub</a></li>
+		<li><a href="https://gitlab.com" target="_blank" rel="noopener">[Right Frame] GitLab</a></li>
+		<li><a href="https://developer.mozilla.org" target="_blank" rel="noopener">[Right Frame] MDN</a></li>
+		<li><a href="https://w3.org" target="_blank" rel="noopener">[Right Frame] W3C</a></li>
+	</ul>
+
+	<p><a class="back-link" href="../index.html" target="_top">&larr; Return to main Frame / iframe Test Page</a></p>
+</main>
+</body>
+</html>

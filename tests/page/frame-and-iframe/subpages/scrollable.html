@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Scrollable iframe Content</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-size: 15px;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			background-color: #f8f9fa;
+		}
+		.scroll-canvas {
+			width: 1400px;
+			min-height: 900px;
+			padding: 1.5rem;
+			box-sizing: border-box;
+			background-color: #f0f0f0;
+		}
+		.section-box {
+			background-color: #ffffff;
+			border: 1px solid #ced4da;
+			border-radius: 4px;
+			padding: 1rem;
+			margin-bottom: 2rem;
+		}
+		.badge {
+			padding: 0.2rem 0.5rem;
+			font-size: 0.75rem;
+			font-weight: bold;
+			border-radius: 3px;
+			background-color: #e9ecef;
+			color: #495057;
+			border: 1px solid #adb5bd;
+		}
+		.links {
+			margin: 0.5rem 0;
+			padding: 0.5rem;
+			list-style: none;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+		.links a {
+			display: inline-block;
+			padding: 0.35rem 0.7rem;
+			background-color: #495057;
+			color: #ffffff;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: 500;
+		}
+		.links a:hover {
+			background-color: #212529;
+		}
+		.spacer-md {
+			height: 250px;
+		}
+		.section-middle {
+			margin-left: 300px;
+			max-width: 600px;
+		}
+		.section-bottom {
+			margin-left: 600px;
+			max-width: 600px;
+		}
+	</style>
+</head>
+<body>
+<div class="scroll-canvas">
+	<div class="section-box">
+		<span class="badge">Top-Left Area (Initial Viewport)</span>
+		<h3>Top Links</h3>
+		<p>Scroll down or right within this frame to test selection while scrolled.</p>
+		<ul class="links">
+			<li><a href="https://www.google.com" target="_blank" rel="noopener">[Scrollable Top] Google</a></li>
+			<li><a href="https://www.bing.com" target="_blank" rel="noopener">[Scrollable Top] Bing</a></li>
+			<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">[Scrollable Top] Yahoo</a></li>
+		</ul>
+	</div>
+
+	<div class="spacer-md"></div>
+
+	<div class="section-box section-middle">
+		<span class="badge">Middle-Right Area (Scrolled)</span>
+		<h3>Middle Links</h3>
+		<ul class="links">
+			<li><a href="https://duckduckgo.com" target="_blank" rel="noopener">[Scrollable Middle] DuckDuckGo</a></li>
+			<li><a href="https://www.wikipedia.org" target="_blank" rel="noopener">[Scrollable Middle] Wikipedia</a></li>
+		</ul>
+	</div>
+
+	<div class="spacer-md"></div>
+
+	<div class="section-box section-bottom">
+		<span class="badge">Bottom-Far-Right Area (Deep Scrolled)</span>
+		<h3>Bottom Links</h3>
+		<ul class="links">
+			<li><a href="https://github.com" target="_blank" rel="noopener">[Scrollable Bottom] GitHub</a></li>
+			<li><a href="https://gitlab.com" target="_blank" rel="noopener">[Scrollable Bottom] GitLab</a></li>
+		</ul>
+	</div>
+</div>
+</body>
+</html>

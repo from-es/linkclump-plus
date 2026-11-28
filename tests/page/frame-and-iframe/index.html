@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../assets/css/common.css" type="text/css">
+	<link rel="stylesheet" href="./css/style.css" type="text/css">
+
+	<title>Linkclump Plus: Frame &amp; iframe Selection Test</title>
+</head>
+<body>
+
+<main>
+	<article>
+		<h1>Linkclump Plus: Frame &amp; iframe Selection Test</h1>
+
+		<nav class="nav-bar">
+			<a class="nav-back-btn" href="../index.html">Return to Test Page Index</a>
+		</nav>
+
+		<section>
+			<h2>About</h2>
+
+			<p>This page verifies the behavior of Linkclump Plus when selecting links within and around various frame environments:</p>
+
+			<ul>
+				<li>same-origin <code>&lt;iframe&gt;</code>s</li>
+				<li>cross-origin <code>&lt;iframe&gt;</code>s</li>
+				<li>nested <code>&lt;iframe&gt;</code>s (multi-level)</li>
+				<li>scrollable <code>&lt;iframe&gt;</code>s</li>
+				<li>inline <code>srcdoc</code> <code>&lt;iframe&gt;</code>s</li>
+				<li>classic HTML <code>&lt;frameset&gt;</code> / <code>&lt;frame&gt;</code></li>
+			</ul>
+
+			<div class="note-box">
+				<strong>Core Specification / Boundary Principle:</strong>
+				<ul>
+					<li><strong>Single Frame Boundary:</strong> Link selection and the drag bounding box are strictly confined to the frame (top page or specific <code>&lt;iframe&gt;</code>) where the pointer press and drag gesture began.</li>
+					<li><strong>No Cross-Boundary Selection:</strong> Dragging starting from the parent page cannot capture links embedded inside an <code>&lt;iframe&gt;</code>. Conversely, dragging starting inside an <code>&lt;iframe&gt;</code> cannot select parent page links or sibling frame links.</li>
+					<li><strong>Overlay Clipping:</strong> The visual selection box rendered by Linkclump Plus is contained within the initiating frame's DOM and will not render outside that frame's viewport.</li>
+				</ul>
+			</div>
+		</section>
+
+		<section>
+			<h2>Procedure &amp; Expected Results</h2>
+			<p>Hold the configured key, then press and drag the mouse button across the target area. Release the button to open the selected links.</p>
+			<table>
+				<thead>
+					<tr>
+						<th>Test Case</th>
+						<th>Drag Start</th>
+						<th>Drag Over / Release</th>
+						<th>Expected Result</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><strong>Top Document Selection</strong></td>
+						<td>Parent page background or link</td>
+						<td>Parent page links</td>
+						<td>Only parent page links are highlighted and opened.</td>
+					</tr>
+					<tr>
+						<td><strong>Parent Drag Over <code>&lt;iframe&gt;</code></strong></td>
+						<td>Parent page</td>
+						<td>Passes over or releases inside an <code>&lt;iframe&gt;</code></td>
+						<td>Only parent links are selected. Links inside the <code>&lt;iframe&gt;</code> are completely ignored.</td>
+					</tr>
+					<tr>
+						<td><strong>Same-Origin <code>&lt;iframe&gt;</code></strong></td>
+						<td>Inside <code>&lt;iframe&gt;</code></td>
+						<td>Inside <code>&lt;iframe&gt;</code> links</td>
+						<td>Links inside the <code>&lt;iframe&gt;</code> are selected. Parent links are NOT selected. Selection box stays inside the <code>&lt;iframe&gt;</code>.</td>
+					</tr>
+					<tr>
+						<td><strong>Cross-Origin <code>&lt;iframe&gt;</code></strong></td>
+						<td>Inside external <code>&lt;iframe&gt;</code></td>
+						<td>Inside external <code>&lt;iframe&gt;</code> links</td>
+						<td>Content script in external <code>&lt;iframe&gt;</code> handles selection within its frame boundaries.</td>
+					</tr>
+					<tr>
+						<td><strong>Nested <code>&lt;iframe&gt;</code> (Lv1 vs Lv2)</strong></td>
+						<td>Inside Level 1 <code>&lt;iframe&gt;</code></td>
+						<td>Passing over Level 2 <code>&lt;iframe&gt;</code></td>
+						<td>Only Level 1 links are selected. Level 2 (grandchild) links are NOT selected.</td>
+					</tr>
+					<tr>
+						<td><strong>Nested <code>&lt;iframe&gt;</code> (Lv2)</strong></td>
+						<td>Inside Level 2 <code>&lt;iframe&gt;</code></td>
+						<td>Inside Level 2 links</td>
+						<td>Only Level 2 links are selected. Level 1 links are NOT selected.</td>
+					</tr>
+					<tr>
+						<td><strong>Scrollable <code>&lt;iframe&gt;</code></strong></td>
+						<td>Inside scrolled <code>&lt;iframe&gt;</code></td>
+						<td>Scrolled links</td>
+						<td>Selection box and link coordinates accurately track the scrolled viewport position.</td>
+					</tr>
+					<tr>
+						<td><strong><code>srcdoc</code> <code>&lt;iframe&gt;</code></strong></td>
+						<td>Inside <code>srcdoc</code> <code>&lt;iframe&gt;</code></td>
+						<td>Inside <code>srcdoc</code> links</td>
+						<td>Linkclump Plus does not run inside <code>about:srcdoc</code> (stability &amp; security constraints). A drag inside has no effect (native browser behavior applies). Dragging from the parent page over the frame selects only parent links.</td>
+					</tr>
+					<tr>
+						<td><strong>Classic <code>&lt;frameset&gt;</code></strong></td>
+						<td>Inside Left or Right <code>&lt;frame&gt;</code></td>
+						<td>Links within that <code>&lt;frame&gt;</code></td>
+						<td>Each <code>&lt;frame&gt;</code> operates independently as an isolated document boundary.</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section>
+			<h2>Test Cases</h2>
+
+			<!-- Case 0: Top Document Links -->
+			<section class="case-card">
+				<h3>Case 0: Main Page Links</h3>
+				<div class="case-meta">
+					<span class="badge badge-parent">Top-Level Document</span>
+				</div>
+				<p>Use these links to test selection in the top-level document and dragging towards/over child <code>&lt;iframe&gt;</code> elements below.</p>
+				<ul class="links">
+					<li><a href="https://www.google.com" target="_blank" rel="noopener">[Top Document] Google</a></li>
+					<li><a href="https://www.bing.com" target="_blank" rel="noopener">[Top Document] Bing</a></li>
+					<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">[Top Document] Yahoo</a></li>
+					<li><a href="https://duckduckgo.com" target="_blank" rel="noopener">[Top Document] DuckDuckGo</a></li>
+				</ul>
+			</section>
+
+			<!-- Case 1: Same-Origin iframe -->
+			<section class="case-card">
+				<h3>Case 1: Same-Origin <code>&lt;iframe&gt;</code></h3>
+				<div class="case-meta">
+					<span class="badge badge-child">Same-Origin</span>
+				</div>
+				<p>Target: <code>./subpages/inner.html</code>. Verify drag-selection initiated inside this <code>&lt;iframe&gt;</code>.</p>
+				<iframe class="test-frame" src="./subpages/inner.html"></iframe>
+			</section>
+
+			<!-- Case 2: Cross-Origin iframe -->
+			<section class="case-card">
+				<h3>Case 2: Cross-Origin <code>&lt;iframe&gt;</code></h3>
+				<div class="case-meta">
+					<span class="badge badge-child">Cross-Origin</span>
+				</div>
+				<p>Target: <code>https://en.wikipedia.org/wiki/Browser_extension</code>. Verify behavior in third-party origin <code>&lt;iframe&gt;</code>s.</p>
+				<p class="note-text"><em>Note:</em> The browser console may log a report-only Content Security Policy (CSP) warning for Wikipedia; this is expected and does not block page rendering on localhost.</p>
+				<iframe class="test-frame test-frame-tall" src="https://en.wikipedia.org/wiki/Browser_extension"></iframe>
+			</section>
+
+			<!-- Case 3: Nested iframes -->
+			<section class="case-card">
+				<h3>Case 3: Nested <code>&lt;iframe&gt;</code>s (2-Level)</h3>
+				<div class="case-meta">
+					<span class="badge badge-nested">Nested Hierarchy</span>
+				</div>
+				<p>Target: Parent &rarr; Level 1 Child <code>&lt;iframe&gt;</code> (<code>./subpages/nested-outer.html</code>) &rarr; Level 2 Grandchild <code>&lt;iframe&gt;</code> (<code>./subpages/nested-inner.html</code>).</p>
+				<iframe class="test-frame test-frame-nested" src="./subpages/nested-outer.html"></iframe>
+			</section>
+
+			<!-- Case 4: Scrollable iframe -->
+			<section class="case-card">
+				<h3>Case 4: Scrollable <code>&lt;iframe&gt;</code></h3>
+				<div class="case-meta">
+					<span class="badge badge-child">Scrollable Content</span>
+				</div>
+				<p>Target: <code>./subpages/scrollable.html</code>. <code>&lt;iframe&gt;</code> with internal vertical and horizontal scrolling.</p>
+				<iframe class="test-frame test-frame-tall" src="./subpages/scrollable.html"></iframe>
+			</section>
+
+			<!-- Case 5: srcdoc iframe -->
+			<section class="case-card">
+				<h3>Case 5: Inline <code>srcdoc</code> <code>&lt;iframe&gt;</code></h3>
+				<div class="case-meta">
+					<span class="badge badge-child">Inline <code>srcdoc</code></span>
+				</div>
+				<p>Target: <code>srcdoc</code> attribute. Linkclump Plus intentionally does not inject into <code>about:srcdoc</code> frames due to stability and blocklist integrity constraints. Verify that dragging inside triggers native browser behavior (no Linkclump box/tabs), and dragging from the parent selects only parent links.</p>
+				<iframe class="test-frame test-frame-srcdoc" srcdoc="<!DOCTYPE html><html><body style='font-family:sans-serif;margin:1rem;background-color:#f8fafc;'><h4 style='margin:0 0 0.5rem 0;color:#0f172a;'>Inside srcdoc Document</h4><p style='font-size:0.85rem;color:#475569;'>Test drag-selection inside an inline <code>srcdoc</code> document:</p><ul style='list-style:none;padding:0;display:flex;gap:0.5rem;'><li><a href='https://www.google.com' target='_blank' rel='noopener' style='display:inline-block;padding:0.3rem 0.6rem;background:#0284c7;color:#fff;text-decoration:none;border-radius:4px;'>[srcdoc] Google</a></li><li><a href='https://www.bing.com' target='_blank' rel='noopener' style='display:inline-block;padding:0.3rem 0.6rem;background:#0284c7;color:#fff;text-decoration:none;border-radius:4px;'>[srcdoc] Bing</a></li><li><a href='https://duckduckgo.com' target='_blank' rel='noopener' style='display:inline-block;padding:0.3rem 0.6rem;background:#0284c7;color:#fff;text-decoration:none;border-radius:4px;'>[srcdoc] DuckDuckGo</a></li></ul></body></html>"></iframe>
+			</section>
+
+			<!-- Case 6: Classic Frameset Navigation -->
+			<section class="case-card">
+				<h3>Case 6: Classic <code>&lt;frameset&gt;</code> / <code>&lt;frame&gt;</code> Test</h3>
+				<div class="case-meta">
+					<span class="badge badge-parent">HTML <code>&lt;frameset&gt;</code></span>
+				</div>
+				<p>
+					Traditional HTML <code>&lt;frameset&gt;</code> documents cannot be combined with standard <code>&lt;body&gt;</code> elements on the same page.
+					Click below to open the dedicated dual-frame frameset test page.
+				</p>
+				<div class="nav-button-container">
+					<a class="nav-button" href="./frameset.html">Open Classic Frameset Test Page &rarr;</a>
+				</div>
+			</section>
+		</section>
+	</article>
+</main>
+
+</body>
+</html>

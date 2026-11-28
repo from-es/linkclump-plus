@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Nested iframe Level 2 (Grandchild)</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-size: 14px;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			background-color: #fff9db;
+			color: #e67700;
+		}
+		main {
+			padding: 0.75rem;
+		}
+		.badge {
+			padding: 0.15rem 0.4rem;
+			font-size: 0.75rem;
+			font-weight: bold;
+			border-radius: 3px;
+			background-color: #ffe066;
+			color: #d9480f;
+			border: 1px solid #fcc419;
+		}
+		.links {
+			margin: 0.5rem 0;
+			padding: 0.5rem;
+			background-color: #ffffff;
+			border: 1px solid #ffd43b;
+			border-radius: 4px;
+			list-style: none;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.4rem;
+		}
+		.links li {
+			margin: 0;
+		}
+		.links a {
+			display: inline-block;
+			padding: 0.25rem 0.5rem;
+			background-color: #d9480f;
+			color: #ffffff;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: 500;
+			font-size: 0.85rem;
+		}
+		.links a:hover {
+			background-color: #bf360c;
+		}
+		.instruction {
+			margin: 0.25rem 0;
+			font-size: 0.8rem;
+			color: #a61e4d;
+		}
+	</style>
+</head>
+<body>
+<main>
+	<div>
+		<span class="badge">Level 2 (Grandchild iframe)</span>
+		<strong>Inside nested Level 2 iframe</strong>
+	</div>
+	<p class="instruction">Selection started here must NOT escape to Level 1 or Top.</p>
+	<ul class="links">
+		<li><a href="https://www.google.com" target="_blank" rel="noopener">[Nested Lv2] Google</a></li>
+		<li><a href="https://www.bing.com" target="_blank" rel="noopener">[Nested Lv2] Bing</a></li>
+		<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">[Nested Lv2] Yahoo</a></li>
+	</ul>
+</main>
+</body>
+</html>
