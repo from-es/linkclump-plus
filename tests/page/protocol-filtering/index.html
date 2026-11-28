@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../assets/css/common.css" type="text/css">
+	<link rel="stylesheet" href="./css/style.css" type="text/css">
+
+	<title>Linkclump Plus: Protocol Filtering &amp; URL Scheme Test</title>
+</head>
+<body>
+
+<main>
+	<article>
+		<h1>Linkclump Plus: Protocol Filtering &amp; URL Scheme Test</h1>
+
+		<nav class="nav-bar">
+			<a class="nav-back-btn" href="../index.html">Return to Test Page Index</a>
+		</nav>
+
+		<section>
+			<h2>About</h2>
+
+			<p>This test page systematically verifies how Linkclump Plus handles various URL schemes, relative paths, and protocol boundaries. It validates both the selection filtering in the content script and the tab creation behavior in the background script.</p>
+
+			<div class="note-box">
+				<strong>Core Specification / Boundary Principle:</strong>
+				<ul>
+					<li><strong>Content Script Filter (<code>lifecycle.ts</code>):</strong> Link selection explicitly rejects only two patterns:
+						<ul>
+							<li>Links matching the regular expression <code>/^javascript:/i</code>.</li>
+							<li>Links with empty <code>href</code> attribute or <code>href="#"</code>.</li>
+						</ul>
+					</li>
+					<li><strong>URL Resolution:</strong> Relative paths (<code>./</code>, <code>/</code>) and protocol-relative URLs (<code>//</code>) are automatically resolved by the browser's DOM (<code>a.href</code> property) to fully qualified absolute URLs before being passed to Linkclump Plus.</li>
+					<li><strong>Background Protection (<code>openTab.ts</code>):</strong> When attempting to open privileged or restricted schemes (such as <code>chrome://settings/</code>, <code>about:preferences</code>, or <code>about:config</code>), browser security policies reject the API call. Linkclump Plus wraps these calls inside <code>safeAsync</code>, safely catching errors without crashing the background worker or halting subsequent tabs in the queue.</li>
+					<li><strong>Adversarial Safety Precautions:</strong> All external Web URLs use RFC 2606 reserved domains (<code>example.com</code>, <code>example.org</code>) with <code>rel="noopener noreferrer"</code>. External application schemes (<code>mailto:</code>) are strictly limited in count and equipped with an interactive interceptor. Data URIs use benign <code>text/plain</code> only.</li>
+				</ul>
+			</div>
+		</section>
+
+		<section>
+			<h2>Procedure &amp; Expected Results</h2>
+			<p>Hold the configured key, then press and drag the mouse button across the target link group. Release the button to trigger the configured action (e.g. <em>"Opened as New Tabs"</em> or <em>"Copied to Clipboard"</em>).</p>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Scheme / Path Type</th>
+						<th>Linkclump Selection</th>
+						<th>Dispatched URL</th>
+						<th>Expected Browser &amp; Extension Behavior</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>http://</code> / <code>https://</code></td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td>Full URL</td>
+						<td>Opens standard web page in a new tab.</td>
+					</tr>
+					<tr>
+						<td>Relative (<code>./...</code>, <code>/...</code>)</td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td>Canonical absolute URL</td>
+						<td>Resolves relative to document base URL and opens resolved page.</td>
+					</tr>
+					<tr>
+						<td>Protocol-relative (<code>//...</code>)</td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td>Resolved URL</td>
+						<td>Inherits current page scheme (HTTP/HTTPS). On <code>file://</code>, treated as UNC path.</td>
+					</tr>
+					<tr>
+						<td><code>file://</code></td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td>Local file URL</td>
+						<td>Opens local file if extension has <em>"Allow access to file URLs"</em> permission enabled.</td>
+					</tr>
+					<tr>
+						<td><code>data:text/plain</code></td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td>Data URI</td>
+						<td>Top-level navigation to data URI is blocked by modern browser security policy.</td>
+					</tr>
+					<tr>
+						<td><code>blob:</code></td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td>Blob URL</td>
+						<td>Opens in-memory plain text blob in a new tab within the same origin.</td>
+					</tr>
+					<tr>
+						<td><code>mailto:</code></td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td><code>mailto:...</code></td>
+						<td>Hands off to OS mail client. Recommended to test with <em>"Copied to Clipboard"</em> action.</td>
+					</tr>
+					<tr>
+						<td><code>javascript:</code></td>
+						<td><span class="result-badge result-excluded">Excluded</span></td>
+						<td>None</td>
+						<td>Completely ignored by Linkclump. Bounding box ignores this link.</td>
+					</tr>
+					<tr>
+						<td><code>#</code> / Empty <code>href</code></td>
+						<td><span class="result-badge result-excluded">Excluded</span></td>
+						<td>None</td>
+						<td>Completely ignored by Linkclump. Bounding box ignores this link.</td>
+					</tr>
+					<tr>
+						<td><code>about:blank</code></td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td><code>about:blank</code></td>
+						<td><strong>Chrome &amp; Firefox:</strong> Opens a new blank tab. (Clipboard / Bookmark also supported)</td>
+					</tr>
+					<tr>
+						<td><code>chrome://</code> (Settings / Extensions)</td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td><code>chrome://...</code></td>
+						<td>
+							<strong>Chrome:</strong> Tab opens &rarr; internal settings page displayed.<br>
+							<strong>Firefox:</strong> Blocked by Firefox API (Illegal URL) &rarr; tab is not opened (caught by <code>safeAsync</code>).<br>
+							<em>Clipboard &amp; Bookmark: supported on both browsers.</em>
+						</td>
+					</tr>
+					<tr>
+						<td>Privileged <code>about:</code> (<code>preferences</code>, <code>addons</code>, <code>config</code>)</td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td><code>about:...</code></td>
+						<td>
+							<strong>Chrome:</strong> Tab opens &rarr; displays scheme error ("このサイトにアクセスできません").<br>
+							<strong>Firefox:</strong> Blocked by Firefox API (Illegal URL) &rarr; tab is not opened (caught by <code>safeAsync</code>).<br>
+							<em>Clipboard &amp; Bookmark: supported on both browsers.</em>
+						</td>
+					</tr>
+					<tr>
+						<td><code>ftp://</code></td>
+						<td><span class="result-badge result-selected">Selected</span></td>
+						<td><code>ftp://...</code></td>
+						<td>Deprecated in modern browsers; displays protocol error or passes to external handler.</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section>
+			<h2>Test Cases</h2>
+
+			<!-- Case 1: Standard Web Protocols -->
+			<div class="case-card">
+				<h3>Case 1: Standard Web Protocols (<code>http://</code>, <code>https://</code>)</h3>
+				<div class="case-meta">
+					<span class="scheme-badge scheme-badge-http">HTTP</span>
+					<span class="scheme-badge scheme-badge-http">HTTPS</span>
+					<span class="result-badge result-selected">Expect: Selected &amp; Opened</span>
+				</div>
+				<p>Standard external web URLs using RFC 2606 reserved domains. Should be selected normally and opened in new tabs.</p>
+
+				<ul class="protocol-test-list">
+					<li class="protocol-test-item">
+						<a href="http://example.com" rel="noopener noreferrer">http://example.com</a>
+						<span class="protocol-test-desc">Standard HTTP URL</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="https://example.org" rel="noopener noreferrer">https://example.org</a>
+						<span class="protocol-test-desc">Standard HTTPS URL</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="https://example.net/test/page" rel="noopener noreferrer">https://example.net/test/page</a>
+						<span class="protocol-test-desc">HTTPS URL with Path</span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Case 2: Path Variations -->
+			<div class="case-card">
+				<h3>Case 2: Path Variations (Relative, Root-relative, Protocol-relative)</h3>
+				<div class="case-meta">
+					<span class="scheme-badge scheme-badge-http">RELATIVE</span>
+					<span class="result-badge result-selected">Expect: Resolved to Absolute &amp; Opened</span>
+				</div>
+				<p>Relative and protocol-relative links. The browser's DOM resolves these to canonical absolute URLs prior to Linkclump tab dispatch.</p>
+
+				<ul class="protocol-test-list">
+					<li class="protocol-test-item">
+						<a href="./subpages/dummy-target.html">./subpages/dummy-target.html</a>
+						<span class="protocol-test-desc">Relative path (opens local dummy target)</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="../index.html">../index.html</a>
+						<span class="protocol-test-desc">Parent relative path (opens test page index)</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="//example.com/protocol-relative-test" rel="noopener noreferrer">//example.com/protocol-relative-test</a>
+						<span class="protocol-test-desc">Protocol-relative URL (inherits scheme)</span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Case 3: Local & Sandboxed Files -->
+			<div class="case-card">
+				<h3>Case 3: Local &amp; Sandboxed Files (<code>file://</code>, <code>data:</code>, <code>blob:</code>)</h3>
+				<div class="case-meta">
+					<span class="scheme-badge scheme-badge-file">FILE</span>
+					<span class="scheme-badge scheme-badge-file">DATA</span>
+					<span class="scheme-badge scheme-badge-file">BLOB</span>
+					<span class="result-badge result-selected">Expect: Selected (Browser Security Applies)</span>
+				</div>
+				<p>Local files and in-memory resources. Top-level navigation to <code>data:</code> URLs is blocked by modern browser security standards. <code>blob:</code> opens in-memory content within the same origin.</p>
+
+				<ul class="protocol-test-list">
+					<li class="protocol-test-item">
+						<a href="./subpages/dummy-target.html">subpages/dummy-target.html (Local Target)</a>
+						<span class="protocol-test-desc">Local navigation target</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="data:text/plain;charset=utf-8,Linkclump%20Plus%20Data%20URI%20Test%20Data">data:text/plain;charset=utf-8,Linkclump%20Plus%20Data%20URI%20Test%20Data</a>
+						<span class="protocol-test-desc">Plain text data URI (Safe)</span>
+					</li>
+					<li class="protocol-test-item">
+						<a id="blob-test-link" href="#">(Initializing Blob URL...)</a>
+						<span class="protocol-test-desc">Dynamically created text Blob URL</span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Case 4: Script & Anchor Protocols -->
+			<div class="case-card">
+				<h3>Case 4: Script &amp; Anchor Protocols (<code>javascript:</code>, <code>#</code>, Empty <code>href</code>)</h3>
+				<div class="case-meta">
+					<span class="scheme-badge scheme-badge-script">JAVASCRIPT</span>
+					<span class="scheme-badge scheme-badge-script">HASH</span>
+					<span class="result-badge result-excluded">Expect: Filtered Out (Never Selected)</span>
+				</div>
+				<p>These links must be completely excluded by Linkclump Plus during selection. Dragging across this entire area should result in 0 selected links and no bounding highlight on these items.</p>
+
+				<ul class="protocol-test-list">
+					<li class="protocol-test-item">
+						<a href="javascript:void(0)">javascript:void(0)</a>
+						<span class="protocol-test-desc">Explicitly rejected by regex <code>/^javascript:/i</code></span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="javascript:console.log('Linkclump-test')">javascript:console.log('Linkclump-test')</a>
+						<span class="protocol-test-desc">Explicitly rejected by regex <code>/^javascript:/i</code></span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="#"># (Empty hash fragment)</a>
+						<span class="protocol-test-desc">Rejected by attribute check <code>href === "#"</code></span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="">(Empty href attribute)</a>
+						<span class="protocol-test-desc">Rejected by attribute check <code>!rawLink.getAttribute("href")</code></span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Case 5: External Application Schemes -->
+			<div class="case-card">
+				<h3>Case 5: External Application Schemes (<code>mailto:</code>)</h3>
+				<div class="case-meta">
+					<span class="scheme-badge scheme-badge-app">MAILTO</span>
+					<span class="result-badge result-selected">Expect: Selected (OS App Hand-off)</span>
+				</div>
+
+				<div class="warning-callout">
+					<strong>Adversarial Safety Warning:</strong>
+					Opening many <code>mailto:</code> links in new tabs will cause the operating system to launch multiple external mail client instances, potentially overwhelming system resources.
+					<ul>
+						<li>Link count on this page is strictly limited to <strong>2 items</strong>.</li>
+						<li>It is strongly recommended to test these links using the <strong>"Copied to Clipboard"</strong> action instead of "Opened as New Tabs".</li>
+						<li>You can toggle the click interceptor below to safely test manual clicks without launching your mail client.</li>
+					</ul>
+				</div>
+
+				<div class="control-panel">
+					<label>
+						<input type="checkbox" id="intercept-mailto-checkbox" checked>
+						Intercept <code>mailto:</code> clicks (Prevent OS mailer launch during test)
+					</label>
+				</div>
+				<p id="mailto-intercept-log" class="note-text"></p>
+
+				<ul class="protocol-test-list">
+					<li class="protocol-test-item">
+						<a href="mailto:test-recipient-1@example.com">mailto:test-recipient-1@example.com</a>
+						<span class="protocol-test-desc">Standard mailto scheme</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="mailto:test-recipient-2@example.org?subject=Linkclump%20Test&amp;body=Verification">mailto:test-recipient-2@example.org?subject=Linkclump%20Test...</a>
+						<span class="protocol-test-desc">Mailto scheme with query parameters</span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Case 6: Browser Internal & Privileged Schemes -->
+			<div class="case-card">
+				<h3>Case 6: Browser Internal &amp; Privileged Schemes (<code>about:</code>, <code>chrome://</code>)</h3>
+				<div class="case-meta">
+					<span class="scheme-badge scheme-badge-browser">ABOUT</span>
+					<span class="scheme-badge scheme-badge-browser">CHROME</span>
+					<span class="result-badge result-blocked">Expect: Selected &rarr; API Security Rejection (Safe)</span>
+				</div>
+				<p>Links pointing to browser-internal or privileged pages. While all these links are selected, counted, copied, and bookmarked normally on both browsers, their behavior under <strong>"Opened as New Tabs"</strong> differs significantly due to underlying browser API policies:</p>
+				<ul>
+					<li><strong>Chrome:</strong> Allows <code>tabs.create</code> to open <code>chrome://</code> pages. For unknown <code>about:</code> schemes (such as Firefox's <code>about:preferences</code>), Chrome opens the tab but fails navigation with <em>"このサイトにアクセスできません"</em>.</li>
+					<li><strong>Firefox:</strong> Strictly restricts <code>tabs.create</code> at the API level (rejects <code>chrome://</code> and privileged <code>about:</code> URLs with <em>Illegal URL</em>). Linkclump Plus's <code>safeAsync</code> catches this rejection, preventing tab creation while keeping the extension stable.</li>
+				</ul>
+
+				<ul class="protocol-test-list">
+					<li class="protocol-test-item">
+						<a href="about:blank">about:blank</a>
+						<span class="protocol-test-desc">Chrome: Opens blank page / Firefox: Opens blank page</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="chrome://settings/">chrome://settings/</a>
+						<span class="protocol-test-desc">Chrome: Opens Settings / Firefox: Tab not opened (API rejection)</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="chrome://extensions/">chrome://extensions/</a>
+						<span class="protocol-test-desc">Chrome: Opens Extensions / Firefox: Tab not opened (API rejection)</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="about:preferences">about:preferences</a>
+						<span class="protocol-test-desc">Chrome: Scheme error page / Firefox: Tab not opened (API rejection)</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="about:addons">about:addons</a>
+						<span class="protocol-test-desc">Chrome: Scheme error page / Firefox: Tab not opened (API rejection)</span>
+					</li>
+					<li class="protocol-test-item">
+						<a href="about:config">about:config</a>
+						<span class="protocol-test-desc">Chrome: Scheme error page / Firefox: Tab not opened (API rejection)</span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Case 7: Deprecated Protocols -->
+			<div class="case-card">
+				<h3>Case 7: Deprecated Protocols (<code>ftp://</code>)</h3>
+				<div class="case-meta">
+					<span class="scheme-badge scheme-badge-browser">FTP</span>
+					<span class="result-badge result-selected">Expect: Selected &rarr; Deprecated Scheme Handling</span>
+				</div>
+				<p>FTP protocol support was removed from modern Chromium and Firefox releases. Linkclump Plus selects the link, but the browser will report a scheme error or attempt external protocol resolution.</p>
+
+				<ul class="protocol-test-list">
+					<li class="protocol-test-item">
+						<a href="ftp://example.com/test-file.txt">ftp://example.com/test-file.txt</a>
+						<span class="protocol-test-desc">Deprecated FTP URL</span>
+					</li>
+				</ul>
+			</div>
+		</section>
+	</article>
+</main>
+
+<script src="./js/script.js"></script>
+
+</body>
+</html>
