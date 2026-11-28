@@ -281,6 +281,7 @@ Run these checks once per browser.
 ### Frames and touch
 
 - [ ] On a page with an `<iframe>`, a drag that starts inside the frame selects only the links of that frame, and a drag that starts in the parent page doesn't select the links inside the frame.
+- [ ] In an `about:srcdoc` or `about:blank` `<iframe>`, Linkclump Plus does not activate (native browser selection applies) due to stability and blocklist integrity constraints.
 - [ ] On a touch screen, a long press of about 0.5 seconds starts the selection, and the Action of the Left button runs.
 
 ### Test pages

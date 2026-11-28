@@ -4,10 +4,10 @@
 
 ### Runtime and build tools
 
-| Tool | Version | Role |
-| :--- | :--- | :--- |
-| [Node.js](https://nodejs.org/) | v22.22.1 or later (recommended) | JavaScript runtime and package manager |
-| [WXT](https://wxt.dev/) | `^0.21.4` | Browser extension build framework |
+| Tool | Role |
+| :--- | :--- |
+| [Node.js](https://nodejs.org/) | JavaScript runtime and package manager (v22+ LTS recommended per [WXT requirements](https://wxt.dev/guide/resources/upgrading.html#minimum-node-js-vite-and-typescript-versions)) |
+| [WXT](https://wxt.dev/) | Browser extension build framework |
 
 ### Languages
 
@@ -19,22 +19,24 @@
 
 ### Dependencies
 
-| Package | Type | Purpose |
-| :--- | :--- | :--- |
-| [jquery](https://jquery.com/) `^4.0.0` | dependencies | DOM manipulation and UI events on the Options page |
-| [dayjs](https://day.js.org/) `^1.11.23` | dependencies | Date and time formatting |
-| [wxt](https://wxt.dev/) `^0.21.4` | devDependencies | Build framework |
-| [typescript](https://www.typescriptlang.org/) `^6.0.3` | devDependencies | Type checking |
-| [typescript-eslint](https://typescript-eslint.io/) `^8.71.1` | devDependencies | TypeScript ESLint integration |
-| [@stylistic/eslint-plugin](https://eslint.style/) `^5.10.0` | devDependencies | Code style lint rules |
-| [eslint](https://eslint.org/) `^10.12.0` | devDependencies | Static analysis tool |
-| [@eslint/js](https://www.npmjs.com/package/@eslint/js) `^10.0.1` | devDependencies | ESLint recommended core rules |
-| [globals](https://www.npmjs.com/package/globals) `^17.13.0` | devDependencies | Global variable definitions for ESLint |
-| [@types/jquery](https://www.npmjs.com/package/@types/jquery) `^4.0.1` | devDependencies | TypeScript type definitions for jQuery |
-| [vitest](https://vitest.dev/) `^5.0.5` | devDependencies | Test runner |
-| [@vitest/coverage-v8](https://www.npmjs.com/package/@vitest/coverage-v8) `^5.0.5` | devDependencies | Coverage report for Vitest |
-| [@vitest/ui](https://www.npmjs.com/package/@vitest/ui) `^5.0.5` | devDependencies | Browser UI for Vitest |
-| [jsdom](https://github.com/jsdom/jsdom) `^30.1.3` | devDependencies | Simulated browser DOM for the tests |
+For exact package versions, see [`package.json`](../../package.json).
+
+| Package | Type | Purpose | Notes |
+| :--- | :--- | :--- | :--- |
+| [jquery](https://jquery.com/) | dependencies | DOM manipulation and UI events on the Options page | Retained for options UI compatibility |
+| [dayjs](https://day.js.org/) | dependencies | Date and time formatting | Lightweight date utility |
+| [wxt](https://wxt.dev/) | devDependencies | Build framework | Generates Manifest V3 builds for Chrome & Firefox |
+| [typescript](https://www.typescriptlang.org/) | devDependencies | Type checking | Pinned to 6.x for compatibility until WXT and related tooling (e.g., typescript-eslint) support TypeScript 7.1 |
+| [typescript-eslint](https://typescript-eslint.io/) | devDependencies | TypeScript ESLint integration | |
+| [@stylistic/eslint-plugin](https://eslint.style/) | devDependencies | Code style lint rules | |
+| [eslint](https://eslint.org/) | devDependencies | Static analysis tool | Flat Config (`eslint.config.js`) |
+| [@eslint/js](https://www.npmjs.com/package/@eslint/js) | devDependencies | ESLint recommended core rules | |
+| [globals](https://www.npmjs.com/package/globals) | devDependencies | Global variable definitions for ESLint | |
+| [@types/jquery](https://www.npmjs.com/package/@types/jquery) | devDependencies | TypeScript type definitions for jQuery | Must match `jquery` major version |
+| [vitest](https://vitest.dev/) | devDependencies | Test runner | |
+| [@vitest/coverage-v8](https://www.npmjs.com/package/@vitest/coverage-v8) | devDependencies | Coverage report for Vitest | |
+| [@vitest/ui](https://www.npmjs.com/package/@vitest/ui) | devDependencies | Browser UI for Vitest | |
+| [jsdom](https://github.com/jsdom/jsdom) | devDependencies | Simulated browser DOM for the tests | Used in Vitest DOM environment |
 
 ### Target browsers
 
@@ -88,7 +90,7 @@ linkclump-plus/                # Repository root (location of package.json)
 │   │   │   ├── settings/      # Settings and storage managers
 │   │   │   └── utils/         # Background utilities (tab opening, URL deduplication)
 │   │   │
-│   │   ├── content/           # Content script (injected into all frames)
+│   │   ├── content/           # Content script (injected into all frames with standard URLs)
 │   │   │   ├── dom/           # Selection box and counter label
 │   │   │   ├── keyboard/      # Keyboard state tracking
 │   │   │   ├── matching/      # Action trigger matching
@@ -135,7 +137,7 @@ linkclump-plus/                # Repository root (location of package.json)
   - **`assets/js/`**: Modules shared by multiple entrypoints (`constants/`, `lib/`, `types/`).
   - **`entrypoints/`**: The root of each build artifact managed by WXT.
     - **`background/`**: Background process (service worker in Chrome, event page in Firefox) managing tabs, windows, bookmarks, and settings state.
-    - **`content/`**: Content script injected into every frame of web pages to handle mouse/touch drag selection and link collection.
+    - **`content/`**: Content script injected into every frame with a standard URL to handle mouse/touch drag selection and link collection (excludes `about:srcdoc` and `about:blank`).
     - **`options/`**: Options page UI (`index.html`, `options.ts`, `style.css`).
   - **`public/`**: Static files copied directly into build output (`img/` for icons and graphics, `playground/` for functional testing).
 - **`tests/`**: Automated unit and integration tests (Vitest) and manual test pages. See [tests/README.md](../../tests/README.md) and [testing.md](./testing.md).
@@ -258,7 +260,16 @@ const getManifest: GetManifest = (env: ConfigEnv): UserManifest => {
 
 ### Content script registration
 
+#### Manifest definition
+
 The manifest definition in `src/manifest.ts` doesn't include `content_scripts` on purpose. WXT generates this entry from `defineContentScript()` in `src/entrypoints/content/index.ts`. If you also define it in `src/manifest.ts`, WXT doesn't merge the two, and the built manifest contains duplicate entries for `content-scripts/content.js`.
+
+#### `about:srcdoc` and `about:blank` frames
+
+The content script does not run in `about:srcdoc` or `about:blank` frames because `matchAboutBlank` is omitted (defaults to `false`). While setting `matchAboutBlank: true` would technically run the script in these frames, it is intentionally disabled because:
+
+1. **Security & Blocklist integrity**: In `about:` frames, `window.location.href` resolves to `about:srcdoc` or `about:blank`, bypassing domain-based blocklist checks unless parent frame origin resolution is introduced.
+2. **Operational stability**: Dynamically rewritten frames (e.g., using `document.write()`) destroy injected DOM elements and listeners, leading to invisible selections or broken states, and risk interfering with rich text editor inputs.
 
 ### Output directories
 
