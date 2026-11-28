@@ -1,0 +1,23 @@
+@charset "utf-8";
+
+#dynamic-links {
+	margin-top: 20px;
+	padding: 10px;
+
+	min-height: 100px;
+
+	border: 1px solid #eee;
+}
+
+.link-item {
+	margin-bottom: 5px;
+}
+
+#loading-indicator {
+	display: none;
+	padding: 10px;
+
+	color: #888;
+	text-align: center;
+	font-style: italic;
+}
