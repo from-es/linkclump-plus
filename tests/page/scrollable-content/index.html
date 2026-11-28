@@ -1,40 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../assets/css/common.css" type="text/css">
+	<link rel="stylesheet" href="./css/style.css" type="text/css">
+
 	<title>Scrollable Content Link Selection Test</title>
-	<style>
-		body { font-family: sans-serif; margin: 20px; }
-		.scroll-container { width: 400px; height: 200px; border: 1px solid #ccc; overflow: auto; margin-bottom: 20px; }
-		.content { height: 500px; padding: 10px; }
-		.link-item { margin-bottom: 10px; }
-	</style>
 </head>
 <body>
 
-	<h1>Scrollable Content Link Selection Test</h1>
-	<p>This page verifies Linkclump Plus's behavior with links inside scrollable containers.</p>
+<main>
+	<article>
+		<h1>Scrollable Content Link Selection Test</h1>
 
-	<div class="scroll-container">
-		<div class="content">
-			<p class="link-item"><a href="#link1">Link 1 (Visible)</a></p>
-			<p class="link-item"><a href="#link2">Link 2 (Visible)</a></p>
-			<p class="link-item"><a href="#link3">Link 3 (Visible)</a></p>
-			<p class="link-item"><a href="#link4">Link 4 (Visible)</a></p>
-			<p class="link-item"><a href="#link5">Link 5 (Visible)</a></p>
-			<p class="link-item"><a href="#link6">Link 6 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link7">Link 7 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link8">Link 8 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link9">Link 9 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link10">Link 10 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link11">Link 11 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link12">Link 12 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link13">Link 13 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link14">Link 14 (Scroll to see)</a></p>
-			<p class="link-item"><a href="#link15">Link 15 (Scroll to see)</a></p>
-		</div>
-	</div>
+		<nav class="nav-bar">
+			<a class="nav-back-btn" href="../index.html">Return to Test Page Index</a>
+		</nav>
+
+		<section>
+			<h2>About</h2>
+
+			<p>This page systematically verifies Linkclump Plus's behavior across three distinct scrolling contexts: internal CSS scroll containers (<code>overflow: auto</code>), scrollable <code>&lt;iframe&gt;</code>s, and top-level page window scrolling.</p>
+
+			<div class="note-box">
+				<strong>Implementation Behavior &amp; Constraints:</strong>
+				<ul>
+					<li><strong>Coordinate Compensation:</strong> Linkclump Plus traverses parent scroll containers in <code>getXY()</code> and subtracts <code>scrollLeft</code> and <code>scrollTop</code>, ensuring accurate hit-testing for links visible at their current scroll position.</li>
+					<li><strong>Auto-scroll Boundary Principle:</strong> Auto-scroll operates by checking whether the pointer is near a <code>window</code> viewport edge (<code>window.innerHeight - 20</code>) and invoking <code>window.scrollBy()</code>:
+						<ul>
+							<li><strong>CSS Scroll Container (<code>overflow: auto</code>):</strong> As a DOM element rather than a <code>window</code>, dragging to the boundary of an internal container will <strong>not</strong> auto-scroll the container (known implementation constraint).</li>
+							<li><strong>Top-level Window:</strong> Dragging near the top or bottom edge of the browser viewport auto-scrolls the entire document.</li>
+							<li><strong>Scrollable <code>&lt;iframe&gt;</code>:</strong> Because each frame runs an independent content script in its own <code>window</code> context, dragging that starts <em>inside</em> the iframe <strong>will</strong> auto-scroll the iframe when reaching the frame's viewport edge.</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<section>
+			<h2>Procedure &amp; Expected Results</h2>
+			<p>Hold the configured key, then press and drag the mouse button across the target areas described below.</p>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Context / Scenario</th>
+						<th>Operation</th>
+						<th>Expected Selection &amp; Scroll Behavior</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><strong>Case 1: CSS Container (Visible)</strong></td>
+						<td>Drag-select visible links (Link 1 to 5)</td>
+						<td>Visible links are highlighted and selected normally.</td>
+					</tr>
+					<tr>
+						<td><strong>Case 1: CSS Container (Scrolled)</strong></td>
+						<td>Manually scroll down, then drag-select</td>
+						<td>Scroll offset is accurately compensated; newly visible links (e.g. Link 6 to 10) are selected.</td>
+					</tr>
+					<tr>
+						<td><strong>Case 1: CSS Container (Edge Drag)</strong></td>
+						<td>Drag towards bottom/top boundary of container</td>
+						<td><strong>No Auto-scroll:</strong> Container does <em>not</em> auto-scroll (known constraint: auto-scroll only targets window).</td>
+					</tr>
+					<tr>
+						<td><strong>Case 2: Scrollable <code>&lt;iframe&gt;</code></strong></td>
+						<td>Drag starting <em>inside</em> iframe towards bottom edge</td>
+						<td><strong>Auto-scrolls iframe:</strong> Child frame's <code>window</code> auto-scrolls, revealing and selecting deeper links.</td>
+					</tr>
+					<tr>
+						<td><strong>Case 2: Scrollable <code>&lt;iframe&gt;</code></strong></td>
+						<td>Drag starting <em>outside</em> iframe across boundary</td>
+						<td><strong>No Selection / No Scroll:</strong> Selection does not cross frame boundary; child iframe does not scroll.</td>
+					</tr>
+					<tr>
+						<td><strong>Case 3: Window Viewport</strong></td>
+						<td>Drag towards browser window bottom edge</td>
+						<td><strong>Auto-scrolls page:</strong> Top-level document scrolls up/down via <code>window.scrollBy()</code>.</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section>
+			<h2>Test Cases</h2>
+
+			<!-- Case 1: CSS Scroll Container -->
+			<section class="case-card">
+				<h3>Case 1: Internal CSS Scroll Container (<code>overflow: auto</code>)</h3>
+				<div class="case-meta">
+					<span class="badge badge-parent">Element Container</span>
+					<span class="badge badge-nested">No Element Auto-scroll</span>
+				</div>
+				<p>Select visible links or manually scroll to select. Notice that dragging towards the container boundary does <strong>not</strong> trigger auto-scroll.</p>
+
+				<div class="scroll-container">
+					<div class="content">
+						<p class="link-item"><a href="#container-link-1">Link 1 (Initially Visible)</a></p>
+						<p class="link-item"><a href="#container-link-2">Link 2 (Initially Visible)</a></p>
+						<p class="link-item"><a href="#container-link-3">Link 3 (Initially Visible)</a></p>
+						<p class="link-item"><a href="#container-link-4">Link 4 (Initially Visible)</a></p>
+						<p class="link-item"><a href="#container-link-5">Link 5 (Initially Visible)</a></p>
+						<p class="link-item"><a href="#container-link-6">Link 6 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-7">Link 7 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-8">Link 8 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-9">Link 9 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-10">Link 10 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-11">Link 11 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-12">Link 12 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-13">Link 13 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-14">Link 14 (Manual Scroll to see)</a></p>
+						<p class="link-item"><a href="#container-link-15">Link 15 (Manual Scroll to see)</a></p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Case 2: Scrollable iframe -->
+			<section class="case-card">
+				<h3>Case 2: Scrollable <code>&lt;iframe&gt;</code> (Embedded Window Context)</h3>
+				<div class="case-meta">
+					<span class="badge badge-child">Child Window</span>
+					<span class="badge badge-parent">Frame Auto-scrolls</span>
+				</div>
+				<p>Target: <code>./subpages/scrollable-iframe.html</code>. Because the <code>&lt;iframe&gt;</code> is an independent <code>window</code> context, dragging started <em>inside</em> the frame towards its bottom border will trigger auto-scroll for that child window.</p>
+
+				<iframe class="test-frame" src="./subpages/scrollable-iframe.html"></iframe>
+			</section>
+
+			<!-- Case 3: Page-level Window Auto-scroll -->
+			<section class="case-card">
+				<h3>Case 3: Page-level Window Auto-scroll (Browser Viewport)</h3>
+				<div class="case-meta">
+					<span class="badge badge-parent">Top-level Window</span>
+					<span class="badge badge-child">Window Auto-scrolls</span>
+				</div>
+				<p>Start drag-selecting links in this section and drag all the way down to the bottom of your browser window (viewport edge). The top-level document will auto-scroll down through the tall spacer to reveal the bottom links.</p>
+
+				<ul class="link-item">
+					<li><a href="#window-top-link-1">Window Top Link A</a></li>
+					<li><a href="#window-top-link-2">Window Top Link B</a></li>
+				</ul>
+
+				<div class="scroll-spacer-tall">
+					<p class="note-text">Tall scroll spacer (height: 96rem). Drag your mouse towards the bottom edge of the browser viewport to test page-level auto-scroll.</p>
+				</div>
+
+				<div class="bottom-content-box">
+					<h4>Bottom of Page Content</h4>
+					<p>If window auto-scroll functions correctly, you reached this area while holding the drag selection.</p>
+					<ul class="link-item">
+						<li><a href="#window-bottom-link-1">Window Bottom Link C (Reached via Window Auto-scroll)</a></li>
+						<li><a href="#window-bottom-link-2">Window Bottom Link D (Reached via Window Auto-scroll)</a></li>
+					</ul>
+				</div>
+			</section>
+		</section>
+	</article>
+</main>
 
 </body>
 </html>

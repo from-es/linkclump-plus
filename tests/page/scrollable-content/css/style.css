@@ -1,0 +1,32 @@
+@charset "utf-8";
+
+.scroll-container {
+	height: 200px;
+	padding: 1rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	overflow: auto;
+	background-color: #fff;
+}
+
+.link-item {
+	margin-bottom: 0.75rem;
+}
+
+.test-frame {
+	display: block;
+	width: 100%;
+	height: 320px;
+	border: 2px solid #4a90e2;
+	border-radius: 4px;
+	margin: 0.75rem 0;
+	background-color: #fff;
+}
+
+.bottom-content-box {
+	margin-top: 1rem;
+	padding: 1rem;
+	background-color: #f6f8fa;
+	border: 1px solid #d0d7de;
+	border-radius: 6px;
+}

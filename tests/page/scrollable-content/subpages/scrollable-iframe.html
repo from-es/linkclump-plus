@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Scrollable iframe Content</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			font-size: 14px;
+			background-color: #f8f9fa;
+		}
+
+		.canvas {
+			padding: 1rem;
+			min-height: 850px;
+		}
+
+		.section-box {
+			background-color: #ffffff;
+			border: 1px solid #d0d7de;
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.section-box h4 {
+			margin: 0 0 0.5rem 0;
+			color: #24292f;
+		}
+
+		.links {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+
+		.links a {
+			display: inline-block;
+			padding: 0.35rem 0.75rem;
+			background-color: #0969da;
+			color: #ffffff;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: 500;
+			width: fit-content;
+		}
+
+		.links a:hover {
+			background-color: #0856b5;
+		}
+
+		.spacer {
+			height: 200px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #6e7781;
+			font-style: italic;
+			border: 1px dashed #d0d7de;
+			border-radius: 4px;
+			margin: 1.25rem 0;
+			background-color: #ffffff;
+		}
+	</style>
+</head>
+<body>
+
+<div class="canvas">
+	<div class="section-box">
+		<h4>Top Links (Initially Visible)</h4>
+		<p>Drag selection starting inside this iframe and moving towards the bottom edge will trigger auto-scroll for this child window.</p>
+		<ul class="links">
+			<li><a href="#iframe-link-1">iframe Link 1 (Top)</a></li>
+			<li><a href="#iframe-link-2">iframe Link 2 (Top)</a></li>
+			<li><a href="#iframe-link-3">iframe Link 3 (Top)</a></li>
+		</ul>
+	</div>
+
+	<div class="spacer">
+		Scroll distance spacer (Auto-scrolls when dragging towards child window edge)
+	</div>
+
+	<div class="section-box">
+		<h4>Middle Links (Scrolled Area)</h4>
+		<ul class="links">
+			<li><a href="#iframe-link-4">iframe Link 4 (Middle)</a></li>
+			<li><a href="#iframe-link-5">iframe Link 5 (Middle)</a></li>
+			<li><a href="#iframe-link-6">iframe Link 6 (Middle)</a></li>
+		</ul>
+	</div>
+
+	<div class="spacer">
+		Scroll distance spacer
+	</div>
+
+	<div class="section-box">
+		<h4>Bottom Links (Deep Area)</h4>
+		<ul class="links">
+			<li><a href="#iframe-link-7">iframe Link 7 (Bottom)</a></li>
+			<li><a href="#iframe-link-8">iframe Link 8 (Bottom)</a></li>
+			<li><a href="#iframe-link-9">iframe Link 9 (Bottom)</a></li>
+		</ul>
+	</div>
+</div>
+
+</body>
+</html>
