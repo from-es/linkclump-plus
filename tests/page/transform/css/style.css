@@ -1,139 +1,32 @@
 @charset "utf-8";
 
-@import url("../../assets/css/common.css");
-
-
-
 :root {
-	--base-size: 16px;
-	--radius   : 256;
+	--radius: 256;
 }
-
-/* Exclude image (img) elements */
-*:not(img) {
-	box-sizing: border-box;
-}
-
-html, body {
-	margin : 0;
-	padding: 0;
-
-	font-size: var(--base-size);
-
-	width : 100%;
-	height: 100%;
-}
-
-header, nav, main, footer {
-	margin : 0;
-	padding: 0;
-}
-
-article {
-	margin: 1rem auto;
-	padding: 0 1rem;
-
-	border: 1px solid #000;
-	border-radius: 0.5rem;
-
-	width: 840px;
-}
-
-/* flexbox layout */
-main {
-	display: flex;
-
-	align-items: flex-start;
-	justify-content: center;
-	flex-direction: row-reverse;
-
-	gap: 1rem;
-
-	margin: 0 auto;
-	width: 1280px;
-}
-nav {
-	position: sticky;
-	top: 0;
-}
-#contents {
-	margin : 0;
-	padding: 0;
-}
-
-
-
-/* tocbot.js */
-.toc a:link    { color: #2330d7; }
-.toc a:visited { color: #2330d7; }
-.toc a:hover   { color: #8000ff; }
-.toc a:active  { color: #0068ff; }
-
-/* Table of Contents > Ref: Table of Contents @ WordPress Plugin */
-.toc {
-	margin-top: 1rem;
-	margin-bottom : 1rem;
-	padding: 1rem 3rem;
-
-	background :#fff;
-
-	border: 1px solid #000;
-	border-radius: 5px;
-
-	width: auto;
-	min-width: 240px;
-}
-.toc > p:first-child {
-	text-align: center;
-	font-weight: bold;
-
-	margin : 0;
-	padding: 0;
-}
-.toc > ul, .toc > ol {
-	margin-top   : 0.5rem;
-	margin-bottom: 0;
-	padding-left : 0;
-}
-.toc-position-right {
-	margin-left: auto;
-}
-.toc-position-left {
-	margin-right: auto;
-}
-.toc-position-center {
-	margin-left : auto;
-	margin-right: auto;
-}
-
-
-
 
 #css-layout-position {
-	--box-size : 512;
+	--box-size: 512;
 
 	.boxes {
 		position: relative;
 
-		border       : 1px solid #ddd;
-		border-radius: 0.5rem;
-		box-sizing   : border-box;
-
-		width : 512px;
-		height: auto;
-
-		margin : 1rem auto;
+		margin : 1rem 0;
 		padding: 0;
 
+		width : calc(var(--box-size) * 1px);
+
 		> div {
+			margin : 0.5rem 0;
+			padding: 0 0.5rem;
+
 			border       : 1px solid #ddd;
 			border-radius: 0.5rem;
 			box-sizing   : border-box;
 
 			> a {
-				font-family: Impact; font-weight: 700; font-size: 3rem; color: #555;
-
-				&:hover { color: #8000ff; }
+				font-family: Impact;
+				font-weight: 700;
+				font-size: 3rem;
 			}
 		}
 	}
@@ -312,14 +205,16 @@ nav {
 		border-radius: 50%;
 		box-sizing: border-box;
 
-		margin: calc(var(--base-size) * 3.5) auto;
+		margin: calc(var(--font-size-base) * 3.5) auto;
 
 		> * {
 			position: absolute;
 		}
 
 		a {
-			font-family: Impact; font-weight: 700; font-size: 3rem; color: #555;
+			font-family: Impact;
+			font-weight: 700;
+			font-size: 3rem;
 
 			&:hover { color: #8000ff; }
 		}
@@ -422,16 +317,16 @@ nav {
 		border-radius: 50%;
 		box-sizing   : border-box;
 
-		margin: calc(var(--base-size) * 3.5) auto;
+		margin: calc(var(--font-size-base) * 3.5) auto;
 
 		> * {
 			position: absolute;
 		}
 
 		a {
-			font-family: Impact; font-weight: 700; font-size: 3rem; color: #555;
-
-			&:hover { color: #8000ff; }
+			font-family: Impact;
+			font-weight: 700;
+			font-size: 3rem;
 		}
 	}
 

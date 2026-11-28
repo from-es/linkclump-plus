@@ -10,7 +10,10 @@ function addSingleLink() {
     linkCount++;
     const newLink = document.createElement('p');
     newLink.className = 'link-item';
-    newLink.innerHTML = `<a href="#dynamicLink${linkCount}">Dynamic Link ${linkCount}</a>`;
+    const anchor = document.createElement('a');
+    anchor.href = `#dynamicLink${linkCount}`;
+    anchor.textContent = `Dynamic Link ${linkCount}`;
+    newLink.appendChild(anchor);
     dynamicLinksDiv.appendChild(newLink);
 }
 
@@ -38,26 +41,16 @@ function addMoreLinks(num = 5, callback = null) {
     }, 500);
 }
 
-let initialViewportFilled = false; // New flag
-
 function fillViewportWithLinks() {
-    if (initialViewportFilled) return; // Only run once
-    initialViewportFilled = true;
+    const rect = dynamicLinksDiv.getBoundingClientRect();
+    const firstChild = dynamicLinksDiv.children[0];
+    const estimatedLinkHeight = (firstChild && firstChild.offsetHeight > 0) ? firstChild.offsetHeight : 30;
+    const remainingHeight = Math.max(window.innerHeight - rect.top, 300);
+    const targetLinks = Math.ceil(remainingHeight / Math.max(estimatedLinkHeight, 20)) + 5;
+    const linksToAdd = Math.max(0, targetLinks - dynamicLinksDiv.children.length);
 
-    let estimatedLinkHeight = 0;
-    if (dynamicLinksDiv.children.length > 0) {
-        estimatedLinkHeight = dynamicLinksDiv.children[0].offsetHeight; // Get actual height of a link item
-    }
-
-    if (estimatedLinkHeight > 0) {
-        const availableHeight = window.innerHeight - dynamicLinksDiv.offsetTop;
-        const linksToFillAvailableHeight = Math.ceil(availableHeight / estimatedLinkHeight);
-        // We already have 3 links, so subtract them from the target
-        const linksToAdd = Math.max(0, (linksToFillAvailableHeight + 5) - dynamicLinksDiv.children.length); // Ensure at least 20 links total, or enough to fill visible area + 5 extra
+    if (linksToAdd > 0) {
         addMoreLinks(linksToAdd);
-    } else {
-        // Fallback if height measurement fails (e.g., no links generated)
-        addMoreLinks(20); // A reasonable default if dynamic calculation fails
     }
 }
 
@@ -74,7 +67,6 @@ function setupScrollListener() {
         window.removeEventListener('scroll', scrollListener);
     }
     scrollListener = () => {
-        // The checkbox state is already checked here because this listener is only active if checked
         const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
         if (scrollTop + clientHeight >= scrollHeight - 100) {
             addMoreLinks();
@@ -86,14 +78,17 @@ function setupScrollListener() {
 enableInfiniteScrollCheckbox.addEventListener('change', () => {
     if (enableInfiniteScrollCheckbox.checked) {
         setupScrollListener();
-        fillViewportWithLinks(); // Trigger filling the viewport when infinite scroll is enabled
+        fillViewportWithLinks(); // Ensure page is tall enough to scroll
     } else {
-        window.removeEventListener('scroll', scrollListener);
-        scrollListener = null;
+        if (scrollListener) {
+            window.removeEventListener('scroll', scrollListener);
+            scrollListener = null;
+        }
     }
 });
 
 // Initial setup based on checkbox state
 if (enableInfiniteScrollCheckbox.checked) {
     setupScrollListener();
+    fillViewportWithLinks();
 }

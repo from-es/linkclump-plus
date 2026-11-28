@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="./assets/css/common.css" type="text/css">
+
 	<title>Linkclump Plus: Test Page Index</title>
 </head>
 <body>
@@ -10,14 +12,49 @@
 <main>
 	<article>
 		<h1>Linkclump Plus: Test Page Index</h1>
-		<p>This page provides links to various functional test pages for Linkclump Plus.</p>
+
+		<h2>About</h2>
+
+		<p>This index provides links to the manual functional test pages for Linkclump Plus. These pages verify selection behavior under diverse DOM structures, CSS layouts, frames, and event conditions.</p>
+
+		<h2>Available Test Pages</h2>
+
+		<p><b>Prerequisites:</b> When testing via local <code>file://</code> URLs, make sure local file permissions are enabled for Linkclump Plus (Chrome: <em>"Allow access to file URLs"</em>; Firefox: <em>"Access local files on your computer"</em>).</p>
+
+		<h3>Layout &amp; Visual Styling</h3>
+
+		<p class="note-text">Verifies coordinate calculation and hit-testing across various CSS layout models, transforms, and visibility properties.</p>
+
 		<ul>
 			<li><a href="./layout/index.html">CSS Layout Functionality Test</a></li>
-			<li><a href="./transform/index.html">CSS Transform Application Link Selection Test</a></li>
+			<li><a href="./transform/index.html">CSS Transform Link Selection Test</a></li>
 			<li><a href="./visibility-and-overlap/index.html">Visibility and Overlap Test</a></li>
+		</ul>
+
+		<h3>Scrolling &amp; Dynamic DOM</h3>
+
+		<p class="note-text">Verifies link coordinate compensation and behavior during DOM mutations, container scrolling, and page scrolling.</p>
+
+		<ul>
 			<li><a href="./scrollable-content/index.html">Scrollable Content Link Selection Test</a></li>
 			<li><a href="./dynamic-content/index.html">Dynamic Content Link Selection Test</a></li>
+		</ul>
+
+		<h3>Pointer Events &amp; Frame Isolation</h3>
+
+		<p class="note-text">Verifies mouse/pointer event interception and frame-level security and drag boundaries.</p>
+
+		<ul>
 			<li><a href="./click-after-release/index.html">Click After Release Test</a></li>
+			<li><a href="./frame-and-iframe/index.html">Frame and iframe Selection Test</a></li>
+		</ul>
+
+		<h3>URL Schemes &amp; Security</h3>
+
+		<p class="note-text">Verifies link filtering, path resolution, and handling of external, local, and browser-privileged schemes.</p>
+
+		<ul>
+			<li><a href="./protocol-filtering/index.html">URL Protocol &amp; Scheme Verification Test</a></li>
 		</ul>
 	</article>
 </main>

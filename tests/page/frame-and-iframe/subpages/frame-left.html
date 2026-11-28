@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Left Frame Content</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-size: 15px;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			background-color: #f0fdf4;
+			color: #166534;
+		}
+		main {
+			padding: 1.25rem;
+		}
+		.badge {
+			padding: 0.2rem 0.5rem;
+			font-size: 0.8rem;
+			font-weight: bold;
+			border-radius: 3px;
+			background-color: #dcfce7;
+			color: #166534;
+			border: 1px solid #86efac;
+		}
+		.links {
+			margin: 1rem 0;
+			padding: 0.75rem;
+			background-color: #ffffff;
+			border: 1px solid #bbf7d0;
+			border-radius: 4px;
+			list-style: none;
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+		.links li {
+			margin: 0;
+		}
+		.links a {
+			display: inline-block;
+			padding: 0.4rem 0.8rem;
+			background-color: #16a34a;
+			color: #ffffff;
+			text-decoration: none;
+			border-radius: 4px;
+			font-weight: 500;
+		}
+		.links a:hover {
+			background-color: #15803d;
+		}
+	</style>
+</head>
+<body>
+<main>
+	<span class="badge"><code>&lt;frame name="left_frame"&gt;</code></span>
+	<h2>Left Frame (HTML <code>&lt;frameset&gt;</code>)</h2>
+	<p>Drag-selecting inside this left frame should highlight only links in the left frame.</p>
+	<p>Dragging across the center splitter into the right frame must NOT highlight right frame links.</p>
+
+	<ul class="links">
+		<li><a href="https://www.google.com" target="_blank" rel="noopener">[Left Frame] Google</a></li>
+		<li><a href="https://www.bing.com" target="_blank" rel="noopener">[Left Frame] Bing</a></li>
+		<li><a href="https://www.yahoo.com" target="_blank" rel="noopener">[Left Frame] Yahoo</a></li>
+		<li><a href="https://duckduckgo.com" target="_blank" rel="noopener">[Left Frame] DuckDuckGo</a></li>
+	</ul>
+</main>
+</body>
+</html>

@@ -1,44 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="../assets/css/common.css" type="text/css">
+	<link rel="stylesheet" href="./css/style.css" type="text/css">
+
 	<title>Dynamic Content Link Selection Test</title>
-	<style>
-		:root {
-			--base-font-size: 16px;
-		}
-		body {
-			font-family: sans-serif;
-			margin: 20px;
-			font-size: var(--base-font-size);
-		}
-		#dynamic-links { margin-top: 20px; border: 1px solid #eee; padding: 10px; min-height: 100px; }
-		.link-item { margin-bottom: 5px; }
-		#loading-indicator { text-align: center; padding: 10px; font-style: italic; color: #888; display: none; }
-	</style>
 </head>
 <body>
 
-	<h1>Dynamic Content Link Selection Test</h1>
-	<p>This page verifies Linkclump Plus's behavior with dynamically added/removed links, with an option to enable infinite scrolling.</p>
+<main>
+	<article>
+		<h1>Dynamic Content Link Selection Test</h1>
 
-	<button id="addLinkBtn">Add Link</button>
-	<button id="removeLinkBtn">Remove Last Link</button>
+		<nav class="nav-bar">
+			<a class="nav-back-btn" href="../index.html">Return to Test Page Index</a>
+		</nav>
 
-	<fieldset>
-		<legend>Infinite Scroll</legend>
-		<label>
-			<input type="checkbox" id="enableInfiniteScroll" />
-			Enable Infinite Scroll (similar to X/Twitter)
-		</label>
-	</fieldset>
+		<section>
+			<h2>About</h2>
 
-	<div id="dynamic-links"></div>
+			<p>This page verifies Linkclump Plus's behavior with dynamically added/removed links, as well as live link detection during asynchronous loading and infinite scrolling.</p>
 
-	<div id="loading-indicator">Loading more...</div>
+			<div class="note-box">
+				<strong>Dynamic DOM Principle:</strong>
+				<p>Linkclump Plus scans <code>document.links</code> fresh on each selection start. Dynamically inserted links are detected immediately on the next drag without requiring a page reload. Removed links are evicted from detection.</p>
+			</div>
+		</section>
 
-	<script src="./js/script.js"></script>
+		<section>
+			<h2>Procedure &amp; Expected Results</h2>
+
+			<ol>
+				<li>Click "Add Link" a few times, then drag-select across the newly added links.</li>
+				<li>Click "Remove Last Link" and verify the removed link is no longer selectable.</li>
+				<li>Enable "Infinite Scroll", scroll down to trigger dynamic loading, and verify newly loaded links are selected.</li>
+			</ol>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Action / Scenario</th>
+						<th>Drag Selection Target</th>
+						<th>Expected Result</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><strong>Initial Links</strong></td>
+						<td>Dynamic Link 1 to 3</td>
+						<td>Selected links are detected and opened.</td>
+					</tr>
+					<tr>
+						<td><strong>Add Link</strong></td>
+						<td>Newly appended links</td>
+						<td>Newly created links are immediately selectable on next drag.</td>
+					</tr>
+					<tr>
+						<td><strong>Remove Link</strong></td>
+						<td>Area of removed link</td>
+						<td>Only remaining links are selected; removed links are ignored.</td>
+					</tr>
+					<tr>
+						<td><strong>Infinite Scroll</strong></td>
+						<td>Auto-loaded links at page bottom</td>
+						<td>Asynchronous links appended while scrolling are detected once rendered.</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section>
+			<h2>Test Cases</h2>
+
+			<section class="case-card">
+				<h3>Dynamic Link List</h3>
+
+				<div class="control-panel">
+					<button type="button" class="action-btn" id="addLinkBtn">Add Link</button>
+					<button type="button" class="action-btn" id="removeLinkBtn">Remove Last Link</button>
+				</div>
+
+				<fieldset>
+					<legend>Infinite Scroll</legend>
+					<label>
+						<input type="checkbox" id="enableInfiniteScroll" />
+						Enable Infinite Scroll (auto-loads more links near bottom)
+					</label>
+				</fieldset>
+
+				<div id="dynamic-links"></div>
+
+				<div id="loading-indicator">Loading more...</div>
+			</section>
+		</section>
+	</article>
+</main>
+
+<script src="./js/script.js"></script>
 
 </body>
 </html>
